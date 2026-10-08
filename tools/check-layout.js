@@ -8,7 +8,7 @@ import { Grid, dist } from '../engine/grid.js';
 
 const scene = JSON.parse(readFileSync(process.argv[2] || 'public/scene.json', 'utf8'));
 const meta = JSON.parse(readFileSync('public/scene.meta.json', 'utf8'));
-const grid = new Grid(scene);
+const grid = new Grid(scene.filter(o => o.pos), { roads: meta.roads || [] });
 const speakers = scene.filter(o => o.type === 'speaker');
 const inB = (p, except = null) => speakers.some(s => s.id !== except && dist(s.pos, p) <= s.radius);
 const inside = p => grid.inRange(p), outside = p => !grid.inRange(p);
@@ -35,7 +35,7 @@ if (big.length < 2) fails.push('聽不到的角落不足兩塊');
 if (covered / total < 0.6) fails.push('廣播覆蓋不到六成');
 
 // 2. 關鍵位置在廣播範圍內
-for (const o of scene.filter(o => o.type === 'keepsake' || o.type === 'notice')) if (!inB(o.pos)) fails.push(`${o.id} 不在廣播範圍內`);
+for (const o of scene.filter(o => o.type === 'keepsake' || o.type === 'notice' || o.type === 'clothes' || o.type === 'lamp')) if (!inB(o.pos)) fails.push(`${o.id} 不在廣播範圍內`);
 
 // 3. 三條不同路線：對每個界石方向找最短路，取兩兩重疊 < 30% 的
 const routes = [];
@@ -70,12 +70,13 @@ for (let y = grid.max[1]; y >= grid.min[1]; y--) {
   let row = '';
   for (let x = grid.min[0]; x <= grid.max[0]; x++) {
     const p = [x, y]; let ch;
-    const o = scene.find(o => o.pos[0] === x && o.pos[1] === y && !['house', 'lectern'].includes(o.type));
+    const o = scene.find(o => o.pos && o.pos[0] === x && o.pos[1] === y && !['house', 'lectern'].includes(o.type));
     if (o?.type === 'book') ch = 'B'; else if (o?.type === 'keepsake') ch = 'K'; else if (o?.type === 'notice') ch = 'N';
     else if (o?.type === 'villager') ch = 'V'; else if (o?.type === 'outsider') ch = 'S'; else if (o?.type === 'speaker') ch = 'A';
     else if (o?.type === 'boundary') ch = '+'; else if (o?.type === 'door') ch = 'D'; else if (o?.type === 'cart') ch = 'C';
     else if (r4 && r4.cost === 0 && r4.path.some(c => c[0] === x && c[1] === y)) ch = '*';
-    else if (grid.blocked(p)) ch = '#'; else if (!inside(p)) ch = ' '; else if (inB(p)) ch = '~'; else ch = '.';
+    else if (o?.type === 'lamppost') ch = 'L'; else if (o?.type === 'clothes') ch = 'W'; else if (o?.type === 'lamp') ch = 'l';
+    else if (grid.blocked(p)) ch = '#'; else if (!inside(p)) ch = ' '; else if (inB(p)) ch = (grid.zone(p) === 'road' ? '=' : '~'); else ch = (grid.zone(p) === 'road' ? '-' : '.');
     row += ch;
   }
   rows.push(row);

@@ -3,8 +3,8 @@
 "id": "book_01",
 "type": "book",
 "pos": [
-29,
-32
+49,
+52
 ],
 "state": "closed",
 "tags": [
@@ -15,14 +15,14 @@
 "move",
 "approach"
 ],
-"radius": 20
+"radius": 32
 },
 {
 "id": "lectern_01",
 "type": "lectern",
 "pos": [
-29,
-32
+49,
+52
 ],
 "state": "intact",
 "tags": [],
@@ -32,8 +32,8 @@
 "id": "house_01",
 "type": "house",
 "pos": [
-30,
-32
+50,
+52
 ],
 "state": "intact",
 "tags": [
@@ -48,8 +48,8 @@
 "id": "house_02",
 "type": "house",
 "pos": [
-16,
-38
+30,
+62
 ],
 "state": "intact",
 "tags": [
@@ -64,8 +64,8 @@
 "id": "house_03",
 "type": "house",
 "pos": [
-44,
-38
+70,
+62
 ],
 "state": "intact",
 "tags": [
@@ -80,8 +80,8 @@
 "id": "house_04",
 "type": "house",
 "pos": [
-30,
-46
+50,
+72
 ],
 "state": "intact",
 "tags": [
@@ -93,11 +93,43 @@
 "owner": "villager_04"
 },
 {
+"id": "house_05",
+"type": "house",
+"pos": [
+34,
+34
+],
+"state": "intact",
+"tags": [
+"shelter"
+],
+"verbs": [
+"enter"
+],
+"owner": "villager_05"
+},
+{
+"id": "house_06",
+"type": "house",
+"pos": [
+66,
+34
+],
+"state": "intact",
+"tags": [
+"shelter"
+],
+"verbs": [
+"enter"
+],
+"owner": "villager_06"
+},
+{
 "id": "door_01",
 "type": "door",
 "pos": [
-30,
-30
+50,
+50
 ],
 "state": "closed",
 "tags": [
@@ -113,8 +145,8 @@
 "id": "door_02",
 "type": "door",
 "pos": [
-16,
-36
+30,
+60
 ],
 "state": "closed",
 "tags": [
@@ -130,8 +162,8 @@
 "id": "door_03",
 "type": "door",
 "pos": [
-44,
-36
+70,
+60
 ],
 "state": "closed",
 "tags": [
@@ -147,8 +179,8 @@
 "id": "door_04",
 "type": "door",
 "pos": [
-30,
-44
+50,
+70
 ],
 "state": "closed",
 "tags": [
@@ -161,11 +193,45 @@
 "parent": "house_04"
 },
 {
+"id": "door_05",
+"type": "door",
+"pos": [
+34,
+32
+],
+"state": "closed",
+"tags": [
+"breakable"
+],
+"verbs": [
+"open",
+"break"
+],
+"parent": "house_05"
+},
+{
+"id": "door_06",
+"type": "door",
+"pos": [
+66,
+32
+],
+"state": "closed",
+"tags": [
+"breakable"
+],
+"verbs": [
+"open",
+"break"
+],
+"parent": "house_06"
+},
+{
 "id": "speaker_01",
 "type": "speaker",
 "pos": [
-30,
-27
+53,
+46
 ],
 "state": "intact",
 "tags": [
@@ -176,14 +242,14 @@
 "break",
 "repair"
 ],
-"radius": 8
+"radius": 12
 },
 {
 "id": "speaker_02",
 "type": "speaker",
 "pos": [
-17,
-30
+33,
+50
 ],
 "state": "intact",
 "tags": [
@@ -194,14 +260,14 @@
 "break",
 "repair"
 ],
-"radius": 8
+"radius": 12
 },
 {
 "id": "speaker_03",
 "type": "speaker",
 "pos": [
-40,
-30
+66,
+50
 ],
 "state": "intact",
 "tags": [
@@ -212,14 +278,14 @@
 "break",
 "repair"
 ],
-"radius": 11
+"radius": 12
 },
 {
 "id": "speaker_04",
 "type": "speaker",
 "pos": [
-23,
-43
+40,
+66
 ],
 "state": "intact",
 "tags": [
@@ -230,14 +296,14 @@
 "break",
 "repair"
 ],
-"radius": 8
+"radius": 12
 },
 {
 "id": "speaker_05",
 "type": "speaker",
 "pos": [
-38,
-43
+60,
+66
 ],
 "state": "intact",
 "tags": [
@@ -248,14 +314,14 @@
 "break",
 "repair"
 ],
-"radius": 8
+"radius": 12
 },
 {
 "id": "speaker_06",
 "type": "speaker",
 "pos": [
-30,
-17
+50,
+31
 ],
 "state": "intact",
 "tags": [
@@ -266,14 +332,50 @@
 "break",
 "repair"
 ],
-"radius": 10
+"radius": 12
+},
+{
+"id": "speaker_07",
+"type": "speaker",
+"pos": [
+28,
+36
+],
+"state": "intact",
+"tags": [
+"breakable",
+"broadcast"
+],
+"verbs": [
+"break",
+"repair"
+],
+"radius": 12
+},
+{
+"id": "speaker_08",
+"type": "speaker",
+"pos": [
+72,
+36
+],
+"state": "intact",
+"tags": [
+"breakable",
+"broadcast"
+],
+"verbs": [
+"break",
+"repair"
+],
+"radius": 12
 },
 {
 "id": "notice_01",
 "type": "notice",
 "pos": [
-25,
-26
+45,
+47
 ],
 "state": "written",
 "tags": [
@@ -288,7 +390,23 @@
 "id": "notice_02",
 "type": "notice",
 "pos": [
-36,
+56,
+57
+],
+"state": "written",
+"tags": [
+"notice"
+],
+"verbs": [
+"read",
+"deface"
+]
+},
+{
+"id": "notice_03",
+"type": "notice",
+"pos": [
+44,
 39
 ],
 "state": "written",
@@ -304,8 +422,8 @@
 "id": "fence_01",
 "type": "fence",
 "pos": [
-27,
-22
+46,
+26
 ],
 "state": "intact",
 "tags": [
@@ -321,8 +439,8 @@
 "id": "fence_02",
 "type": "fence",
 "pos": [
-28,
-22
+47,
+26
 ],
 "state": "intact",
 "tags": [
@@ -338,8 +456,8 @@
 "id": "fence_03",
 "type": "fence",
 "pos": [
-29,
-22
+48,
+26
 ],
 "state": "intact",
 "tags": [
@@ -355,8 +473,8 @@
 "id": "fence_04",
 "type": "fence",
 "pos": [
-30,
-22
+49,
+26
 ],
 "state": "intact",
 "tags": [
@@ -372,8 +490,8 @@
 "id": "fence_05",
 "type": "fence",
 "pos": [
-31,
-22
+50,
+26
 ],
 "state": "intact",
 "tags": [
@@ -389,8 +507,8 @@
 "id": "fence_06",
 "type": "fence",
 "pos": [
-32,
-22
+51,
+26
 ],
 "state": "intact",
 "tags": [
@@ -406,8 +524,8 @@
 "id": "fence_07",
 "type": "fence",
 "pos": [
-21,
-26
+47,
+77
 ],
 "state": "intact",
 "tags": [
@@ -417,14 +535,14 @@
 "break",
 "climb"
 ],
-"dir": "y"
+"dir": "x"
 },
 {
 "id": "fence_08",
 "type": "fence",
 "pos": [
-21,
-27
+48,
+77
 ],
 "state": "intact",
 "tags": [
@@ -434,14 +552,82 @@
 "break",
 "climb"
 ],
-"dir": "y"
+"dir": "x"
 },
 {
 "id": "fence_09",
 "type": "fence",
 "pos": [
-21,
-28
+49,
+77
+],
+"state": "intact",
+"tags": [
+"breakable"
+],
+"verbs": [
+"break",
+"climb"
+],
+"dir": "x"
+},
+{
+"id": "fence_10",
+"type": "fence",
+"pos": [
+50,
+77
+],
+"state": "intact",
+"tags": [
+"breakable"
+],
+"verbs": [
+"break",
+"climb"
+],
+"dir": "x"
+},
+{
+"id": "fence_11",
+"type": "fence",
+"pos": [
+51,
+77
+],
+"state": "intact",
+"tags": [
+"breakable"
+],
+"verbs": [
+"break",
+"climb"
+],
+"dir": "x"
+},
+{
+"id": "fence_12",
+"type": "fence",
+"pos": [
+52,
+77
+],
+"state": "intact",
+"tags": [
+"breakable"
+],
+"verbs": [
+"break",
+"climb"
+],
+"dir": "x"
+},
+{
+"id": "fence_13",
+"type": "fence",
+"pos": [
+22,
+45
 ],
 "state": "intact",
 "tags": [
@@ -454,11 +640,62 @@
 "dir": "y"
 },
 {
-"id": "fence_10",
+"id": "fence_14",
 "type": "fence",
 "pos": [
-21,
-29
+22,
+46
+],
+"state": "intact",
+"tags": [
+"breakable"
+],
+"verbs": [
+"break",
+"climb"
+],
+"dir": "y"
+},
+{
+"id": "fence_15",
+"type": "fence",
+"pos": [
+22,
+47
+],
+"state": "intact",
+"tags": [
+"breakable"
+],
+"verbs": [
+"break",
+"climb"
+],
+"dir": "y"
+},
+{
+"id": "fence_16",
+"type": "fence",
+"pos": [
+22,
+48
+],
+"state": "intact",
+"tags": [
+"breakable"
+],
+"verbs": [
+"break",
+"climb"
+],
+"dir": "y"
+},
+{
+"id": "fence_17",
+"type": "fence",
+"pos": [
+22,
+49
 ],
 "state": "intact",
 "tags": [
@@ -474,8 +711,8 @@
 "id": "cart_01",
 "type": "cart",
 "pos": [
-34,
-23
+54,
+27
 ],
 "state": "intact",
 "tags": [
@@ -492,8 +729,26 @@
 "id": "cart_02",
 "type": "cart",
 "pos": [
-22,
-35
+45,
+75
+],
+"state": "intact",
+"tags": [
+"breakable",
+"step"
+],
+"verbs": [
+"move",
+"break",
+"use"
+]
+},
+{
+"id": "cart_03",
+"type": "cart",
+"pos": [
+24,
+52
 ],
 "state": "intact",
 "tags": [
@@ -510,8 +765,8 @@
 "id": "keepsake_01",
 "type": "keepsake",
 "pos": [
-14,
-24
+28,
+44
 ],
 "state": "intact",
 "tags": [
@@ -527,8 +782,8 @@
 "id": "keepsake_02",
 "type": "keepsake",
 "pos": [
-45,
-25
+72,
+44
 ],
 "state": "intact",
 "tags": [
@@ -544,8 +799,8 @@
 "id": "keepsake_03",
 "type": "keepsake",
 "pos": [
-20,
-47
+36,
+70
 ],
 "state": "intact",
 "tags": [
@@ -561,8 +816,8 @@
 "id": "keepsake_04",
 "type": "keepsake",
 "pos": [
-37,
-15
+56,
+29
 ],
 "state": "intact",
 "tags": [
@@ -575,11 +830,298 @@
 "owner": "villager_04"
 },
 {
+"id": "keepsake_05",
+"type": "keepsake",
+"pos": [
+64,
+70
+],
+"state": "intact",
+"tags": [
+"portable"
+],
+"verbs": [
+"take",
+"give"
+],
+"owner": "villager_05"
+},
+{
+"id": "keepsake_06",
+"type": "keepsake",
+"pos": [
+41,
+31
+],
+"state": "intact",
+"tags": [
+"portable"
+],
+"verbs": [
+"take",
+"give"
+],
+"owner": "villager_06"
+},
+{
+"id": "lamppost_01",
+"type": "lamppost",
+"pos": [
+40,
+47
+],
+"state": "intact",
+"tags": [
+"breakable",
+"light"
+],
+"verbs": [
+"break"
+],
+"radius": 4
+},
+{
+"id": "lamppost_02",
+"type": "lamppost",
+"pos": [
+60,
+47
+],
+"state": "intact",
+"tags": [
+"breakable",
+"light"
+],
+"verbs": [
+"break"
+],
+"radius": 4
+},
+{
+"id": "lamppost_03",
+"type": "lamppost",
+"pos": [
+50,
+42
+],
+"state": "intact",
+"tags": [
+"breakable",
+"light"
+],
+"verbs": [
+"break"
+],
+"radius": 4
+},
+{
+"id": "lamppost_04",
+"type": "lamppost",
+"pos": [
+50,
+59
+],
+"state": "intact",
+"tags": [
+"breakable",
+"light"
+],
+"verbs": [
+"break"
+],
+"radius": 4
+},
+{
+"id": "lamppost_05",
+"type": "lamppost",
+"pos": [
+30,
+47
+],
+"state": "intact",
+"tags": [
+"breakable",
+"light"
+],
+"verbs": [
+"break"
+],
+"radius": 4
+},
+{
+"id": "lamppost_06",
+"type": "lamppost",
+"pos": [
+70,
+47
+],
+"state": "intact",
+"tags": [
+"breakable",
+"light"
+],
+"verbs": [
+"break"
+],
+"radius": 4
+},
+{
+"id": "lamppost_07",
+"type": "lamppost",
+"pos": [
+50,
+30
+],
+"state": "intact",
+"tags": [
+"breakable",
+"light"
+],
+"verbs": [
+"break"
+],
+"radius": 4
+},
+{
+"id": "lamppost_08",
+"type": "lamppost",
+"pos": [
+50,
+70
+],
+"state": "intact",
+"tags": [
+"breakable",
+"light"
+],
+"verbs": [
+"break"
+],
+"radius": 4
+},
+{
+"id": "clothes_01",
+"type": "clothes",
+"pos": [
+37,
+59
+],
+"state": "intact",
+"tags": [
+"portable",
+"disguise"
+],
+"verbs": [
+"take",
+"wear",
+"drop"
+],
+"owner": "villager_02"
+},
+{
+"id": "clothes_02",
+"type": "clothes",
+"pos": [
+63,
+59
+],
+"state": "intact",
+"tags": [
+"portable",
+"disguise"
+],
+"verbs": [
+"take",
+"wear",
+"drop"
+],
+"owner": "villager_03"
+},
+{
+"id": "clothes_03",
+"type": "clothes",
+"pos": [
+50,
+35
+],
+"state": "intact",
+"tags": [
+"portable",
+"disguise"
+],
+"verbs": [
+"take",
+"wear",
+"drop"
+],
+"owner": "villager_05"
+},
+{
+"id": "lamp_01",
+"type": "lamp",
+"pos": [
+52,
+49
+],
+"state": "unlit",
+"tags": [
+"portable",
+"light"
+],
+"verbs": [
+"take",
+"light",
+"drop",
+"give",
+"break"
+]
+},
+{
+"id": "lamp_02",
+"type": "lamp",
+"pos": [
+31,
+59
+],
+"state": "unlit",
+"tags": [
+"portable",
+"light"
+],
+"verbs": [
+"take",
+"light",
+"drop",
+"give",
+"break"
+]
+},
+{
+"id": "lamp_03",
+"type": "lamp",
+"pos": [
+69,
+41
+],
+"state": "unlit",
+"tags": [
+"portable",
+"light"
+],
+"verbs": [
+"take",
+"light",
+"drop",
+"give",
+"break"
+]
+},
+{
 "id": "boundary_01",
 "type": "boundary",
 "pos": [
-49,
-32
+81,
+52
 ],
 "state": "intact",
 "tags": [
@@ -591,8 +1133,8 @@
 "id": "boundary_02",
 "type": "boundary",
 "pos": [
-46,
-42
+79,
+64
 ],
 "state": "intact",
 "tags": [
@@ -604,8 +1146,8 @@
 "id": "boundary_03",
 "type": "boundary",
 "pos": [
-39,
-49
+72,
+75
 ],
 "state": "intact",
 "tags": [
@@ -617,8 +1159,8 @@
 "id": "boundary_04",
 "type": "boundary",
 "pos": [
-29,
-52
+61,
+82
 ],
 "state": "intact",
 "tags": [
@@ -630,8 +1172,8 @@
 "id": "boundary_05",
 "type": "boundary",
 "pos": [
-19,
-49
+49,
+84
 ],
 "state": "intact",
 "tags": [
@@ -643,8 +1185,8 @@
 "id": "boundary_06",
 "type": "boundary",
 "pos": [
-12,
-42
+37,
+82
 ],
 "state": "intact",
 "tags": [
@@ -656,8 +1198,8 @@
 "id": "boundary_07",
 "type": "boundary",
 "pos": [
-9,
-32
+26,
+75
 ],
 "state": "intact",
 "tags": [
@@ -669,8 +1211,8 @@
 "id": "boundary_08",
 "type": "boundary",
 "pos": [
-12,
-22
+19,
+64
 ],
 "state": "intact",
 "tags": [
@@ -682,8 +1224,8 @@
 "id": "boundary_09",
 "type": "boundary",
 "pos": [
-19,
-15
+17,
+52
 ],
 "state": "intact",
 "tags": [
@@ -695,8 +1237,8 @@
 "id": "boundary_10",
 "type": "boundary",
 "pos": [
-29,
-12
+19,
+40
 ],
 "state": "intact",
 "tags": [
@@ -708,8 +1250,8 @@
 "id": "boundary_11",
 "type": "boundary",
 "pos": [
-39,
-15
+26,
+29
 ],
 "state": "intact",
 "tags": [
@@ -721,8 +1263,60 @@
 "id": "boundary_12",
 "type": "boundary",
 "pos": [
-46,
+37,
 22
+],
+"state": "intact",
+"tags": [
+"marker"
+],
+"verbs": []
+},
+{
+"id": "boundary_13",
+"type": "boundary",
+"pos": [
+49,
+20
+],
+"state": "intact",
+"tags": [
+"marker"
+],
+"verbs": []
+},
+{
+"id": "boundary_14",
+"type": "boundary",
+"pos": [
+61,
+22
+],
+"state": "intact",
+"tags": [
+"marker"
+],
+"verbs": []
+},
+{
+"id": "boundary_15",
+"type": "boundary",
+"pos": [
+72,
+29
+],
+"state": "intact",
+"tags": [
+"marker"
+],
+"verbs": []
+},
+{
+"id": "boundary_16",
+"type": "boundary",
+"pos": [
+79,
+40
 ],
 "state": "intact",
 "tags": [
@@ -734,8 +1328,8 @@
 "id": "villager_01",
 "type": "villager",
 "pos": [
-35,
-23
+55,
+43
 ],
 "state": "half",
 "tags": [
@@ -754,8 +1348,8 @@
 "id": "villager_02",
 "type": "villager",
 "pos": [
-21,
-31
+31,
+55
 ],
 "state": "puppet",
 "tags": [
@@ -774,8 +1368,8 @@
 "id": "villager_03",
 "type": "villager",
 "pos": [
-40,
-33
+69,
+55
 ],
 "state": "half",
 "tags": [
@@ -794,8 +1388,8 @@
 "id": "villager_04",
 "type": "villager",
 "pos": [
-30,
-41
+50,
+67
 ],
 "state": "awake",
 "tags": [
@@ -811,11 +1405,51 @@
 ]
 },
 {
+"id": "villager_05",
+"type": "villager",
+"pos": [
+35,
+41
+],
+"state": "half",
+"tags": [
+"actor"
+],
+"verbs": [
+"induce"
+],
+"color": [
+0.7,
+0.4,
+0.8
+]
+},
+{
+"id": "villager_06",
+"type": "villager",
+"pos": [
+66,
+41
+],
+"state": "puppet",
+"tags": [
+"actor"
+],
+"verbs": [
+"induce"
+],
+"color": [
+0.95,
+0.55,
+0.25
+]
+},
+{
 "id": "outsider",
 "type": "outsider",
 "pos": [
-30,
-28
+50,
+48
 ],
 "state": "intact",
 "tags": [
@@ -824,6 +1458,18 @@
 ],
 "verbs": [
 "capture"
+]
+},
+{
+"id": "wild",
+"type": "wild",
+"pos": null,
+"state": "intact",
+"tags": [
+"zone"
+],
+"verbs": [
+"enter"
 ]
 }
 ]

@@ -8,13 +8,14 @@ const file = process.argv[2] || 'public/scene.json';
 const scene = JSON.parse(readFileSync(file, 'utf8'));
 const errors = [], warn = [];
 const ids = new Set();
-const TYPES = ['book', 'lectern', 'speaker', 'notice', 'house', 'door', 'fence', 'cart', 'keepsake', 'boundary', 'villager', 'outsider'];
+const TYPES = ['book', 'lectern', 'speaker', 'notice', 'house', 'door', 'fence', 'cart', 'keepsake', 'boundary', 'villager', 'outsider', 'lamppost', 'clothes', 'lamp', 'wild'];
+const ZONE = new Set(['wild']);
 for (const o of scene) {
   for (const k of ['id', 'type', 'state', 'verbs']) if (!(k in o)) errors.push(`${o.id || '?'}: 缺 ${k}`);
   if (ids.has(o.id)) errors.push(`id 重複：${o.id}`); ids.add(o.id);
   if (!TYPES.includes(o.type)) errors.push(`${o.id}: 不認得的 type ${o.type}`);
   for (const v of o.verbs || []) if (!VERBS.includes(v)) errors.push(`${o.id}: 動詞 ${v} 不在 VERBS`);
-  if (!Array.isArray(o.pos) || o.pos.length !== 2 || !o.pos.every(Number.isInteger)) errors.push(`${o.id}: pos 要是整數格子座標`);
+  if (!ZONE.has(o.type) && (!Array.isArray(o.pos) || o.pos.length !== 2 || !o.pos.every(Number.isInteger))) errors.push(`${o.id}: pos 要是整數格子座標`);
 }
 for (const o of scene) {
   if (o.owner && !ids.has(o.owner)) errors.push(`${o.id}: owner ${o.owner} 不存在`);
@@ -25,7 +26,7 @@ for (const o of scene) {
   }
 }
 const count = t => scene.filter(o => o.type === t).length;
-const expect = { book: [1, 1], lectern: [1, 1], speaker: [4, 6], notice: [2, 2], house: [4, 4], fence: [6, 10], cart: [2, 2], boundary: [8, 12], villager: [3, 6], outsider: [1, 1] };
+const expect = { book: [1, 1], lectern: [1, 1], speaker: [4, 10], notice: [2, 4], house: [4, 8], fence: [6, 30], cart: [2, 4], boundary: [8, 20], villager: [3, 8], outsider: [1, 1] };
 for (const [t, [lo, hi]] of Object.entries(expect)) { const n = count(t); if (n < lo || n > hi) errors.push(`${t} 數量 ${n}，規格是 ${lo}–${hi}`); }
 if (count('door') !== count('house')) errors.push('門的數量要等於住宅數量');
 if (count('keepsake') !== count('villager')) errors.push('信物數量要等於村民數量');
@@ -39,6 +40,7 @@ if (existsSync(glbPath)) {
   const json = JSON.parse(buf.subarray(20, 20 + len).toString('utf8'));
   const names = new Set(json.nodes.map(n => n.name));
   for (const o of scene) {
+    if (ZONE.has(o.type)) continue;
     if (!names.has(o.id)) errors.push(`${o.id}: glb 沒有同名節點`);
     if (o.type !== 'villager' && o.type !== 'outsider' && o.type !== 'book' && o.type !== 'lectern' && !names.has(`${o.id}__${o.state}`)) errors.push(`${o.id}: glb 沒有 ${o.id}__${o.state}`);
   }

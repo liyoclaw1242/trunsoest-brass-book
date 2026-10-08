@@ -1,4 +1,4 @@
-// node engine/villagers.test.js —— M4：村民拒絕違規、在邊界停下、喚醒、抓捕、誘導
+// node engine/villagers.test.js —— 原型三村民：目擊違規才追、守規則、邊界停下、夜間睡覺／守夜、偽裝辨識、誘導、喚醒
 import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
 import { createSession } from './session.js';
@@ -8,150 +8,132 @@ const scene = JSON.parse(readFileSync(new URL('../public/scene.json', import.met
 const meta = JSON.parse(readFileSync(new URL('../public/scene.meta.json', import.meta.url)));
 const ok = msg => console.log('PASS', msg);
 let seed = 7; const rng = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
-const fresh = (opt = {}) => { const s = createSession(scene, meta, { villagers: { rng, ...opt } }); s.world.outsiderArrived(); return s; };
+const fresh = (opt = {}) => { const s = createSession(scene, meta, { villagers: { rng, ...opt.villagers }, world: opt.world, match: opt.match }); s.world.outsiderArrived(); s.match.start(); return s; };
 const run = (s, sec, each = null) => { for (let i = 0; i < sec * 20; i++) { s.tick(0.05); if (each) each(); } };
 const v = (s, id) => s.world.actors.get(id);
-const hear = (s, ids) => { for (const id of ids) v(s, id).known.add(s.world.live('capture').no); };
+const toNight = s => { s.world.t = s.world.opt.daySec - 0.01; s.tick(0.05); assert.equal(s.world.isNight(), true); };
 
-// 1. 抓捕：認知抓捕令的村民走到相鄰格 0.5 秒 → capture；被抓後 3 秒免疫
+// 1. 開場沒有抓捕令：外鄉人走來走去沒人追；做了違規的事、被看見，才追
 {
-  const s = fresh(); hear(s, ['villager_01']);
+  const s = fresh();
+  const p = v(s, 'villager_01');                       // half，在 (55,43)；外鄉人在 (50,48)
+  run(s, 5);
+  assert.ok(!s.villagers.hunts(p), '沒違規不該追');
+  // 外鄉人在他眼前破壞廣播器（第一次）：還沒有條文禁止 → 不追
+  s.outsider.pos = [53, 45];
+  s.world.attempt('outsider', 'break', 'speaker_01'); run(s, 0.1);
+  assert.ok(!s.villagers.hunts(p), '沒有條文的事不是違規');
+  // 外鄉人在他眼前未經邀請進他家（憲法第二條，市民認知）→ 追
+  s.outsider.pos = [50, 50]; p.pos = [50, 48]; p.fpos = [...p.pos];   // 站在門洞做「進入」（畫面端也是這樣），村民在門前看得見
+  const w = []; s.world.on('witness', e => w.push(`${e.actor.id}:${e.verb}:${e.rules.map(r => r.key)}`));
+  s.world.attempt('outsider', 'enter', 'house_01', { uninvited: true }); run(s, 0.1);
+  assert.ok(s.villagers.hunts(p), '看見違規要追'); assert.ok(w[0].startsWith('villager_01:enter:invite-only'), `${w}`);
+  ok('目擊：沒有條文的事不追；看見違反他認知到的條文才追');
+  // 看不見的村民不追
+  const q = v(s, 'villager_06'); assert.ok(!s.villagers.hunts(q), '在遠處的沒看見');
+  ok('目擊：看不見的村民不追');
+}
+// 2. 抓捕：追到相鄰 0.5 秒 → captured；追逐 20 秒後放棄回家
+{
+  const s = fresh();
+  const p = v(s, 'villager_01');
+  s.outsider.pos = [50, 50]; p.pos = [50, 48]; p.fpos = [...p.pos];
   const events = []; s.world.on('captured', e => events.push(e.actor.id));
-  s.outsider.pos = [33, 25];           // villager_01 在 (35,23)
-  run(s, 6);
-  assert.ok(events.length >= 1, '應該被抓到'); assert.equal(events[0], 'villager_01');
-  const first = events.length; run(s, 2);
-  assert.equal(events.length, first, '被抓後 3 秒內不會再被抓');
-  assert.equal(v(s, 'villager_01').mode, 'chase', '免疫期間村民仍在追，只是抓不到');
-  ok('抓捕：相鄰 0.5 秒後 capture 事件；之後 3 秒免疫（免疫只擋判定，不停追）');
+  s.world.attempt('outsider', 'enter', 'house_01', { uninvited: true });   // 憲法：看見 → 追
+  run(s, 3);
+  assert.equal(events[0], 'villager_01');
+  ok('抓捕：追到相鄰 0.5 秒 → capture；免疫 3 秒');
+  const s2 = fresh(); const q = v(s2, 'villager_01');
+  s2.outsider.pos = [50, 50]; q.pos = [50, 48]; q.fpos = [...q.pos];
+  s2.world.attempt('outsider', 'enter', 'house_01', { uninvited: true });
+  s2.outsider.pos = [20, 20];   // 瞬間消失
+  run(s2, 25);
+  assert.ok(!s2.villagers.hunts(q), '追 20 秒看不到就放棄');
+  ok('追逐：失去視線 20 秒後放棄');
 }
-// 2. 村民拒絕違規：外鄉人躲在別人家裡，追捕的村民不進屋（憲法第三條），在門口停下
+// 3. 守規則與邊界：追捕時不進別人家、不出範圍
 {
-  const s = fresh(); hear(s, ['villager_02']);
-  const d = s.world.objects.get('door_03'); d.state = 'open';
-  s.outsider.pos = [44, 37];           // house_03 室內（屋主 villager_03）
-  const p = v(s, 'villager_02'); let inside = false, minD = Infinity;
-  run(s, 40, () => { if (s.grid.houseAt(p.pos) === 'house_03') inside = true; minD = Math.min(minD, dist(p.pos, [44, 35])); });
-  assert.equal(inside, false, '村民不得進入別人的住宅');
-  assert.ok(minD <= 2, `應該追到門口附近，最近 ${minD}`);
-  ok('村民拒絕違規：追到別人家門口就不進去，等幾秒放棄回去巡邏');
-  // 直接叫他做違規的事也會拒絕
-  assert.equal(s.world.attempt('villager_02', 'enter', 'house_03', { uninvited: true }).refused, true);
-  ok('村民拒絕違規：attempt 直接回 refused');
-}
-// 3. 村民在邊界停下
-{
-  const s = fresh(); hear(s, ['villager_02']);
-  s.outsider.pos = [6, 32];            // 範圍外（圓心 (29,32) 半徑 20）
-  const p = v(s, 'villager_02'); let out = false, maxD = 0;
-  run(s, 40, () => { if (!s.grid.inRange(p.pos)) out = true; maxD = Math.max(maxD, dist(p.pos, [29, 32])); });
-  assert.equal(out, false, '村民不離開影響範圍');
-  assert.ok(maxD >= 18, `應該追到邊界附近，最遠 ${maxD}`);
+  const s = fresh(); const p = v(s, 'villager_02');
+  s.world.objects.get('door_03').state = 'open';
+  s.outsider.pos = [70, 60]; p.pos = [70, 58]; p.fpos = [...p.pos];
+  s.world.attempt('outsider', 'enter', 'house_03', { uninvited: true }); s.outsider.pos = [70, 61];
+  let inside = false; run(s, 15, () => { if (s.grid.houseAt(p.pos) === 'house_03') inside = true; });
+  assert.equal(inside, false);
+  ok('村民拒絕違規：追到別人家門口就不進去');
+  const s3 = fresh(); const q = v(s3, 'villager_02');
+  s3.outsider.pos = [30, 60]; q.pos = [30, 58]; q.fpos = [...q.pos];
+  s3.world.attempt('outsider', 'enter', 'house_02', { uninvited: true });
+  s3.outsider.pos = [16, 52];   // 範圍外（圓心 (49,52) r32 → x<17）
+  q.chaseUntil = 1e9;
+  let out = false; run(s3, 20, () => { if (!s3.grid.inRange(q.pos)) out = true; });
+  assert.equal(out, false);
   ok('村民在邊界停下');
 }
-// 4. 喚醒：30 秒聽不到廣播降一級；收到自己的信物降一級；人偶不能誘導
+// 4. 夜間：半同化回家睡覺、人偶守夜持燈；視線縮短；夜間不得追捕（備用條文）認知到就不追
 {
   const s = fresh();
-  for (const o of s.world.objects.values()) if (o.type === 'speaker') o.state = 'broken';
-  const p = v(s, 'villager_02'); assert.equal(p.level, 'puppet');
-  const levels = []; s.world.on('level', e => levels.push(`${e.actor.id}:${e.from}>${e.to}:${e.why}`));
-  assert.equal(s.villagers.induce(p, 'invite'), false, '人偶不能誘導');
-  run(s, 31);
-  assert.equal(p.level, 'half'); assert.ok(levels.includes('villager_02:puppet>half:quiet'));
-  ok('喚醒：連續 30 秒聽不到廣播降一級');
-  const ks = s.world.objects.get('keepsake_02');
-  s.outsider.pos = [...p.pos];
-  assert.equal(s.world.attempt('outsider', 'take', ks.id).done, true);
-  assert.equal(s.world.attempt('outsider', 'give', ks.id, { to: 'villager_02' }).done, true);
-  assert.equal(p.level, 'awake'); assert.ok(levels.some(l => l.includes('keepsake')));
-  ok('喚醒：收到自己的信物直接降一級；已喚醒的不執行抓捕令');
-  hear(s, ['villager_02']); assert.equal(s.villagers.hunts(p), false);
+  const half = v(s, 'villager_01'), puppet = v(s, 'villager_02');
+  toNight(s);
+  run(s, 20);
+  assert.equal(half.sleeping, true); assert.equal(s.grid.houseAt(half.pos), 'house_01');
+  assert.equal(puppet.sleeping, false); assert.equal(puppet.lit, true);
+  ok('夜間：半同化回家睡覺；人偶守夜持燈');
+  assert.equal(s.villagers.sight(half), 3); assert.equal(s.villagers.sight(puppet), 6);
+  s.outsider.pos = [puppet.pos[0] + 5, puppet.pos[1]];
+  assert.equal(s.villagers.canSee(puppet, s.outsider.pos), true);
+  s.outsider.pos = [puppet.pos[0] + 7, puppet.pos[1]];
+  assert.equal(s.villagers.canSee(puppet, s.outsider.pos), false);
+  s.outsider.lit = true; assert.equal(s.villagers.seesOutsider(puppet), true); s.outsider.lit = false;
+  ok('夜間視線 3 格，持燈各加 3');
+  // 夜間不得追捕
+  s.world.write({ key: 'no-night-capture', text: '市民不得在夜間追捕。', who: 'citizen', verb: 'capture', target: { type: 'outsider' }, cond: 'night' }, { silent: true, knownBy: ['villager_02'] });
+  assert.equal(s.villagers.mayCapture(puppet), false);
+  ok('認知到「夜間不得追捕」的村民夜裡不追');
+  // 天亮：醒來
+  s.world.t = s.world.opt.daySec + s.world.opt.nightSec - 0.01; s.tick(0.05);
+  assert.equal(half.sleeping, false); assert.equal(puppet.lit, false);
+  ok('天亮：醒來、熄燈');
 }
-// 5. 誘導：邀請進屋
+// 5. 偽裝：穿上衣物後，只管外鄉人的條文要在 2 格內才認得出；任何存在的條文照樣算
 {
-  const s = fresh();
-  const p = v(s, 'villager_01');       // half，屋主 house_01
-  s.outsider.pos = [34, 23];
+  const s = fresh(); const p = v(s, 'villager_05');
+  s.world.write({ key: 'door-open', text: '外鄉人不得開啟任何門。', who: 'outsider', verb: 'open', target: { type: 'door' } }, { silent: true, knownBy: ['villager_05'] });
+  s.outsider.pos = [34, 31]; p.pos = [39, 31]; p.fpos = [...p.pos];   // 門前，村民在 5 格外的路上，看得見
+  const c = s.world.objects.get('clothes_03'); s.outsider.pos = [50, 35];
+  assert.equal(s.world.attempt('outsider', 'take', c.id).done, true);
+  assert.equal(s.world.attempt('outsider', 'wear', c.id).done, true); assert.equal(s.outsider.wearing, 'clothes_03');
+  assert.ok(s.world.live('no-disguise'), '第一次穿就被寫成條文');
+  s.outsider.pos = [34, 31];
+  s.world.attempt('outsider', 'open', 'door_05'); run(s, 0.1);
+  assert.ok(!s.villagers.hunts(p), '5 格外認不出外鄉人 → 不追');
+  s.world.objects.get('door_05').state = 'closed';
+  p.pos = [36, 31]; p.fpos = [...p.pos];   // 2 格
+  s.world.attempt('outsider', 'open', 'door_05'); run(s, 0.1);
+  assert.ok(s.villagers.hunts(p), '2 格內認得出 → 追');
+  ok('偽裝：穿著市民衣物，只管外鄉人的條文要靠近才認得出');
+  // 認知到「不得穿著」的村民，認出你就追
+  const s2 = fresh(); const q = v(s2, 'villager_05');
+  s2.world.write({ key: 'no-disguise', text: '外鄉人不得穿著市民的衣物。', who: 'outsider', verb: 'wear', target: { type: 'clothes' } }, { silent: true, knownBy: ['villager_05'] });
+  s2.outsider.pos = [50, 35]; s2.world.attempt('outsider', 'take', 'clothes_03'); s2.world.attempt('outsider', 'wear', 'clothes_03');
+  s2.outsider.pos = [34, 31]; q.pos = [39, 31]; q.fpos = [...q.pos]; run(s2, 1);
+  assert.ok(!s2.villagers.hunts(q)); q.pos = [35, 31]; q.fpos = [...q.pos]; run(s2, 0.2);
+  assert.ok(s2.villagers.hunts(q));
+  ok('偽裝：被認出來本身就是「穿著衣物」的持續違規');
+}
+// 6. 誘導與喚醒（沿用原型二）
+{
+  const s = fresh(); const p = v(s, 'villager_01');
+  s.outsider.pos = [54, 43];
   assert.equal(s.villagers.induce(p, 'invite'), true);
   let invited = null; s.world.on('invited', e => invited = e.house);
-  run(s, 15);
-  assert.equal(invited, 'house_01'); assert.equal(s.outsider.invitedTo, 'house_01');
-  assert.equal(s.world.check('outsider', 'enter', 'house_01', { invited: true }).violates.length, 0);
-  ok('誘導：請他邀請我進屋 → 走回門口、邀請生效');
-}
-// 6. 誘導：去拿信物（條文只禁止外鄉人拿）
-{
-  const s = fresh();
-  const p = v(s, 'villager_03');       // half，在 (40,33)；最近的信物 keepsake_02 在 (45,25)
-  s.world.write({ key: 'keepsake-take', text: '外鄉人不得取走信物。', who: 'outsider', verb: 'take', target: { type: 'keepsake' } }, { knownBy: ['outsider', 'villager_03'] });
-  s.outsider.pos = [42, 33];
-  assert.equal(s.villagers.induce(p, 'fetch'), true);
-  run(s, 30);
-  assert.ok(s.outsider.held.includes('keepsake_02'), `外鄉人應該拿到信物，實際 ${s.outsider.held}`);
-  ok('誘導：請他去拿信物 → 村民拿了交給外鄉人');
-}
-// 7. 誘導：搬書。憲法裡就有「黃銅書不得被搬動」，市民認知 → 拒絕；撕掉之後才搬得動，搬了書又會被重寫
-{
-  const s = fresh();
-  const p = v(s, 'villager_01'); s.outsider.pos = [34, 23];
-  let refused = 0; s.world.on('refuse', () => refused++);
-  assert.equal(s.villagers.induce(p, 'book'), false); assert.equal(refused, 1);
-  assert.equal(s.villagers.cooldown(p), 0, '拒絕不算幫過你，不吃冷卻');
-  ok('誘導：認知到「不得搬動」的村民拒絕搬書');
-  s.world.live('book-move').void = true;   // 模擬被重置撕掉
-  assert.equal(s.villagers.induce(p, 'book'), true);
-  let moved = null; s.world.on('bookMoved', e => moved = e.pos);
-  run(s, 30);
-  const book = s.world.objects.get('book_01');
-  assert.ok(moved, '書應該被搬');
-  assert.equal(s.world.live('book-move'), null, '搬一次還不會被寫成條文（觸發 count 2）');
-  assert.deepEqual(book.pos, p.home);
-  assert.deepEqual(s.grid.center(), p.home);
-  ok('誘導：撕掉之後，請他去搬書 → 搬到自己家門口、範圍中心跟著書');
-  // 搬到一半聽到條文就放下
-  const s2 = fresh(); const q = v(s2, 'villager_01'); s2.outsider.pos = [34, 23];
-  s2.world.live('book-move').void = true;
-  assert.equal(s2.villagers.induce(q, 'book'), true);
-  for (let i = 0; i < 400 && !q.carrying; i++) s2.tick(0.05);
-  assert.ok(q.carrying, '應該已經拿起書');
-  const rw = s2.world.write({ key: 'book-move', text: '黃銅書不得被搬動。', verb: 'move', target: { id: 'book_01' } }, { silent: true });
-  q.known.add(rw.no);   // 途中聽到了
-  let fail = null; s2.world.on('taskFail', e => fail = e.why);
-  s2.tick(0.05);
-  assert.equal(q.carrying, null); assert.equal(fail, 'refused'); assert.ok(s2.world.objects.get('book_01').pos);
-  ok('搬書途中認知到「不得搬動」→ 當場放下，書留在半路');
-}
-// 9. 誘導是書看得見的招：第三次誘導寫下「市民不得替外鄉人跑腿」，認知到的村民拒絕
-{
-  const s = fresh();
-  const p = v(s, 'villager_01'); s.outsider.pos = [34, 23];
-  for (let i = 0; i < 3; i++) { p.cooldownUntil = 0; p.returning = false; assert.equal(s.villagers.induce(p, 'invite'), true); p.task = null; }
-  assert.ok(s.world.live('no-errand'), '第三次誘導後書寫下條文');
-  p.known.add(s.world.live('no-errand').no); p.cooldownUntil = 0; p.returning = false;
-  let refused = 0; s.world.on('refuse', e => { if (e.verb === 'induce') refused++; });
-  assert.equal(s.villagers.induce(p, 'fetch'), false); assert.equal(refused, 1);
-  p.task = null; p.cooldownUntil = 0; p.returning = false;
-  assert.equal(s.villagers.induce(p, 'invite'), true, '漏洞：邀請進屋不算跑腿');
-  const a = v(s, 'villager_04'); a.known.add(s.world.live('no-errand').no);
-  assert.equal(s.villagers.induce(a, 'fetch'), true, '漏洞：已喚醒的人算不算市民沒說 → 不追究');
-  ok('誘導用到第三次被寫成條文；認知到的村民拒絕跑腿，但邀請與已喚醒者是條文留下的漏洞');
-}
-// 8. 誘導冷卻：任務結束後 20 秒內不接受誘導；被規則擋在門口會發 blockedByRule（同一地點只一次）
-{
-  const s = fresh();
-  const p = v(s, 'villager_01'); s.outsider.pos = [34, 23];
-  assert.equal(s.villagers.induce(p, 'invite'), true); run(s, 15);
-  assert.equal(s.outsider.invitedTo, 'house_01');
-  let why = null; s.world.on('induceFail', e => why = e.reason);
-  assert.equal(s.villagers.induce(p, 'fetch'), false); assert.equal(why, 'cooldown'); assert.ok(s.villagers.cooldown(p) > 0);
-  run(s, 21); assert.equal(s.villagers.inducible(p), true);
-  ok('誘導冷卻：剛幫過的村民 20 秒內不接受誘導');
-  const s2 = fresh(); hear(s2, ['villager_02']);
-  s2.world.objects.get('door_03').state = 'open'; s2.outsider.pos = [44, 37];
-  const blocked = []; s2.world.on('blockedByRule', e => blocked.push(`${e.actor.id}@${e.house}:${e.rules.map(r => r.key)}`));
-  run(s2, 20);
-  assert.ok(blocked.some(b => b.startsWith('villager_02@house_03:invite-only')), `${blocked}`);
-  assert.ok(blocked.filter(b => b.startsWith('villager_02')).length <= 3, `同一地點不該一直重複，實際 ${blocked}`);
-  ok('被憲法第三條擋在門口 → blockedByRule 事件（附條文），不洗版');
+  run(s, 15); assert.equal(invited, 'house_01');
+  ok('誘導：邀請進屋');
+  const s2 = fresh();
+  for (const o of s2.world.objects.values()) if (o.type === 'speaker') o.state = 'broken';
+  const q = v(s2, 'villager_02'); run(s2, 31); assert.equal(q.level, 'half');
+  s2.outsider.pos = [...q.pos];
+  s2.world.attempt('outsider', 'take', 'keepsake_02'); s2.world.attempt('outsider', 'give', 'keepsake_02', { to: 'villager_02' });
+  assert.equal(q.level, 'awake');
+  ok('喚醒：30 秒安靜降一級；收到自己的信物降一級');
 }
 console.log('villagers.test 全部通過');

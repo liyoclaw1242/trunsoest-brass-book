@@ -19,6 +19,8 @@ export class Grid {
   /** @param objects  scene.json 的陣列，或 World.objects（Map）——只讀 type/pos/state */
   constructor(objects, opt = {}) {
     this.objects = objects instanceof Map ? objects : new Map(objects.map(o => [o.id, o]));
+    this.roads = opt.roads || [];          // [[x0,y0,x1,y1], ...] 村道矩形；其餘是野地。沒有村道資料時全部算村道。
+    this.plaza = opt.plaza || null;
     const book = [...this.objects.values()].find(o => o.type === 'book');
     this.radius = opt.radius ?? book?.radius ?? 20;
     const margin = opt.margin ?? 10;
@@ -37,6 +39,13 @@ export class Grid {
   inRange(pos) { return dist(pos, this.center()) <= this.radius; }
   inBounds([x, y]) { return x >= this.min[0] && y >= this.min[1] && x <= this.max[0] && y <= this.max[1]; }
   houseAt(pos) { return this.cellHouse.get(key(...pos)) || null; }
+  /** 'road' 村道（含住宅與其門前）或 'wild' 野地。 */
+  zone([x, y]) {
+    if (!this.roads.length) return 'road';
+    if (this.houseAt([x, y])) return 'road';
+    for (const o of this.objects.values()) if (o.type === 'house') { const [hx, hy] = o.pos; if (x >= hx - 3 && x <= hx + 2 && y >= hy - 4 && y <= hy + 2) return 'road'; }
+    return this.roads.some(([x0, y0, x1, y1]) => x >= x0 && x <= x1 && y >= y0 && y <= y1) ? 'road' : 'wild';
+  }
 
   /** 這一格現在擋不擋路（不含角色）。 */
   blocked(pos) {
@@ -52,7 +61,7 @@ export class Grid {
         }
         case 'door': if (o.pos[0] === x && o.pos[1] === y && o.state === 'closed') return true; break;
         case 'fence': if (o.pos[0] === x && o.pos[1] === y && o.state === 'intact') return true; break;
-        case 'cart': case 'lectern': case 'speaker': case 'notice': case 'boundary':
+        case 'cart': case 'lectern': case 'speaker': case 'notice': case 'boundary': case 'lamppost':
           if (o.pos[0] === x && o.pos[1] === y) return true; break;
       }
     }
