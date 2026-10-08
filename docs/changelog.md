@@ -38,3 +38,16 @@
 - 門多做了 `broken` 狀態（規格只列 closed/open 但動詞有 break）。
 - 驗證：`node tools/validate-scene.js` 通過、`node tools/check-layout.js` 通過；兩張圖我自己打開看過，十二類在斜上方圖互相分得出來；俯視圖看不到書（在屋內、被屋頂蓋住），其餘十一類分得出來。
 - 未驗證：在 three.js 裡載入後的座標對應（M2 做）。
+
+## M2 畫面骨架（2026-10-09）
+
+- Vite + three 0.186。`index.html`、`src/main.js`（啟動與主迴圈、`window.__game` 給試玩腳本）、`src/view.js`（GLTFLoader 載 glb、節點名對應 id、`__col` 隱藏、`<id>__<state>` 切換、正交斜俯視鏡頭跟隨、標記 API）、`src/game.js`（World + Grid + 玩家格子移動 + 互動選項 + 事件紀錄，不碰 DOM/three）、`src/hud.js`、`src/input.js`。
+- 座標對應：格子 `[x, y]` → three `(x, 0, -y)`。啟動時逐一比對 scene.json 與 glb 節點位置，51 個物件一致（寫進 console 與 `__game.mismatches`）。
+- 移動：WASD／方向鍵，一格 0.16 秒。阻擋由 `engine/grid.js` 判（M1 已驗證它與 `__col` 逐格一致）；跨進住宅室內時呼叫 `attempt('enter')`。
+- 互動：E 是第一個選項、2–9 選其他。推（`move` 推車）、墊腳（`use` 推車，玩家—推車—圍籬—落地成一直線）、翻越（`climb` 落到另一側）、搬書（`move` 後書跟著玩家，範圍圓心跟著走，可放下）、歸還信物給相鄰村民。做不到的選項顯示紅框，會違規的標「（違反第 N 條）」。
+- 玩家在屋內時該棟屋頂隱藏。
+- 引擎小改：`STATE_OK` 加 `climb`（圍籬要完好）、`move`／`use`（不能是壞的）；推車動詞加 `use`；`TRIGGERS` 加「推車不得用於越過圍籬」（第 2 次 `use` 推車觸發，漏洞：只禁止用於越過圍籬）。
+- Playwright：`tools/pw.js` 共用（開頁、等 `__game`、走路、截圖）。套件 1.64 要的 chromium 1248 本機沒有，改用 `executablePath` 指向本機快取的 chromium_headless_shell 1223（可用 `PW_CHROME` 覆寫），沒有下載任何東西。
+- 修過的坑：`#overlay` 的 `display:flex` 蓋過 `hidden` 屬性，整個畫面被 85% 黑遮住；加 `[hidden]{display:none!important}`。
+- 驗證：`node tools/playtest-m2.js` 45/45 通過，截圖與事件紀錄在 `docs/playtest/m2/`。涵蓋：走到東西南北與兩個角落、speaker break/repair、notice read/deface、door open、house enter、book read/move/放下、fence climb/break、cart move/use/break、keepsake take/give；每次 `object` 事件後檢查畫面只顯示對應狀態的子物件。書台、界石、村民、外鄉人沒有動詞。
+- 未驗證：真人用鍵盤的手感（腳本是直接呼叫 `step`）。

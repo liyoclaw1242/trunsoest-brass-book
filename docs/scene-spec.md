@@ -13,7 +13,7 @@
 | `house` 住宅 | 4 | `intact` | enter | `rb_owner` 屋主村民 id |
 | `door` 門 | 每屋 1 | `closed` `open` | open, break | `rb_parent` 所屬住宅 |
 | `fence` 圍籬段 | 6–10 | `intact` `broken` | break, climb | 擋路用 |
-| `cart` 推車 | 2 | `intact` `broken` | move, break | 可推去擋路或墊腳 |
+| `cart` 推車 | 2 | `intact` `broken` | move, break, use | 可推去擋路或墊腳（墊腳＝`use`，這一版預設） |
 | `keepsake` 信物 | 每村民 1 | `intact` | take, give | `rb_owner` |
 | `boundary` 界石 | 8–12 | `intact` | 無 | 沿影響範圍邊緣排一圈 |
 | `villager` 村民 | 3–6 | `puppet` `half` `awake` | 無（角色） | 三種同化程度要從外觀分得出來 |

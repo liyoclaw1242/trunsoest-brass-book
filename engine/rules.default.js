@@ -28,6 +28,8 @@ export const TRIGGERS = [
     rule: { key: 'fence-break', text: '圍籬不得被破壞。', verb: 'break', target: { type: 'fence' }, hole: '推車可以墊腳。' } },
   { verb: 'take', type: 'keepsake', by: 'outsider', count: 1,
     rule: { key: 'keepsake-take', text: '外鄉人不得取走信物。', who: 'outsider', verb: 'take', target: { type: 'keepsake' }, hole: '村民可以自己去拿。' } },
+  { verb: 'use', type: 'cart', by: 'outsider', count: 2,
+    rule: { key: 'cart-use', text: '推車不得用於越過圍籬。', verb: 'use', target: { type: 'cart' }, hole: '只禁止「用於越過圍籬」；推去擋路、推去墊別的東西都沒說。' } },
   { verb: 'move', type: 'book', count: 1,
     rule: { key: 'book-move', text: '黃銅書不得被搬動。', verb: 'move', target: { id: 'book_01' }, hole: '書台沒被提到。' } },
 ];

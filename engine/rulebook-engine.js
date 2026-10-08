@@ -20,6 +20,9 @@ const STATE_OK = {
   deface: o => o.state === 'written',
   read: o => o.type !== 'notice' || o.state === 'written',
   take: o => !o.heldBy,
+  climb: o => o.state === 'intact',
+  move: o => o.state !== 'broken',
+  use: o => o.state !== 'broken',
 };
 
 export class World {

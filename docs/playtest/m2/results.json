@@ -1,0 +1,222 @@
+[
+ {
+  "name": "載入後座標對應一致",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "speaker break 成功",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "speaker_01 模型切到 broken",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "speaker repair 成功",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "走到公告牌旁",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "notice read 成功",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "讀公告牌後認知全部現行條文",
+  "ok": true,
+  "info": "5/5"
+ },
+ {
+  "name": "notice deface 成功",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "走到門前",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "door open 成功",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "走進門洞",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "門洞前有「進入住宅」選項",
+  "ok": true,
+  "info": "開啟門 01|破壞門 01|進入住宅 01"
+ },
+ {
+  "name": "進入住宅後在屋內",
+  "ok": true,
+  "info": "[30,31]"
+ },
+ {
+  "name": "屋內屋頂隱藏",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "走到書旁",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "book read 成功",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "book move（搬起）成功",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "搬著書走出屋外",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "有放下選項",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "書放在屋外",
+  "ok": true,
+  "info": "[31,28]"
+ },
+ {
+  "name": "書的範圍中心跟著移動",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "走到南圍籬前",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "fence climb 後落在另一側",
+  "ok": true,
+  "info": "[30,21]"
+ },
+ {
+  "name": "fence break 成功",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "壞掉的圍籬走得過",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "走到推車東側",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "cart move（推）成功",
+  "ok": true,
+  "info": "[33,23]"
+ },
+ {
+  "name": "推車節點位置更新",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "再推一次到 (32,23)",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "走到推車北側",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "cart use（墊腳翻過圍籬）落在 (32,21)",
+  "ok": true,
+  "info": "[32,21]"
+ },
+ {
+  "name": "走回推車旁",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "cart break 成功",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "走到信物旁",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "keepsake take 成功",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "被拿走的信物節點隱藏",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "走到村民旁",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "keepsake give 成功",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "走到西 [11,32]",
+  "ok": true,
+  "info": "ok inRange=false"
+ },
+ {
+  "name": "走到東 [47,32]",
+  "ok": true,
+  "info": "ok inRange=true"
+ },
+ {
+  "name": "走到北 [30,51]",
+  "ok": true,
+  "info": "ok inRange=false"
+ },
+ {
+  "name": "走到南 [30,13]",
+  "ok": true,
+  "info": "ok inRange=true"
+ },
+ {
+  "name": "走到西北角 [14,48]",
+  "ok": true,
+  "info": "ok inRange=false"
+ },
+ {
+  "name": "走到東南角 [46,16]",
+  "ok": true,
+  "info": "ok inRange=true"
+ }
+]

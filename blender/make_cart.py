@@ -2,7 +2,7 @@
 import rb
 
 def make(id, pos, **kw):
-    p = rb.parent_empty(id, pos, rb.props('cart', ['move', 'break'], ['breakable', 'step']))
+    p = rb.parent_empty(id, pos, rb.props('cart', ['move', 'break', 'use'], ['breakable', 'step']))
     s = rb.state_root(p, 'intact')
     rb.box(s, f'{id}__intact_body', (0.9, 0.7, 0.4), (0, 0, 0.55), rb.WOOD)
     rb.cyl(s, f'{id}__intact_wheelL', 0.25, 0.08, (-0.5, 0, 0.25), rb.DARKWOOD, rot=(0, 1.5708, 0))

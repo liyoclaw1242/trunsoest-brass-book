@@ -483,7 +483,8 @@
 ],
 "verbs": [
 "move",
-"break"
+"break",
+"use"
 ]
 },
 {
@@ -500,7 +501,8 @@
 ],
 "verbs": [
 "move",
-"break"
+"break",
+"use"
 ]
 },
 {
