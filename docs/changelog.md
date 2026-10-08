@@ -25,3 +25,16 @@
 7. **匯出參數**：已確認 `export_extras`、`export_apply` 存在。
 
 補充要求：規則邏輯（村民狀態、同化度、範圍、尋路）一律放 `engine/` 並用 node 測試；書的備用條文 4–6 條、每條有可讀出的漏洞；M1 佈局多檢查「從中心出發全程不進廣播範圍能否到邊界」。
+
+## M1 Blender 場景（2026-10-09）
+
+- `blender/rb.py` 共用工具 + 十二支 `make_<type>.py` + `layout.py`（純資料）+ `build_scene.py`。`npm run scene` 產出 `public/village.glb`、`public/scene.json`、`public/scene.meta.json`（中心、半徑、出生點）並算 `docs/playtest/m1/top.png`、`iso.png`。
+- `engine/grid.js`：從 scene.json 推格子地圖（住宅牆／室內／門洞、擋路、影響範圍、BFS 尋路、0-1 BFS）。畫面端與村民尋路共用。
+- `tools/validate-scene.js`：欄位、id、動詞、owner/parent、數量範圍；另解析 glb 確認每個 id 有同名節點、每個 `__col` 的佔地與 grid.js 算法逐格一致（81 格）。
+- `tools/check-layout.js`：印 ASCII 地圖；檢查覆蓋率（84%）、≥12 格的安靜區 6 塊、信物與公告牌都在廣播內、中心到邊界互不重疊的路線 5 條、路線至少四成在廣播內。
+- **補充要求 C（安靜逃脫路）**：第一版佈局有一條沿東側的全程安靜路（排除出生點所在廣播器後代價 0）。處理：把南邊 `speaker_06` 半徑由 8 改為 10。改後最少要經過 7 格廣播範圍（不排除任何廣播器則 11 格）。
+- 佈局：地圖 60×60，書在 `house_01` 室內 (29,32)，影響半徑 20，出生點 (30,26) 在書台正門前的廣場；6 台廣播器、4 棟住宅（各一村民、一門、一信物）、10 段圍籬（南排 6、西列 4）、2 推車、2 公告牌、12 界石。村民：v1 半同化（紅）、v2 人偶（藍）、v3 半同化（黃）、v4 已喚醒（綠）。
+- 修過的坑：所有方塊共用同一份 mesh 時材質會串，改為每個物件複製 mesh；Workbench 算圖要把 view transform 改 Standard 顏色才對。
+- 門多做了 `broken` 狀態（規格只列 closed/open 但動詞有 break）。
+- 驗證：`node tools/validate-scene.js` 通過、`node tools/check-layout.js` 通過；兩張圖我自己打開看過，十二類在斜上方圖互相分得出來；俯視圖看不到書（在屋內、被屋頂蓋住），其餘十一類分得出來。
+- 未驗證：在 three.js 裡載入後的座標對應（M2 做）。

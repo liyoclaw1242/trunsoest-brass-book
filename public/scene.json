@@ -1,0 +1,816 @@
+[
+{
+"id": "book_01",
+"type": "book",
+"pos": [
+29,
+32
+],
+"state": "closed",
+"tags": [
+"range-center"
+],
+"verbs": [
+"read",
+"move"
+],
+"radius": 20
+},
+{
+"id": "lectern_01",
+"type": "lectern",
+"pos": [
+29,
+32
+],
+"state": "intact",
+"tags": [],
+"verbs": []
+},
+{
+"id": "house_01",
+"type": "house",
+"pos": [
+30,
+32
+],
+"state": "intact",
+"tags": [
+"shelter"
+],
+"verbs": [
+"enter"
+],
+"owner": "villager_01"
+},
+{
+"id": "house_02",
+"type": "house",
+"pos": [
+16,
+38
+],
+"state": "intact",
+"tags": [
+"shelter"
+],
+"verbs": [
+"enter"
+],
+"owner": "villager_02"
+},
+{
+"id": "house_03",
+"type": "house",
+"pos": [
+44,
+38
+],
+"state": "intact",
+"tags": [
+"shelter"
+],
+"verbs": [
+"enter"
+],
+"owner": "villager_03"
+},
+{
+"id": "house_04",
+"type": "house",
+"pos": [
+30,
+46
+],
+"state": "intact",
+"tags": [
+"shelter"
+],
+"verbs": [
+"enter"
+],
+"owner": "villager_04"
+},
+{
+"id": "door_01",
+"type": "door",
+"pos": [
+30,
+30
+],
+"state": "closed",
+"tags": [
+"breakable"
+],
+"verbs": [
+"open",
+"break"
+],
+"parent": "house_01"
+},
+{
+"id": "door_02",
+"type": "door",
+"pos": [
+16,
+36
+],
+"state": "closed",
+"tags": [
+"breakable"
+],
+"verbs": [
+"open",
+"break"
+],
+"parent": "house_02"
+},
+{
+"id": "door_03",
+"type": "door",
+"pos": [
+44,
+36
+],
+"state": "closed",
+"tags": [
+"breakable"
+],
+"verbs": [
+"open",
+"break"
+],
+"parent": "house_03"
+},
+{
+"id": "door_04",
+"type": "door",
+"pos": [
+30,
+44
+],
+"state": "closed",
+"tags": [
+"breakable"
+],
+"verbs": [
+"open",
+"break"
+],
+"parent": "house_04"
+},
+{
+"id": "speaker_01",
+"type": "speaker",
+"pos": [
+30,
+27
+],
+"state": "intact",
+"tags": [
+"breakable",
+"broadcast"
+],
+"verbs": [
+"break",
+"repair"
+],
+"radius": 8
+},
+{
+"id": "speaker_02",
+"type": "speaker",
+"pos": [
+17,
+30
+],
+"state": "intact",
+"tags": [
+"breakable",
+"broadcast"
+],
+"verbs": [
+"break",
+"repair"
+],
+"radius": 8
+},
+{
+"id": "speaker_03",
+"type": "speaker",
+"pos": [
+42,
+30
+],
+"state": "intact",
+"tags": [
+"breakable",
+"broadcast"
+],
+"verbs": [
+"break",
+"repair"
+],
+"radius": 8
+},
+{
+"id": "speaker_04",
+"type": "speaker",
+"pos": [
+23,
+43
+],
+"state": "intact",
+"tags": [
+"breakable",
+"broadcast"
+],
+"verbs": [
+"break",
+"repair"
+],
+"radius": 8
+},
+{
+"id": "speaker_05",
+"type": "speaker",
+"pos": [
+38,
+43
+],
+"state": "intact",
+"tags": [
+"breakable",
+"broadcast"
+],
+"verbs": [
+"break",
+"repair"
+],
+"radius": 8
+},
+{
+"id": "speaker_06",
+"type": "speaker",
+"pos": [
+30,
+17
+],
+"state": "intact",
+"tags": [
+"breakable",
+"broadcast"
+],
+"verbs": [
+"break",
+"repair"
+],
+"radius": 10
+},
+{
+"id": "notice_01",
+"type": "notice",
+"pos": [
+25,
+26
+],
+"state": "written",
+"tags": [
+"notice"
+],
+"verbs": [
+"read",
+"deface"
+]
+},
+{
+"id": "notice_02",
+"type": "notice",
+"pos": [
+36,
+39
+],
+"state": "written",
+"tags": [
+"notice"
+],
+"verbs": [
+"read",
+"deface"
+]
+},
+{
+"id": "fence_01",
+"type": "fence",
+"pos": [
+27,
+22
+],
+"state": "intact",
+"tags": [
+"breakable"
+],
+"verbs": [
+"break",
+"climb"
+],
+"dir": "x"
+},
+{
+"id": "fence_02",
+"type": "fence",
+"pos": [
+28,
+22
+],
+"state": "intact",
+"tags": [
+"breakable"
+],
+"verbs": [
+"break",
+"climb"
+],
+"dir": "x"
+},
+{
+"id": "fence_03",
+"type": "fence",
+"pos": [
+29,
+22
+],
+"state": "intact",
+"tags": [
+"breakable"
+],
+"verbs": [
+"break",
+"climb"
+],
+"dir": "x"
+},
+{
+"id": "fence_04",
+"type": "fence",
+"pos": [
+30,
+22
+],
+"state": "intact",
+"tags": [
+"breakable"
+],
+"verbs": [
+"break",
+"climb"
+],
+"dir": "x"
+},
+{
+"id": "fence_05",
+"type": "fence",
+"pos": [
+31,
+22
+],
+"state": "intact",
+"tags": [
+"breakable"
+],
+"verbs": [
+"break",
+"climb"
+],
+"dir": "x"
+},
+{
+"id": "fence_06",
+"type": "fence",
+"pos": [
+32,
+22
+],
+"state": "intact",
+"tags": [
+"breakable"
+],
+"verbs": [
+"break",
+"climb"
+],
+"dir": "x"
+},
+{
+"id": "fence_07",
+"type": "fence",
+"pos": [
+21,
+26
+],
+"state": "intact",
+"tags": [
+"breakable"
+],
+"verbs": [
+"break",
+"climb"
+],
+"dir": "y"
+},
+{
+"id": "fence_08",
+"type": "fence",
+"pos": [
+21,
+27
+],
+"state": "intact",
+"tags": [
+"breakable"
+],
+"verbs": [
+"break",
+"climb"
+],
+"dir": "y"
+},
+{
+"id": "fence_09",
+"type": "fence",
+"pos": [
+21,
+28
+],
+"state": "intact",
+"tags": [
+"breakable"
+],
+"verbs": [
+"break",
+"climb"
+],
+"dir": "y"
+},
+{
+"id": "fence_10",
+"type": "fence",
+"pos": [
+21,
+29
+],
+"state": "intact",
+"tags": [
+"breakable"
+],
+"verbs": [
+"break",
+"climb"
+],
+"dir": "y"
+},
+{
+"id": "cart_01",
+"type": "cart",
+"pos": [
+34,
+23
+],
+"state": "intact",
+"tags": [
+"breakable",
+"step"
+],
+"verbs": [
+"move",
+"break"
+]
+},
+{
+"id": "cart_02",
+"type": "cart",
+"pos": [
+22,
+35
+],
+"state": "intact",
+"tags": [
+"breakable",
+"step"
+],
+"verbs": [
+"move",
+"break"
+]
+},
+{
+"id": "keepsake_01",
+"type": "keepsake",
+"pos": [
+14,
+24
+],
+"state": "intact",
+"tags": [
+"portable"
+],
+"verbs": [
+"take",
+"give"
+],
+"owner": "villager_01"
+},
+{
+"id": "keepsake_02",
+"type": "keepsake",
+"pos": [
+45,
+25
+],
+"state": "intact",
+"tags": [
+"portable"
+],
+"verbs": [
+"take",
+"give"
+],
+"owner": "villager_02"
+},
+{
+"id": "keepsake_03",
+"type": "keepsake",
+"pos": [
+20,
+47
+],
+"state": "intact",
+"tags": [
+"portable"
+],
+"verbs": [
+"take",
+"give"
+],
+"owner": "villager_03"
+},
+{
+"id": "keepsake_04",
+"type": "keepsake",
+"pos": [
+37,
+15
+],
+"state": "intact",
+"tags": [
+"portable"
+],
+"verbs": [
+"take",
+"give"
+],
+"owner": "villager_04"
+},
+{
+"id": "boundary_01",
+"type": "boundary",
+"pos": [
+49,
+32
+],
+"state": "intact",
+"tags": [
+"marker"
+],
+"verbs": []
+},
+{
+"id": "boundary_02",
+"type": "boundary",
+"pos": [
+46,
+42
+],
+"state": "intact",
+"tags": [
+"marker"
+],
+"verbs": []
+},
+{
+"id": "boundary_03",
+"type": "boundary",
+"pos": [
+39,
+49
+],
+"state": "intact",
+"tags": [
+"marker"
+],
+"verbs": []
+},
+{
+"id": "boundary_04",
+"type": "boundary",
+"pos": [
+29,
+52
+],
+"state": "intact",
+"tags": [
+"marker"
+],
+"verbs": []
+},
+{
+"id": "boundary_05",
+"type": "boundary",
+"pos": [
+19,
+49
+],
+"state": "intact",
+"tags": [
+"marker"
+],
+"verbs": []
+},
+{
+"id": "boundary_06",
+"type": "boundary",
+"pos": [
+12,
+42
+],
+"state": "intact",
+"tags": [
+"marker"
+],
+"verbs": []
+},
+{
+"id": "boundary_07",
+"type": "boundary",
+"pos": [
+9,
+32
+],
+"state": "intact",
+"tags": [
+"marker"
+],
+"verbs": []
+},
+{
+"id": "boundary_08",
+"type": "boundary",
+"pos": [
+12,
+22
+],
+"state": "intact",
+"tags": [
+"marker"
+],
+"verbs": []
+},
+{
+"id": "boundary_09",
+"type": "boundary",
+"pos": [
+19,
+15
+],
+"state": "intact",
+"tags": [
+"marker"
+],
+"verbs": []
+},
+{
+"id": "boundary_10",
+"type": "boundary",
+"pos": [
+29,
+12
+],
+"state": "intact",
+"tags": [
+"marker"
+],
+"verbs": []
+},
+{
+"id": "boundary_11",
+"type": "boundary",
+"pos": [
+39,
+15
+],
+"state": "intact",
+"tags": [
+"marker"
+],
+"verbs": []
+},
+{
+"id": "boundary_12",
+"type": "boundary",
+"pos": [
+46,
+22
+],
+"state": "intact",
+"tags": [
+"marker"
+],
+"verbs": []
+},
+{
+"id": "villager_01",
+"type": "villager",
+"pos": [
+32,
+28
+],
+"state": "half",
+"tags": [
+"actor"
+],
+"verbs": [],
+"color": [
+0.9,
+0.35,
+0.3
+]
+},
+{
+"id": "villager_02",
+"type": "villager",
+"pos": [
+16,
+33
+],
+"state": "puppet",
+"tags": [
+"actor"
+],
+"verbs": [],
+"color": [
+0.3,
+0.55,
+0.9
+]
+},
+{
+"id": "villager_03",
+"type": "villager",
+"pos": [
+44,
+33
+],
+"state": "half",
+"tags": [
+"actor"
+],
+"verbs": [],
+"color": [
+0.95,
+0.75,
+0.2
+]
+},
+{
+"id": "villager_04",
+"type": "villager",
+"pos": [
+30,
+41
+],
+"state": "awake",
+"tags": [
+"actor"
+],
+"verbs": [],
+"color": [
+0.35,
+0.75,
+0.4
+]
+},
+{
+"id": "outsider",
+"type": "outsider",
+"pos": [
+30,
+26
+],
+"state": "intact",
+"tags": [
+"actor",
+"player"
+],
+"verbs": []
+}
+]
