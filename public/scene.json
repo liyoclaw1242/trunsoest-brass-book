@@ -733,8 +733,8 @@
 "id": "villager_01",
 "type": "villager",
 "pos": [
-32,
-28
+37,
+27
 ],
 "state": "half",
 "tags": [
@@ -813,6 +813,8 @@
 "actor",
 "player"
 ],
-"verbs": []
+"verbs": [
+"capture"
+]
 }
 ]

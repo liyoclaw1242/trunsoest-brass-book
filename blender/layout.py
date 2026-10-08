@@ -57,7 +57,7 @@ OBJECTS = [
     # 界石
     *[dict(type='boundary', id=f'boundary_{i+1:02d}', pos=p) for i, p in enumerate(boundary_ring())],
     # 角色
-    dict(type='villager', id='villager_01', pos=(32, 28), state='half'),
+    dict(type='villager', id='villager_01', pos=(37, 27), state='half'),
     dict(type='villager', id='villager_02', pos=(16, 33), state='puppet'),
     dict(type='villager', id='villager_03', pos=(44, 33), state='half'),
     dict(type='villager', id='villager_04', pos=(30, 41), state='awake'),

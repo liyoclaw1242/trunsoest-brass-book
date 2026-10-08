@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node engine/engine.test.js && node engine/broadcast.test.js",
+    "test": "node engine/engine.test.js && node engine/broadcast.test.js && node engine/villagers.test.js",
     "scene": "${BLENDER:-/Applications/Blender.app/Contents/MacOS/Blender} --background --python blender/build_scene.py",
     "validate": "node tools/validate-scene.js && node tools/check-layout.js",
     "dev": "vite",

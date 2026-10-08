@@ -14,11 +14,11 @@ html, body { margin: 0; height: 100%; background: #1b1d1a; color: #eee; font: 14
 #notes .rule.void { text-decoration: line-through; color: #655; }
 #notes .rule.dead { color: #877; } #notes .rule.dead::after { content: '（廢文）'; }
 #notes .rule.now { color: #fd8; }
-#prompt { left: 50%; bottom: 90px; transform: translateX(-50%); display: flex; gap: 8px; }
+#prompt { left: 390px; right: 12px; bottom: 16px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
 #prompt span { background: rgba(0,0,0,.7); border: 1px solid #888; padding: 4px 10px; border-radius: 4px; }
 #prompt span b { color: #fd8; margin-right: 6px; }
 #prompt span.blocked { border-color: #a33; color: #e88; }
-#log { left: 12px; bottom: 12px; width: 460px; max-height: 32vh; overflow: hidden; background: rgba(0,0,0,.5); padding: 6px 10px; border-radius: 6px; font-size: 13px; }
+#log { left: 12px; bottom: 12px; width: 360px; max-height: 32vh; overflow: hidden; background: rgba(0,0,0,.5); padding: 6px 10px; border-radius: 6px; font-size: 13px; }
 #log div { opacity: .9; } #log div.violation { color: #f88; } #log div.write { color: #fd8; } #log div.reset { color: #f55; font-weight: bold; } #log div.refuse { color: #8cf; } #log div.conflict { color: #c9f; } #log div.learn { color: #9e9; }
 #designer { right: 12px; bottom: 12px; width: 420px; max-height: 60vh; overflow: auto; background: rgba(10,20,30,.9); border: 1px solid #58a; padding: 8px 10px; border-radius: 6px; font-size: 12px; }
 #designer h3 { margin: 0 0 4px; font-size: 13px; color: #9cf; }
@@ -36,3 +36,7 @@ html, body { margin: 0; height: 100%; background: #1b1d1a; color: #eee; font: 14
 #resetflash h1 { font-size: 64px; letter-spacing: 12px; color: #fff; text-shadow: 0 0 24px #f00; margin: 0; }
 #resetflash .small { font-size: 18px; color: #fcc; margin-top: 12px; }
 #notes.collapsed { display: none; }
+#labels { inset: 0; }
+#labels .label { position: absolute; left: 0; top: 0; font-size: 11px; padding: 1px 6px; border-radius: 3px; background: rgba(0,0,0,.6); color: #ddd; white-space: nowrap; }
+#labels .label.puppet { color: #ccc; } #labels .label.half { color: #fd9; } #labels .label.awake { color: #8f8; }
+#labels .label.chase { background: rgba(160,0,0,.85); color: #fff; font-weight: bold; }

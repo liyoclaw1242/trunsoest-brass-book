@@ -106,5 +106,5 @@ export class View {
     mesh.position.set(cell[0], y, -cell[1]); this.markers.add(mesh); return mesh;
   }
   /** 把畫面座標轉成格子（給 debug 用）。 */
-  project(cell) { const v = toWorld(cell, 1).project(this.camera); return [(v.x + 1) / 2 * this.canvas.clientWidth, (1 - v.y) / 2 * this.canvas.clientHeight]; }
+  project(cell, h = 1) { const v = toWorld(cell, h).project(this.camera); return [(v.x + 1) / 2 * this.canvas.clientWidth, (1 - v.y) / 2 * this.canvas.clientHeight]; }
 }

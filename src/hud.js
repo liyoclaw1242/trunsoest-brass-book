@@ -16,6 +16,19 @@ export class Hud {
     const f = document.createElement('div'); f.id = 'resetflash'; f.hidden = true; f.innerHTML = '<h1>以上規則無效</h1><div class="small"></div>'; document.getElementById('hud').appendChild(f);
     this.el.flash = f;
   }
+  /** 村民頭上的 DOM 標籤。 */
+  labels(items) {
+    let box = document.getElementById('labels');
+    if (!box) { box = document.createElement('div'); box.id = 'labels'; document.getElementById('hud').appendChild(box); }
+    const have = new Map([...box.children].map(c => [c.dataset.id, c]));
+    for (const it of items) {
+      let el = have.get(it.id);
+      if (!el) { el = document.createElement('div'); el.dataset.id = it.id; box.appendChild(el); } else have.delete(it.id);
+      el.className = 'label ' + it.cls; el.textContent = it.text;
+      el.style.transform = `translate(${Math.round(it.xy[0])}px, ${Math.round(it.xy[1])}px) translate(-50%, -100%)`;
+    }
+    for (const el of have.values()) el.remove();
+  }
   toggleDesigner() { this.designer = !this.designer; this.el.designer.hidden = !this.designer; }
   renderNotes() {
     const g = this.game, notes = g.world.notes('outsider'), bc = g.broadcast();

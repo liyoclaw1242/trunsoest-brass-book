@@ -1,5 +1,5 @@
 // main.js —— 啟動：讀 scene.json、建 Game、載 glb、主迴圈。把 window.__game 露出來給試玩腳本用。
-import { Game, name } from './game.js';
+import { Game, name, STATE, INDUCE } from './game.js';
 import { View, toWorld } from './view.js';
 import { Hud } from './hud.js';
 import { Input } from './input.js';
@@ -24,6 +24,8 @@ for (const o of game.world.objects.values()) view.setState(o.id, o.state);
 for (const v of game.villagers) view.setState(v.id, v.level);
 view.setState('outsider', 'intact');
 
+game.world.on('level', ({ actor, to }) => view.setState(actor.id, to));
+game.on(e => { if (e.type === 'captured') hud.toast(e.text, '', 3); else if (e.type === 'level') hud.toast(e.text, 'info', 3); });
 game.world.on('object', ({ object: o }) => {
   view.setState(o.id, o.state);
   if (o.heldBy) view.setVisible(o.id, false); else if (o.pos) { view.setVisible(o.id, true); view.setPos(o.id, o.pos, o.type === 'book' && game.player.carrying === o.id ? 1.4 : 0); }
@@ -47,6 +49,11 @@ function drawMarkers() {
   const mine = new Set(game.protectedIds('outsider'));
   for (const id of mine) view.outline(id, 0xffcc33);
   if (hud.designer) for (const id of game.protectedIds(null)) if (!mine.has(id)) view.outline(id, 0x33ddff, 1.3, 2.4);
+  // 村民：追你的畫紅色菱形，可誘導的畫綠色小點
+  for (const v of game.villagers) {
+    if (game.vil.hunts(v) && v.mode === 'chase') view.tag(v.fpos, 0xff2222, 2.6, 0.3);
+    else if (v.task) view.tag(v.fpos, 0x44aaff, 2.6, 0.22);
+  }
   // 廣播中的廣播器頭上標記
   const bc = game.broadcast();
   if (bc) for (const o of w.objects.values()) if (o.type === 'speaker' && o.state === 'intact') view.tag(o.pos, 0xff4444, 3.4, 0.25);
@@ -66,10 +73,12 @@ function loop(now) {
   const p = game.player;
   view.setPos('outsider', p.pos);
   if (p.carrying) view.setPos(p.carrying, p.pos, 1.4);
+  for (const v of game.villagers) { view.setPos(v.id, v.fpos); if (v.carrying) view.setPos(v.carrying, v.fpos, 1.4); }
   for (const h of view.roofs.keys()) view.setRoof(h, p.house !== h);
   drawMarkers();
   view.lookAtCell(p.pos, frames === 1);
   hud.update(dt);
+  hud.labels(game.villagers.map(v => ({ id: v.id, xy: view.project(v.fpos, 2.3), text: `${STATE[v.level]}${game.vil.hunts(v) && v.mode === 'chase' ? '・追你！' : v.task ? '・' + INDUCE[v.task.kind].slice(1) : ''}`, cls: v.level + (game.vil.hunts(v) && v.mode === 'chase' ? ' chase' : '') })));
   view.render();
   requestAnimationFrame(loop);
 }
@@ -92,6 +101,8 @@ window.__game = {
   quiet: () => game.quietCell(),
   protectedIds: a => game.protectedIds(a),
   designer: on => { if (hud.designer !== on) hud.toggleDesigner(); },
-  invite: h => { game.player.invitedTo = h; },
+  invite: h => { game.invitedTo = h; },
+  induce: (id, kind) => game.vil.induce(game.world.actors.get(id), kind),
+  villager: id => { const v = game.world.actors.get(id); return { pos: v.pos, level: v.level, mode: v.mode, task: v.task }; },
   designerRules: () => game.designerRules(),
 };

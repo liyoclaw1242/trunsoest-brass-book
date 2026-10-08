@@ -1,11 +1,12 @@
 // game.js —— 串接：引擎 World + Grid + 玩家移動與互動 + 事件紀錄。不碰 three.js（那在 view.js），不碰 DOM（那在 hud.js）。
-import { World, num } from '../engine/rulebook-engine.js';
-import { setup } from '../engine/rules.default.js';
-import { Grid, dist } from '../engine/grid.js';
+import { num } from '../engine/rulebook-engine.js';
+import { dist } from '../engine/grid.js';
+import { createSession } from '../engine/session.js';
 
 export const LABEL = { enter: '進入', use: '使用', open: '開啟', take: '取走', give: '歸還', break: '破壞', repair: '修復', move: '搬動', climb: '翻越', read: '閱讀', deface: '塗毀', approach: '靠近', run: '奔跑', capture: '抓捕' };
 export const TYPE = { book: '黃銅書', lectern: '書台', speaker: '廣播器', notice: '公告牌', house: '住宅', door: '門', fence: '圍籬', cart: '推車', keepsake: '信物', boundary: '界石', villager: '村民', outsider: '外鄉人' };
 export const STATE = { intact: '完好', broken: '損壞', closed: '關著', open: '開著', blank: '空白', written: '有字', defaced: '被塗毀', puppet: '人偶', half: '半同化', awake: '已喚醒', writing: '書寫中' };
+export const INDUCE = { invite: '請他邀請我進屋', fetch: '請他去拿信物', book: '請他去搬書' };
 export const name = o => o ? `${TYPE[o.type] || o.type}${o.id.replace(/^[a-z]+_?/, '') ? ' ' + o.id.split('_').pop() : ''}` : '';
 
 const STEP = 0.16;                 // 走一格的秒數
@@ -17,22 +18,21 @@ const cheb = (a, b) => Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1]));
 export class Game {
   constructor(scene, meta, opt = {}) {
     this.meta = meta;
-    this.world = new World(scene, opt.world || {});
-    this.grid = new Grid(this.world.objects);
+    this.session = createSession(scene, meta, opt);
+    this.world = this.session.world;
+    this.grid = this.session.grid;
+    this.vil = this.session.villagers;
+    this.villagers = this.vil.list;
     this.t = 0;
     this.log = [];
     this.listeners = [];
-    const me = this.world.addActor({ id: 'outsider', kind: 'outsider', pos: [...meta.start] });
-    this.player = { actor: me, cell: [...meta.start], pos: [...meta.start], from: null, to: null, k: 0, facing: [0, -1], house: null, invitedTo: null, carrying: null };
-    this.villagers = [];
-    for (const o of scene.filter(o => o.type === 'villager')) {
-      const a = this.world.addActor({ id: o.id, kind: 'citizen', pos: [...o.pos], level: o.state, home: [...o.pos], color: o.color });
-      this.villagers.push(a);
-    }
-    setup(this.world);
+    const me = this.session.outsider;
+    this.player = { actor: me, cell: [...meta.start], pos: [...meta.start], from: null, to: null, k: 0, facing: [0, -1], house: null, carrying: null };
     this.hookEvents();
     this.world.outsiderArrived();
   }
+  get invitedTo() { return this.player.actor.invitedTo; }
+  set invitedTo(h) { this.player.actor.invitedTo = h; }
   on(fn) { this.listeners.push(fn); }
   note(type, text, data = {}) {
     const e = { t: +this.t.toFixed(2), type, text, ...data };
@@ -52,6 +52,14 @@ export class Game {
       const what = o.state !== before ? `變成${STATE[o.state] || o.state}` : o.heldBy ? `被${o.heldBy === 'outsider' ? '你' : name(w.objects.get(o.heldBy))}拿著` : o.pos ? `移到 (${o.pos})` : '';
       this.note('object', `${name(o)}${what}`, { id: o.id, state: o.state, pos: o.pos, heldBy: o.heldBy });
     });
+    w.on('captured', ({ actor }) => { this.note('captured', `你被${name(w.objects.get(actor.id))}抓住了，送回村子中心`, { actor: actor.id }); this.onCaptured(actor); });
+    w.on('level', ({ actor, from, to, why }) => this.note('level', `${name(w.objects.get(actor.id))}從${STATE[from]}變成${STATE[to]}（${why === 'quiet' ? '太久沒聽到廣播' : why === 'keepsake' ? '收到自己的信物' : why}）`, { actor: actor.id, from, to, why }));
+    w.on('induce', ({ actor, kind }) => this.note('induce', `${name(w.objects.get(actor.id))}答應了：${INDUCE[kind]}`, { actor: actor.id, kind }));
+    w.on('induceFail', ({ actor }) => this.note('refuse', `${name(w.objects.get(actor.id))}是人偶，聽不進去`, { actor: actor.id }));
+    w.on('invited', ({ actor, house }) => this.note('invited', `${name(w.objects.get(actor.id))}邀請你進${name(w.objects.get(house))}`, { actor: actor.id, house }));
+    w.on('taskFail', ({ actor, kind, why }) => this.note('refuse', `${name(w.objects.get(actor.id))}做不到：${INDUCE[kind]}（${why === 'path' ? '走不到' : why === 'refused' ? '違反規則' : why}）`, { actor: actor.id, kind, why }));
+    w.on('bookMoved', ({ actor, pos }) => this.note('object', `${name(w.objects.get(actor.id))}把黃銅書搬到 (${pos})`, { actor: actor.id, pos }));
+    w.on('stuck', ({ actor }) => this.note('stuck', `${name(w.objects.get(actor.id))}過不去，先放棄`, { actor: actor.id }));
     w.on('act', ({ actor, verb, target }) => this.note('act', `${actor.id === 'outsider' ? '你' : name(w.objects.get(actor.id))}${LABEL[verb]}了${name(target) || ''}`, { actor: actor.id, verb, target: target?.id }));
   }
 
@@ -67,7 +75,7 @@ export class Game {
     if (!s.ok) return 'blocked';
     if (s.enterHouse) {
       const h = this.world.objects.get(s.enterHouse);
-      const ctx = p.invitedTo === h.id ? { invited: true } : { uninvited: true };
+      const ctx = this.invitedTo === h.id ? { invited: true } : { uninvited: true };
       const r = this.world.attempt('outsider', 'enter', h.id, ctx);
       if (!r.done) return 'refused';
     }
@@ -85,10 +93,15 @@ export class Game {
     p.actor.pos = [...cell];
     this.afterArrive();
   }
+  onCaptured(actor) {
+    if (this.player.carrying) this.dropBook();
+    this.place(this.meta.start);
+    this.captures = (this.captures || 0) + 1;
+  }
   afterArrive() {
     const p = this.player;
     const h = this.grid.houseAt(p.cell);
-    if (h !== p.house) { if (p.house && p.invitedTo === p.house) p.invitedTo = null; p.house = h; }
+    if (h !== p.house) { if (p.house && this.invitedTo === p.house) this.invitedTo = null; p.house = h; }
   }
   tick(dt) {
     this.t += dt;
@@ -99,7 +112,7 @@ export class Game {
       else p.pos = [p.from[0] + (p.to[0] - p.from[0]) * p.k, p.from[1] + (p.to[1] - p.from[1]) * p.k];
     }
     if (p.carrying) { const b = this.world.objects.get(p.carrying); b.pos = [...p.cell]; }
-    this.world.tick(dt);
+    this.session.tick(dt);
   }
 
   // ---------- 互動 ----------
@@ -115,6 +128,12 @@ export class Game {
       for (const v of this.villagers) if (cheb(v.pos, p.cell) <= 1) out.push(this.opt('give', o, { to: v.id }, `歸還${name(o)}給${name(w.objects.get(v.id))}`));
     }
     if (p.carrying) out.push({ verb: 'drop', label: '放下黃銅書', target: p.carrying, ok: true, run: () => this.dropBook() });
+    // 誘導相鄰的村民
+    for (const v of this.villagers) if (cheb(v.pos, p.cell) <= 1) {
+      const vo = w.objects.get(v.id);
+      if (!this.vil.inducible(v)) { out.push({ verb: 'induce', target: v.id, label: `${name(vo)}是人偶，無法誘導`, ok: false, reason: 'state', violates: [], run: () => ({ done: false }) }); continue; }
+      for (const o of this.vil.induceOptions(v)) out.push({ verb: 'induce', kind: o.kind, target: v.id, label: `${o.label}（${name(vo)}）`, ok: true, violates: [], run: () => ({ done: this.vil.induce(v, o.kind) }) });
+    }
     for (const o of near) {
       for (const verb of o.verbs) {
         if (verb === 'give') continue;
@@ -187,6 +206,7 @@ export class Game {
   /** 給 HUD／試玩腳本看的狀態摘要。 */
   status() {
     const p = this.player, w = this.world;
-    return { t: +this.t.toFixed(1), cell: [...p.cell], house: p.house, inBroadcast: w.inBroadcast(p.cell), inRange: this.grid.inRange(p.cell), held: [...p.actor.held], carrying: p.carrying, rules: w.active().length, max: w.opt.max, resets: w.resets };
+    return { t: +this.t.toFixed(1), cell: [...p.cell], house: p.house, inBroadcast: w.inBroadcast(p.cell), inRange: this.grid.inRange(p.cell), held: [...p.actor.held], carrying: p.carrying, rules: w.active().length, max: w.opt.max, resets: w.resets, invitedTo: this.invitedTo, captures: this.captures || 0,
+      villagers: this.villagers.map(v => ({ id: v.id, pos: [...v.pos], level: v.level, mode: v.mode, hunting: this.vil.hunts(v), task: v.task?.kind || null, quiet: +v.quiet.toFixed(1) })) };
   }
 }

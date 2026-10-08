@@ -1,0 +1,87 @@
+[
+ {
+  "name": "村民頭上標籤顯示三種同化程度",
+  "ok": true,
+  "info": "半同化,人偶,半同化,已喚醒"
+ },
+ {
+  "name": "走到村民 01 旁",
+  "ok": true,
+  "info": "[36,27]"
+ },
+ {
+  "name": "誘導：請他邀請我進屋",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "村民 01 走回自家門口並邀請",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "受邀後進入住宅、沒有違規",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "有村民在追（紅色標籤「追你！」）",
+  "ok": true,
+  "info": "半同化・追你！,人偶・追你！,半同化・追你！,已喚醒"
+ },
+ {
+  "name": "被抓到並送回中心",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "事件紀錄：被誰抓住",
+  "ok": true,
+  "info": "你被村民 01抓住了，送回村子中心"
+ },
+ {
+  "name": "被抓後在出生點附近（3 秒免疫內）",
+  "ok": true,
+  "info": "[30,26]"
+ },
+ {
+  "name": "躲在 house_04 內",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "村民 04 是已喚醒",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "對已喚醒村民有「請他去拿信物」選項",
+  "ok": true,
+  "info": "請他邀請我進屋（村民 04）|請他去拿信物（村民 04）|請他去搬書（村民 04）"
+ },
+ {
+  "name": "誘導：請他去拿信物",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "村民 04 拿到信物後交給你",
+  "ok": true,
+  "info": "{\"t\":18.5,\"cell\":[30,46],\"house\":\"house_04\",\"inBroadcast\":true,\"inRange\":true,\"held\":[\"keepsake_03\"],\"carrying\":null,\"rules\":6,\"max\":10,\"resets\":0,\"invitedTo\":null,\"captures\":1,\"villagers\":[{\"id\":\"villager_01\",\"pos\":[30,44],\"level\":\"half\",\"mode\":\"wander\",\"hunting\":true,\"task\":null,\"quiet\":0},{\"id\":\"villager_02\",\"pos\":[30,44],\"level\":\"puppet\",\"mode\":\"wander\",\"hunting\":true,\"task\":null,\"quiet\":0},{\"id\":\"villager_03\",\"pos\":[35,43],\"level\":\"half\",\"mode\":\"wander\",\"hunting\":true,\"task\":null,\"quiet\":0},{\"id\":\"villager_04\",\"pos\":[30,45],\"level\":\"awake\",\"mode\":\"wander\",\"hunting\":false,\"task\":null,\"quiet\":0}]}"
+ },
+ {
+  "name": "追捕的村民沒進入 house_04",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "事件紀錄有「過不去，先放棄」或走到門口",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "對人偶顯示「無法誘導」",
+  "ok": true,
+  "info": "歸還信物 03給村民 02|歸還信物 03給村民 04|村民 02是人偶，無法誘導|請他邀請我進屋（村民 04）|請他去拿信物（村民 04）|請他去搬書（村民 04）|開啟門 04|破壞門 04"
+ }
+]

@@ -4,7 +4,7 @@ import rb
 BLUE = (0.2, 0.4, 0.85)
 
 def make(id, pos, **kw):
-    p = rb.parent_empty(id, pos, rb.props('outsider', [], ['actor', 'player']))
+    p = rb.parent_empty(id, pos, rb.props('outsider', ['capture'], ['actor', 'player']))
     s = rb.state_root(p, 'intact')
     rb.box(s, f'{id}__intact_legL', (0.18, 0.2, 0.5), (-0.12, 0, 0.25), (0.2, 0.2, 0.3))
     rb.box(s, f'{id}__intact_legR', (0.18, 0.2, 0.5), (0.12, 0, 0.25), (0.2, 0.2, 0.3))

@@ -1,0 +1,199 @@
+[
+ {
+  "t": 0,
+  "type": "write",
+  "text": "書寫下第五條：請所有市民一起抓捕外鄉人，可採用一切手段。",
+  "no": 5
+ },
+ {
+  "t": 0,
+  "type": "broadcast",
+  "text": "廣播開始：第五條",
+  "no": 5
+ },
+ {
+  "t": 1.52,
+  "type": "induce",
+  "text": "村民 01答應了：請他邀請我進屋",
+  "actor": "villager_01",
+  "kind": "invite"
+ },
+ {
+  "t": 4.02,
+  "type": "learn",
+  "text": "聽完第五條：你、村民 01、村民 02、村民 03、村民 04認知了",
+  "no": 5,
+  "learned": [
+   "outsider",
+   "villager_01",
+   "villager_02",
+   "villager_03",
+   "villager_04"
+  ]
+ },
+ {
+  "t": 4.06,
+  "type": "invited",
+  "text": "村民 01邀請你進住宅 01",
+  "actor": "villager_01",
+  "house": "house_01"
+ },
+ {
+  "t": 5.51,
+  "type": "object",
+  "text": "門 01變成開著",
+  "id": "door_01",
+  "state": "open",
+  "pos": [
+   30,
+   30
+  ]
+ },
+ {
+  "t": 5.51,
+  "type": "act",
+  "text": "你開啟了門 01",
+  "actor": "outsider",
+  "verb": "open",
+  "target": "door_01"
+ },
+ {
+  "t": 5.68,
+  "type": "act",
+  "text": "你進入了住宅 01",
+  "actor": "outsider",
+  "verb": "enter",
+  "target": "house_01"
+ },
+ {
+  "t": 7.06,
+  "type": "act",
+  "text": "村民 01抓捕了外鄉人",
+  "actor": "villager_01",
+  "verb": "capture",
+  "target": "outsider"
+ },
+ {
+  "t": 7.06,
+  "type": "captured",
+  "text": "你被村民 01抓住了，送回村子中心",
+  "actor": "villager_01"
+ },
+ {
+  "t": 7.44,
+  "type": "object",
+  "text": "門 04變成開著",
+  "id": "door_04",
+  "state": "open",
+  "pos": [
+   30,
+   44
+  ]
+ },
+ {
+  "t": 7.44,
+  "type": "act",
+  "text": "你開啟了門 04",
+  "actor": "outsider",
+  "verb": "open",
+  "target": "door_04"
+ },
+ {
+  "t": 7.62,
+  "type": "act",
+  "text": "你進入了住宅 04",
+  "actor": "outsider",
+  "verb": "enter",
+  "target": "house_04"
+ },
+ {
+  "t": 7.62,
+  "type": "write",
+  "text": "書寫下第六條：外鄉人不得進入住宅。",
+  "no": 6
+ },
+ {
+  "t": 7.67,
+  "type": "broadcast",
+  "text": "廣播開始：第六條",
+  "no": 6
+ },
+ {
+  "t": 8.38,
+  "type": "induce",
+  "text": "村民 04答應了：請他去拿信物",
+  "actor": "villager_04",
+  "kind": "fetch"
+ },
+ {
+  "t": 11.69,
+  "type": "learn",
+  "text": "聽完第六條：你、村民 01、村民 02、村民 03、村民 04認知了",
+  "no": 6,
+  "learned": [
+   "outsider",
+   "villager_01",
+   "villager_02",
+   "villager_03",
+   "villager_04"
+  ]
+ },
+ {
+  "t": 12.97,
+  "type": "object",
+  "text": "信物 03被村民 04拿著",
+  "id": "keepsake_03",
+  "state": "intact",
+  "pos": null,
+  "heldBy": "villager_04"
+ },
+ {
+  "t": 12.97,
+  "type": "act",
+  "text": "村民 04取走了信物 03",
+  "actor": "villager_04",
+  "verb": "take",
+  "target": "keepsake_03"
+ },
+ {
+  "t": 15.04,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 15.38,
+  "type": "stuck",
+  "text": "村民 02過不去，先放棄",
+  "actor": "villager_02"
+ },
+ {
+  "t": 16.61,
+  "type": "stuck",
+  "text": "村民 01過不去，先放棄",
+  "actor": "villager_01"
+ },
+ {
+  "t": 17.71,
+  "type": "broadcast",
+  "text": "廣播開始：第一條",
+  "no": 1
+ },
+ {
+  "t": 18.3,
+  "type": "object",
+  "text": "信物 03被你拿著",
+  "id": "keepsake_03",
+  "state": "intact",
+  "pos": null,
+  "heldBy": "outsider"
+ },
+ {
+  "t": 18.3,
+  "type": "act",
+  "text": "村民 04歸還了信物 03",
+  "actor": "villager_04",
+  "verb": "give",
+  "target": "keepsake_03"
+ }
+]
