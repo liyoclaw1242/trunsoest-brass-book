@@ -16,10 +16,10 @@
 | `cart` 推車 | 2 | `intact` `broken` | move, break, use | 可推去擋路或墊腳（墊腳＝`use`，這一版預設） |
 | `keepsake` 信物 | 每村民 1 | `intact` | take, give | `rb_owner` |
 | `boundary` 界石 | 8–12 | `intact` | 無 | 沿影響範圍邊緣排一圈 |
-| `villager` 村民 | 3–6 | `puppet` `half` `awake` | 無（角色） | 三種同化程度要從外觀分得出來 |
+| `villager` 村民 | 3–6 | `puppet` `half` `awake` | induce（誘導，第 2 輪加的預設） | 三種同化程度要從外觀分得出來 |
 | `outsider` 外鄉人 | 1 | `intact` | 無（玩家） | |
 
-動詞是固定清單（引擎的 `VERBS`），條文裡的每個動詞都要對應到其中一個：`enter` 進入、`use` 使用、`open` 開啟、`take` 取走、`give` 歸還、`break` 破壞、`repair` 修復、`move` 搬動、`climb` 翻越、`read` 閱讀、`deface` 塗毀、`approach` 靠近、`run` 奔跑、`capture` 抓捕。
+動詞是固定清單（引擎的 `VERBS`），條文裡的每個動詞都要對應到其中一個：`enter` 進入、`use` 使用、`open` 開啟、`take` 取走、`give` 歸還、`break` 破壞、`repair` 修復、`move` 搬動、`climb` 翻越、`read` 閱讀、`deface` 塗毀、`approach` 靠近、`run` 奔跑、`capture` 抓捕、`induce` 誘導（第 2 輪加）。
 
 ## 建模規範
 

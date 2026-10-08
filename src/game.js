@@ -66,7 +66,7 @@ export class Game {
     w.on('captured', ({ actor }) => { this.note('captured', `你被${name(w.objects.get(actor.id))}抓住了，送回村子中心`, { actor: actor.id }); this.onCaptured(actor); });
     w.on('level', ({ actor, from, to, why }) => this.note('level', `${name(w.objects.get(actor.id))}從${STATE[from]}變成${STATE[to]}（${why === 'quiet' ? '太久沒聽到廣播' : why === 'keepsake' ? '收到自己的信物' : why}）`, { actor: actor.id, from, to, why }));
     w.on('induce', ({ actor, kind }) => this.note('induce', `${name(w.objects.get(actor.id))}答應了：${INDUCE[kind]}`, { actor: actor.id, kind }));
-    w.on('induceFail', ({ actor, reason }) => this.note('refuse', reason === 'cooldown' ? `${name(w.objects.get(actor.id))}剛幫過你，現在不想理你` : `${name(w.objects.get(actor.id))}是人偶，聽不進去`, { actor: actor.id, reason }));
+    w.on('induceFail', ({ actor, reason }) => this.note('refuse', reason === 'cooldown' ? `${name(w.objects.get(actor.id))}剛幫過你，現在不想理你` : reason === 'nothing' ? `地上沒有信物可拿了` : `${name(w.objects.get(actor.id))}是人偶，聽不進去`, { actor: actor.id, reason }));
     w.on('blockedByRule', ({ actor, house, rules }) => {
       const known = rules.filter(r => this.player.actor.known.has(r.no));
       const why = known.length ? `第${known.map(r => num(r.no)).join('、')}條擋著他：${known[0].text}` : '似乎有規則擋著他';
@@ -150,12 +150,14 @@ export class Game {
     // 身上的信物：可歸還給相鄰村民
     for (const id of p.actor.held) {
       const o = w.objects.get(id); if (o.type !== 'keepsake') continue;
-      for (const v of this.villagers) if (cheb(v.pos, p.cell) <= 1) out.push(this.opt('give', o, { to: v.id }, `歸還${name(o)}給${name(w.objects.get(v.id))}`));
+      const nearV = this.villagers.filter(v => cheb(v.pos, p.cell) <= 1).sort((a, b) => (a.id === o.owner ? 0 : 1) - (b.id === o.owner ? 0 : 1));
+      for (const v of nearV) out.push(this.opt('give', o, { to: v.id }, v.id === o.owner ? `把${name(o)}還給${name(w.objects.get(v.id))}（他的信物）` : `把${name(o)}交給${name(w.objects.get(v.id))}（不是他的）`));
     }
     if (p.carrying) out.push({ verb: 'drop', label: '放下黃銅書', target: p.carrying, ok: true, run: () => this.dropBook() });
     // 誘導相鄰的村民
     for (const v of this.villagers) if (cheb(v.pos, p.cell) <= 1) {
       const vo = w.objects.get(v.id);
+      if (v.returning) { out.push({ verb: 'induce', target: v.id, label: `${name(vo)}正在回家`, ok: false, reason: 'state', violates: [], run: () => ({ done: false }) }); continue; }
       if (!this.vil.inducible(v)) { const cd = this.vil.cooldown(v); out.push({ verb: 'induce', target: v.id, label: v.level === 'puppet' ? `${name(vo)}是人偶，無法誘導` : `${name(vo)}剛幫過你（${Math.ceil(cd)} 秒後再試）`, ok: false, reason: 'state', violates: [], run: () => ({ done: false }) }); continue; }
       for (const o of this.vil.induceOptions(v)) out.push({ verb: 'induce', kind: o.kind, target: v.id, label: `${o.label}（${name(vo)}）`, ok: true, violates: [], run: () => ({ done: this.vil.induce(v, o.kind) }) });
     }

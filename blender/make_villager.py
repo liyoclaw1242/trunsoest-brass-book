@@ -11,7 +11,7 @@ def _legs(s, id, st, color):
     rb.box(s, f'{id}__{st}_legR', (0.18, 0.2, 0.5), (0.12, 0, 0.25), color)
 
 def make(id, pos, color=(0.9, 0.3, 0.5), state='puppet', **kw):
-    p = rb.parent_empty(id, pos, rb.props('villager', [], ['actor'], color=','.join(str(round(c, 2)) for c in color)))
+    p = rb.parent_empty(id, pos, rb.props('villager', ['induce'], ['actor'], color=','.join(str(round(c, 2)) for c in color)))
     # puppet
     s = rb.state_root(p, 'puppet')
     _legs(s, id, 'puppet', GREY)

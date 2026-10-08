@@ -2,8 +2,8 @@
  {
   "t": 0,
   "type": "write",
-  "text": "書寫下第五條：請所有市民一起抓捕外鄉人，可採用一切手段。",
-  "no": 5
+  "text": "書寫下第六條：請所有市民一起抓捕外鄉人，可採用一切手段。",
+  "no": 6
  },
  {
   "t": 0,
@@ -13,14 +13,14 @@
  {
   "t": 0,
   "type": "broadcast",
-  "text": "廣播開始：第五條",
-  "no": 5
+  "text": "廣播開始：第六條",
+  "no": 6
  },
  {
-  "t": 4.04,
+  "t": 4.03,
   "type": "learn",
-  "text": "聽完第五條：你、村民 01、村民 02、村民 03、村民 04認知了",
-  "no": 5,
+  "text": "聽完第六條：你、村民 01、村民 02、村民 03、村民 04認知了",
+  "no": 6,
   "learned": [
    "outsider",
    "villager_01",
@@ -30,7 +30,7 @@
   ]
  },
  {
-  "t": 6.81,
+  "t": 6.99,
   "type": "act",
   "text": "村民 01抓捕了外鄉人",
   "actor": "villager_01",
@@ -38,7 +38,7 @@
   "target": "outsider"
  },
  {
-  "t": 6.81,
+  "t": 6.99,
   "type": "assim",
   "text": "同化度 0→1（被抓）",
   "from": 0,
@@ -46,52 +46,36 @@
   "why": "captured"
  },
  {
-  "t": 6.81,
+  "t": 6.99,
   "type": "captured",
   "text": "你被村民 01抓住了，送回村子中心",
   "actor": "villager_01"
  },
  {
-  "t": 10.06,
+  "t": 10.05,
   "type": "broadcast",
-  "text": "廣播開始：第四條",
-  "no": 4
+  "text": "廣播開始：第五條",
+  "no": 5
  },
  {
-  "t": 11.93,
-  "type": "act",
-  "text": "村民 03抓捕了外鄉人",
-  "actor": "villager_03",
-  "verb": "capture",
-  "target": "outsider"
- },
- {
-  "t": 11.93,
-  "type": "assim",
-  "text": "同化度 1→2（被抓）",
-  "from": 1,
-  "to": 2,
-  "why": "captured"
- },
- {
-  "t": 11.93,
-  "type": "captured",
-  "text": "你被村民 03抓住了，送回村子中心",
-  "actor": "villager_03"
- },
- {
-  "t": 12.19,
+  "t": 12.45,
   "type": "end",
   "text": "你走出了影響範圍。",
   "state": "won",
   "reason": "escaped",
   "stats": {
-   "time": 12.2,
+   "time": 12.4,
    "written": 0,
    "resets": 0,
    "awakened": 0,
-   "captures": 2,
+   "captures": 1,
    "idleWrites": 0
   }
+ },
+ {
+  "t": 12.62,
+  "type": "stuck",
+  "text": "村民 02過不去，先放棄",
+  "actor": "villager_02"
  }
 ]

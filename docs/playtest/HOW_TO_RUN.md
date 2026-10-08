@@ -11,7 +11,7 @@ npm run dev          # http://localhost:5173/
 ```
 開始畫面按「開始」。WASD／方向鍵移動，E 互動（數字鍵 2–9 選其他動作），N 收合筆記，Tab 設計者視角（所有條文、漏洞、誰認知到）。
 
-網址參數：`?autostart` 跳過開始畫面；`&noopening` 跳過開場 4 秒聽公告；`&nohunt` 村民不追人；`&noend` 對局不會結束（後兩個只給回歸腳本用）。
+網址參數：`?autostart` 跳過開始畫面；`&noopening` 跳過開場 4 秒聽公告；`&nohunt` 村民不追人；`&noend` 對局不會結束；`&noidle` 書不會自己動筆（後三個只給回歸腳本用）。
 
 ## 測試與腳本（dev server 要先開著）
 ```

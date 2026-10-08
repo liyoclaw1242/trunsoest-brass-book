@@ -64,8 +64,8 @@ export class Villagers {
   inducible(v) { return v.level !== 'puppet' && this.world.t >= v.cooldownUntil; }
   /** 冷卻還剩幾秒（0 表示可以誘導）。 */
   cooldown(v) { return Math.max(0, v.cooldownUntil - this.world.t); }
-  /** 任務結束：記冷卻。 */
-  endTask(v) { v.task = null; v.cooldownUntil = this.world.t + this.opt.induceCooldownSec; }
+  /** 任務結束：記冷卻，先走回家再恢復追捕（回家路上不抓人）。 */
+  endTask(v) { v.task = null; v.cooldownUntil = this.world.t + this.opt.induceCooldownSec; v.returning = true; v.path = []; v.goal = null; }
 
   // ---------- 誘導 ----------
   /**
@@ -86,11 +86,18 @@ export class Villagers {
   }
   induce(v, kind) {
     if (!this.inducible(v)) { this.emit('induceFail', { actor: v, kind, reason: v.level === 'puppet' ? 'puppet' : 'cooldown' }); return false; }
+    // 誘導是一個「招」：書看得見（外鄉人 attempt induce，觸發計數）；村民若認知到禁止跑腿的條文會拒絕。
+    // 條文的漏洞要成真：「已喚醒的人算不算市民沒說」→ 已喚醒的不受約束；「邀請算不算跑腿沒說」→ 邀請不算。
+    if (v.level !== 'awake' && kind !== 'invite') {
+      const bound = this.world.check(v.id, 'induce', v.id, {});
+      if (bound.violates.length) { this.emit('refuse', { actor: v, verb: 'induce', target: this.world.objects.get(v.id), rules: bound.violates }); return false; }
+    }
     const house = [...this.world.objects.values()].find(o => o.type === 'house' && o.owner === v.id);
     if (kind === 'invite') { v.task = { kind, house: house.id, stage: 0 }; }
     else if (kind === 'fetch') {
-      const ks = [...this.world.objects.values()].filter(o => o.type === 'keepsake' && o.pos).sort((a, b) => dist(a.pos, v.pos) - dist(b.pos, v.pos))[0];
-      if (!ks) return false;
+      const taken = new Set(this.list.filter(x => x.task?.kind === 'fetch').map(x => x.task.keepsake));
+      const ks = [...this.world.objects.values()].filter(o => o.type === 'keepsake' && o.pos && !taken.has(o.id)).sort((a, b) => dist(a.pos, v.pos) - dist(b.pos, v.pos))[0];
+      if (!ks) { this.emit('induceFail', { actor: v, kind, reason: 'nothing' }); return false; }
       v.task = { kind, keepsake: ks.id, stage: 0 };
     } else if (kind === 'book') {
       const book = [...this.world.objects.values()].find(o => o.type === 'book');
@@ -100,6 +107,7 @@ export class Villagers {
       v.task = { kind, book: book.id, dest: [...v.home], stage: 0 };
     } else return false;
     v.mode = 'task'; v.path = []; v.goal = null;
+    this.world.attempt('outsider', 'induce', v.id, {});
     this.emit('induce', { actor: v, kind });
     return true;
   }
@@ -185,8 +193,15 @@ export class Villagers {
         else v.fpos = [v.move.from[0] + (v.move.to[0] - v.move.from[0]) * v.move.k, v.move.from[1] + (v.move.to[1] - v.move.from[1]) * v.move.k];
       }
       if (v.carrying) { const b = w.objects.get(v.carrying); b.pos = [...v.pos]; }
-      // 抓捕判定（接了誘導任務的村民忙著做事，不抓人）
-      if (this.hunts(v) && !v.task && this.adjacentWalkable(v.pos, me.pos)) {
+      // 搬書途中聽到「不得搬動」就放下（絕不違反自己認知到的規則）
+      if (v.carrying) {
+        const c = w.check(v.id, 'move', v.carrying, {});
+        if (c.violates.length) { const b = w.objects.get(v.carrying); this.dropBook(v); this.emit('refuse', { actor: v, verb: 'move', target: b, rules: c.violates }); this.emit('taskFail', { actor: v, kind: 'book', why: 'refused' }); this.endTask(v); }
+      }
+      // 任務做完先走回家，到家附近才恢復追捕
+      if (v.returning && dist(v.pos, v.home) <= 1.5) v.returning = false;
+      // 抓捕判定（接了誘導任務或正在回家的村民忙著做事，不抓人）
+      if (this.hunts(v) && !v.task && !v.returning && this.adjacentWalkable(v.pos, me.pos)) {
         v.captureT += dt;
         if (v.captureT >= this.opt.captureSec) {
           v.captureT = 0;
@@ -196,9 +211,11 @@ export class Villagers {
       } else v.captureT = 0;
       // 決定模式
       if (v.task) v.mode = 'task';
+      else if (v.returning) v.mode = 'return';
       else if (this.hunts(v) && w.t >= v.waitUntil) v.mode = 'chase';
       else v.mode = 'wander';
-      if (v.mode === 'chase') this.chase(v, dt);
+      if (v.mode === 'return') { if (!v.move) { if (!v.path.length && !this.goTo(v, v.home)) v.returning = false; else this.stepAlong(v); } }
+      else if (v.mode === 'chase') this.chase(v, dt);
       else if (v.mode === 'task') this.doTask(v, dt);
       else this.wander(v, dt);
     }

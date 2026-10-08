@@ -89,23 +89,50 @@ const hear = (s, ids) => { for (const id of ids) v(s, id).known.add(s.world.live
   assert.ok(s.outsider.held.includes('keepsake_02'), `外鄉人應該拿到信物，實際 ${s.outsider.held}`);
   ok('誘導：請他去拿信物 → 村民拿了交給外鄉人');
 }
-// 7. 誘導：搬書（搬回自己家）；書的條文若認知到會拒絕
+// 7. 誘導：搬書。憲法裡就有「黃銅書不得被搬動」，市民認知 → 拒絕；撕掉之後才搬得動，搬了書又會被重寫
 {
   const s = fresh();
   const p = v(s, 'villager_01'); s.outsider.pos = [34, 23];
+  let refused = 0; s.world.on('refuse', () => refused++);
+  assert.equal(s.villagers.induce(p, 'book'), false); assert.equal(refused, 1);
+  assert.equal(s.villagers.cooldown(p), 0, '拒絕不算幫過你，不吃冷卻');
+  ok('誘導：認知到「不得搬動」的村民拒絕搬書');
+  s.world.live('book-move').void = true;   // 模擬被重置撕掉
   assert.equal(s.villagers.induce(p, 'book'), true);
   let moved = null; s.world.on('bookMoved', e => moved = e.pos);
   run(s, 30);
   const book = s.world.objects.get('book_01');
   assert.ok(moved, '書應該被搬');
-  assert.ok(s.world.live('book-move'), '搬書後書寫下「黃銅書不得被搬動」');
+  assert.ok(s.world.live('book-move'), '搬書後書重寫「黃銅書不得被搬動」');
   assert.deepEqual(book.pos, p.home);
   assert.deepEqual(s.grid.center(), p.home);
-  ok('誘導：請他去搬書 → 村民搬到自己家門口、範圍中心跟著書');
-  p.known.add(s.world.live('book-move').no);
-  let refused = 0; s.world.on('refuse', () => refused++);
-  assert.equal(s.villagers.induce(p, 'book'), false); assert.equal(refused, 1);
-  ok('誘導：認知到「不得搬動」的村民拒絕搬書');
+  ok('誘導：撕掉之後，請他去搬書 → 搬到自己家門口、範圍中心跟著書');
+  // 搬到一半聽到條文就放下
+  const s2 = fresh(); const q = v(s2, 'villager_01'); s2.outsider.pos = [34, 23];
+  s2.world.live('book-move').void = true;
+  assert.equal(s2.villagers.induce(q, 'book'), true);
+  for (let i = 0; i < 400 && !q.carrying; i++) s2.tick(0.05);
+  assert.ok(q.carrying, '應該已經拿起書');
+  q.known.add(s2.world.live('book-move').no);   // 途中聽到了
+  let fail = null; s2.world.on('taskFail', e => fail = e.why);
+  s2.tick(0.05);
+  assert.equal(q.carrying, null); assert.equal(fail, 'refused'); assert.ok(s2.world.objects.get('book_01').pos);
+  ok('搬書途中認知到「不得搬動」→ 當場放下，書留在半路');
+}
+// 9. 誘導是書看得見的招：第三次誘導寫下「市民不得替外鄉人跑腿」，認知到的村民拒絕
+{
+  const s = fresh();
+  const p = v(s, 'villager_01'); s.outsider.pos = [34, 23];
+  for (let i = 0; i < 3; i++) { p.cooldownUntil = 0; p.returning = false; assert.equal(s.villagers.induce(p, 'invite'), true); p.task = null; }
+  assert.ok(s.world.live('no-errand'), '第三次誘導後書寫下條文');
+  p.known.add(s.world.live('no-errand').no); p.cooldownUntil = 0; p.returning = false;
+  let refused = 0; s.world.on('refuse', e => { if (e.verb === 'induce') refused++; });
+  assert.equal(s.villagers.induce(p, 'fetch'), false); assert.equal(refused, 1);
+  p.task = null; p.cooldownUntil = 0; p.returning = false;
+  assert.equal(s.villagers.induce(p, 'invite'), true, '漏洞：邀請進屋不算跑腿');
+  const a = v(s, 'villager_04'); a.known.add(s.world.live('no-errand').no);
+  assert.equal(s.villagers.induce(a, 'fetch'), true, '漏洞：已喚醒的人算不算市民沒說 → 不追究');
+  ok('誘導用到第三次被寫成條文；認知到的村民拒絕跑腿，但邀請與已喚醒者是條文留下的漏洞');
 }
 // 8. 誘導冷卻：任務結束後 20 秒內不接受誘導；被規則擋在門口會發 blockedByRule（同一地點只一次）
 {
@@ -121,8 +148,8 @@ const hear = (s, ids) => { for (const id of ids) v(s, id).known.add(s.world.live
   s2.world.objects.get('door_03').state = 'open'; s2.outsider.pos = [44, 37];
   const blocked = []; s2.world.on('blockedByRule', e => blocked.push(`${e.actor.id}@${e.house}:${e.rules.map(r => r.key)}`));
   run(s2, 20);
-  assert.ok(blocked.length >= 1 && blocked[0].startsWith('villager_02@house_03:invite-only'), `${blocked}`);
-  assert.ok(blocked.length <= 3, `同一地點不該一直重複，實際 ${blocked.length} 次`);
+  assert.ok(blocked.some(b => b.startsWith('villager_02@house_03:invite-only')), `${blocked}`);
+  assert.ok(blocked.filter(b => b.startsWith('villager_02')).length <= 3, `同一地點不該一直重複，實際 ${blocked}`);
   ok('被憲法第三條擋在門口 → blockedByRule 事件（附條文），不洗版');
 }
 console.log('villagers.test 全部通過');

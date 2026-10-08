@@ -10,7 +10,7 @@ export class Match {
    */
   constructor(session, opt = {}) {
     this.s = session; this.world = session.world; this.grid = session.grid;
-    this.opt = { loseAssim: 3, aliveResets: 3, decaySec: 30, idleSec: 50, ...opt };
+    this.opt = { loseAssim: 3, aliveResets: 3, decaySec: 30, idleSec: 25, ...opt };
     this.state = 'playing'; this.reason = null;
     this.assim = 0; this.quiet = 0; this.t = 0;
     this.stats = { time: 0, written: 0, resets: 0, awakened: 0, captures: 0, idleWrites: 0 };

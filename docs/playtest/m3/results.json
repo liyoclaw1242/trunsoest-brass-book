@@ -1,13 +1,13 @@
 [
  {
-  "name": "開場筆記：0 條認知、5 條沒聽過",
+  "name": "開場筆記：0 條認知、6 條沒聽過（憲法五條＋抓捕令）",
   "ok": true,
   "info": ""
  },
  {
   "name": "廣播條顯示正在唸的條文與進度",
   "ok": true,
-  "info": "{\"key\":\"capture\",\"progress\":0.13818350000000001}"
+  "info": "{\"key\":\"capture\",\"progress\":0.15155000000000007}"
  },
  {
   "name": "聽完抓捕令後認知",
@@ -57,7 +57,7 @@
  {
   "name": "protectedBy：客觀受保護的（完好）廣播器有、玩家認知的沒有；壞掉的兩台不算",
   "ok": true,
-  "info": "mine=0 all=8"
+  "info": "mine=0 all=9"
  },
  {
   "name": "走到 speaker_03 範圍內",
@@ -82,7 +82,7 @@
  {
   "name": "破壞選項標示會違反第幾條",
   "ok": true,
-  "info": "{\"verb\":\"break\",\"target\":\"speaker_03\",\"label\":\"破壞廣播器 03\",\"ok\":true,\"violates\":[6]}"
+  "info": "{\"verb\":\"break\",\"target\":\"speaker_03\",\"label\":\"破壞廣播器 03\",\"ok\":true,\"violates\":[7]}"
  },
  {
   "name": "破壞受保護的廣播器 → violation 事件",
@@ -115,9 +115,14 @@
   "info": ""
  },
  {
-  "name": "破壞圍籬 → 第十條 → 第一次重置",
+  "name": "「圍籬不得翻越」是第十條 → 第一次重置（憲法五條被撕）",
   "ok": true,
-  "info": "rules=6"
+  "info": "rules=5"
+ },
+ {
+  "name": "破壞圍籬 → 補丁「圍籬不得被破壞」",
+  "ok": true,
+  "info": ""
  },
  {
   "name": "重置閃現「以上規則無效」",
@@ -135,12 +140,17 @@
   "info": ""
  },
  {
-  "name": "書重寫了更不客氣的抓捕令",
+  "name": "抓捕令這次沒被撕（第六條以後保留）",
   "ok": true,
   "info": ""
  },
  {
   "name": "第二次重置後 speaker-break 失效",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "第二次重置撕掉舊抓捕令，書重寫了更不客氣的版本",
   "ok": true,
   "info": ""
  },

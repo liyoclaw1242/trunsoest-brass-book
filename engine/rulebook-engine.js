@@ -2,7 +2,7 @@
 // 規則書的純邏輯：沒有 DOM、沒有 three.js，瀏覽器和 Node 都能跑。
 // 畫面端只需要：每幀呼叫 tick(dt)、玩家或村民做事時呼叫 attempt()、監聽事件更新模型。
 
-export const VERBS = ['enter', 'use', 'open', 'take', 'give', 'break', 'repair', 'move', 'climb', 'read', 'deface', 'approach', 'run', 'capture'];
+export const VERBS = ['enter', 'use', 'open', 'take', 'give', 'break', 'repair', 'move', 'climb', 'read', 'deface', 'approach', 'run', 'capture', 'induce'];
 
 const CN = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
 export function num(n) {

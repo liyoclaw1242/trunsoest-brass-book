@@ -2,8 +2,8 @@
  {
   "t": 0,
   "type": "write",
-  "text": "書寫下第五條：請所有市民一起抓捕外鄉人，可採用一切手段。",
-  "no": 5
+  "text": "書寫下第六條：請所有市民一起抓捕外鄉人，可採用一切手段。",
+  "no": 6
  },
  {
   "t": 0,
@@ -11,16 +11,16 @@
   "text": "黃銅書察覺了你。廣播器開始唸公告……"
  },
  {
-  "t": 0,
+  "t": -0.01,
   "type": "broadcast",
-  "text": "廣播開始：第五條",
-  "no": 5
+  "text": "廣播開始：第六條",
+  "no": 6
  },
  {
   "t": 4.01,
   "type": "learn",
-  "text": "聽完第五條：你、村民 01、村民 02、村民 03、村民 04認知了",
-  "no": 5,
+  "text": "聽完第六條：你、村民 01、村民 02、村民 03、村民 04認知了",
+  "no": 6,
   "learned": [
    "outsider",
    "villager_01",
@@ -30,7 +30,7 @@
   ]
  },
  {
-  "t": 4.35,
+  "t": 4.38,
   "type": "object",
   "text": "廣播器 01變成損壞",
   "id": "speaker_01",
@@ -41,7 +41,7 @@
   ]
  },
  {
-  "t": 4.35,
+  "t": 4.38,
   "type": "act",
   "text": "你破壞了廣播器 01",
   "actor": "outsider",
@@ -49,7 +49,15 @@
   "target": "speaker_01"
  },
  {
-  "t": 8.09,
+  "t": 7.07,
+  "type": "act",
+  "text": "村民 02翻越了圍籬 09",
+  "actor": "villager_02",
+  "verb": "climb",
+  "target": "fence_09"
+ },
+ {
+  "t": 8.11,
   "type": "object",
   "text": "廣播器 02變成損壞",
   "id": "speaker_02",
@@ -60,7 +68,7 @@
   ]
  },
  {
-  "t": 8.09,
+  "t": 8.11,
   "type": "act",
   "text": "你破壞了廣播器 02",
   "actor": "outsider",
@@ -68,30 +76,38 @@
   "target": "speaker_02"
  },
  {
-  "t": 8.09,
+  "t": 8.11,
   "type": "write",
-  "text": "書寫下第六條：廣播器不得被破壞。",
-  "no": 6
+  "text": "書寫下第七條：廣播器不得被破壞。",
+  "no": 7
  },
  {
-  "t": 8.13,
+  "t": 8.16,
   "type": "broadcast",
-  "text": "廣播開始：第六條",
-  "no": 6
+  "text": "廣播開始：第七條",
+  "no": 7
  },
  {
-  "t": 9.22,
+  "t": 9.87,
   "type": "act",
-  "text": "村民 01翻越了圍籬 06",
-  "actor": "villager_01",
+  "text": "村民 02翻越了圍籬 09",
+  "actor": "villager_02",
   "verb": "climb",
-  "target": "fence_06"
+  "target": "fence_09"
  },
  {
-  "t": 12.16,
+  "t": 10.2,
+  "type": "act",
+  "text": "村民 02翻越了圍籬 10",
+  "actor": "villager_02",
+  "verb": "climb",
+  "target": "fence_10"
+ },
+ {
+  "t": 12.2,
   "type": "learn",
-  "text": "聽完第六條：村民 01、村民 03、村民 04認知了",
-  "no": 6,
+  "text": "聽完第七條：村民 01、村民 03、村民 04認知了",
+  "no": 7,
   "learned": [
    "villager_01",
    "villager_03",
@@ -99,33 +115,41 @@
   ]
  },
  {
-  "t": 18.2,
-  "type": "broadcast",
-  "text": "廣播開始：第六條",
-  "no": 6
+  "t": 17.35,
+  "type": "act",
+  "text": "村民 02翻越了圍籬 10",
+  "actor": "villager_02",
+  "verb": "climb",
+  "target": "fence_10"
  },
  {
-  "t": 22.22,
+  "t": 18.21,
+  "type": "broadcast",
+  "text": "廣播開始：第七條",
+  "no": 7
+ },
+ {
+  "t": 22.25,
   "type": "learn",
-  "text": "聽完第六條：你認知了",
-  "no": 6,
+  "text": "聽完第七條：你認知了",
+  "no": 7,
   "learned": [
    "outsider"
   ]
  },
  {
-  "t": 23.88,
+  "t": 23.79,
   "type": "violation",
-  "text": "你違反了第六條（破壞廣播器 03）",
+  "text": "你違反了第七條（破壞廣播器 03）",
   "actor": "outsider",
   "verb": "break",
   "target": "speaker_03",
   "rules": [
-   6
+   7
   ]
  },
  {
-  "t": 23.88,
+  "t": 23.79,
   "type": "object",
   "text": "廣播器 03變成損壞",
   "id": "speaker_03",
@@ -136,7 +160,7 @@
   ]
  },
  {
-  "t": 23.88,
+  "t": 23.79,
   "type": "act",
   "text": "你破壞了廣播器 03",
   "actor": "outsider",
@@ -144,15 +168,7 @@
   "target": "speaker_03"
  },
  {
-  "t": 23.92,
-  "type": "act",
-  "text": "村民 01翻越了圍籬 06",
-  "actor": "villager_01",
-  "verb": "climb",
-  "target": "fence_06"
- },
- {
-  "t": 27.4,
+  "t": 27.47,
   "type": "object",
   "text": "門 01變成開著",
   "id": "door_01",
@@ -163,7 +179,7 @@
   ]
  },
  {
-  "t": 27.4,
+  "t": 27.47,
   "type": "act",
   "text": "你開啟了門 01",
   "actor": "outsider",
@@ -171,7 +187,7 @@
   "target": "door_01"
  },
  {
-  "t": 27.66,
+  "t": 27.73,
   "type": "act",
   "text": "你靠近了黃銅書 01",
   "actor": "outsider",
@@ -179,7 +195,7 @@
   "target": "book_01"
  },
  {
-  "t": 27.66,
+  "t": 27.73,
   "type": "act",
   "text": "你進入了住宅 01",
   "actor": "outsider",
@@ -187,13 +203,13 @@
   "target": "house_01"
  },
  {
-  "t": 28.27,
+  "t": 28.29,
   "type": "broadcast",
   "text": "廣播開始：第二條",
   "no": 2
  },
  {
-  "t": 28.33,
+  "t": 28.39,
   "type": "act",
   "text": "你靠近了黃銅書 01",
   "actor": "outsider",
@@ -201,7 +217,7 @@
   "target": "book_01"
  },
  {
-  "t": 28.33,
+  "t": 28.39,
   "type": "act",
   "text": "你進入了住宅 01",
   "actor": "outsider",
@@ -209,13 +225,13 @@
   "target": "house_01"
  },
  {
-  "t": 28.33,
+  "t": 28.39,
   "type": "write",
-  "text": "書寫下第七條：外鄉人不得進入住宅。",
-  "no": 7
+  "text": "書寫下第八條：外鄉人不得進入住宅。",
+  "no": 8
  },
  {
-  "t": 28.91,
+  "t": 28.97,
   "type": "act",
   "text": "你閱讀了黃銅書 01",
   "actor": "outsider",
@@ -233,15 +249,15 @@
  {
   "t": 29.93,
   "type": "conflict",
-  "text": "第七條與第四條衝突，這次不追究（進入）",
+  "text": "第八條與第四條衝突，這次不追究（進入）",
   "actor": "outsider",
   "verb": "enter"
  },
  {
   "t": 29.93,
   "type": "write",
-  "text": "書寫下第八條：第四條與第七條衝突時，以第七條為準。",
-  "no": 8
+  "text": "書寫下第九條：第四條與第八條衝突時，以第八條為準。",
+  "no": 9
  },
  {
   "t": 29.93,
@@ -252,13 +268,13 @@
   "target": "house_01"
  },
  {
-  "t": 32.44,
+  "t": 32.46,
   "type": "broadcast",
-  "text": "廣播開始：第七條",
-  "no": 7
+  "text": "廣播開始：第八條",
+  "no": 8
  },
  {
-  "t": 33.86,
+  "t": 33.35,
   "type": "act",
   "text": "你翻越了圍籬 04",
   "actor": "outsider",
@@ -266,7 +282,7 @@
   "target": "fence_04"
  },
  {
-  "t": 34.03,
+  "t": 33.53,
   "type": "act",
   "text": "你翻越了圍籬 04",
   "actor": "outsider",
@@ -274,7 +290,7 @@
   "target": "fence_04"
  },
  {
-  "t": 34.18,
+  "t": 33.71,
   "type": "act",
   "text": "你翻越了圍籬 04",
   "actor": "outsider",
@@ -282,38 +298,13 @@
   "target": "fence_04"
  },
  {
-  "t": 34.18,
+  "t": 33.71,
   "type": "write",
-  "text": "書寫下第九條：圍籬不得翻越。",
-  "no": 9
- },
- {
-  "t": 34.44,
-  "type": "object",
-  "text": "圍籬 04變成損壞",
-  "id": "fence_04",
-  "state": "broken",
-  "pos": [
-   30,
-   22
-  ]
- },
- {
-  "t": 34.44,
-  "type": "act",
-  "text": "你破壞了圍籬 04",
-  "actor": "outsider",
-  "verb": "break",
-  "target": "fence_04"
- },
- {
-  "t": 34.44,
-  "type": "write",
-  "text": "書寫下第十條：圍籬不得被破壞。",
+  "text": "書寫下第十條：圍籬不得翻越。",
   "no": 10
  },
  {
-  "t": 34.44,
+  "t": 33.71,
   "type": "reset",
   "text": "—— 以上規則無效 ——（撕掉 5 條）",
   "gone": [
@@ -325,36 +316,48 @@
   ]
  },
  {
-  "t": 34.44,
+  "t": 33.87,
+  "type": "object",
+  "text": "圍籬 04變成損壞",
+  "id": "fence_04",
+  "state": "broken",
+  "pos": [
+   30,
+   22
+  ]
+ },
+ {
+  "t": 33.87,
+  "type": "act",
+  "text": "你破壞了圍籬 04",
+  "actor": "outsider",
+  "verb": "break",
+  "target": "fence_04"
+ },
+ {
+  "t": 33.87,
   "type": "write",
-  "text": "書寫下第十一條：所有市民必須抓捕外鄉人。",
+  "text": "書寫下第十一條：圍籬不得被破壞。",
   "no": 11
  },
  {
-  "t": 34.96,
-  "type": "act",
-  "text": "村民 02翻越了圍籬 09",
-  "actor": "villager_02",
-  "verb": "climb",
-  "target": "fence_09"
- },
- {
-  "t": 36.53,
+  "t": 36.47,
   "type": "learn",
-  "text": "聽完第七條：村民 04認知了",
-  "no": 7,
+  "text": "聽完第八條：村民 01、村民 04認知了",
+  "no": 8,
   "learned": [
+   "villager_01",
    "villager_04"
   ]
  },
  {
-  "t": 36.62,
+  "t": 36.57,
   "type": "broadcast",
-  "text": "廣播開始：第八條",
-  "no": 8
+  "text": "廣播開始：第九條",
+  "no": 9
  },
  {
-  "t": 38.1,
+  "t": 38.14,
   "type": "level",
   "text": "村民 02從人偶變成半同化（太久沒聽到廣播）",
   "actor": "villager_02",
@@ -363,31 +366,31 @@
   "why": "quiet"
  },
  {
-  "t": 38.64,
+  "t": 38.14,
   "type": "write",
   "text": "書寫下第十二條：（填充條文）",
   "no": 12
  },
  {
-  "t": 38.64,
+  "t": 38.14,
   "type": "write",
   "text": "書寫下第十三條：（填充條文）",
   "no": 13
  },
  {
-  "t": 38.64,
+  "t": 38.14,
   "type": "write",
   "text": "書寫下第十四條：（填充條文）",
   "no": 14
  },
  {
-  "t": 38.64,
+  "t": 38.14,
   "type": "write",
   "text": "書寫下第十五條：（填充條文）",
   "no": 15
  },
  {
-  "t": 38.64,
+  "t": 38.14,
   "type": "reset",
   "text": "—— 以上規則無效 ——（撕掉 5 條）",
   "gone": [
@@ -399,25 +402,15 @@
   ]
  },
  {
-  "t": 40.72,
+  "t": 38.14,
+  "type": "write",
+  "text": "書寫下第十六條：任何存在必須抓捕外鄉人。",
+  "no": 16
+ },
+ {
+  "t": 40.66,
   "type": "broadcast",
   "text": "廣播開始：第十一條",
   "no": 11
- },
- {
-  "t": 44.75,
-  "type": "learn",
-  "text": "聽完第十一條：村民 01、村民 04認知了",
-  "no": 11,
-  "learned": [
-   "villager_01",
-   "villager_04"
-  ]
- },
- {
-  "t": 44.84,
-  "type": "broadcast",
-  "text": "廣播開始：第十二條",
-  "no": 12
  }
 ]

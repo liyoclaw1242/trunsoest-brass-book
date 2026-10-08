@@ -43,3 +43,4 @@ html, body { margin: 0; height: 100%; background: #1b1d1a; color: #eee; font: 14
 #overlay.won h1 { color: #8f8; } #overlay.lost h1 { color: #f66; } #overlay.start h1 { letter-spacing: 16px; }
 #resetflash .list { margin-top: 14px; font-size: 16px; color: #fff; line-height: 1.8; text-align: center; } #resetflash .list .unknown { color: #daa; font-style: italic; }
 #log div.protected { color: #ade; }
+#hud:has(#overlay:not([hidden])) #labels, #hud:has(#overlay:not([hidden])) #toast, #hud:has(#overlay:not([hidden])) #prompt { display: none !important; }

@@ -23,17 +23,25 @@ async function runRoute(route) {
   const over = async () => (await st()).state !== 'playing';
   const log = (...a) => console.log(`[${route}]`, ...a);
   // 一邊等一邊處理「有人到身邊」：可誘導的就誘導（kind），手上有誰的信物就還給誰
-  const tend = async (sec, { induceKind = 'fetch', onTick = null, stop = null, only = null } = {}) => {
+  const tend = async (sec, { induceKind = 'fetch', onTick = null, stop = null, only = null, noGive = false } = {}) => {
     const end = Date.now() + sec * 1000;
     while (Date.now() < end) {
       const s = await st(); if (s.state !== 'playing') return 'over';
       const o = await opts();
-      const give = o.find(x => x.verb === 'give' && s.villagers.some(v => cheb(v.pos, s.cell) <= 1 && x.label.includes(x.target.replace('keepsake_', '')) && x.label.endsWith(`村民 ${x.target.split('_')[1]}`)));
+      const give = noGive ? null : o.find(x => x.verb === 'give' && x.label.includes('他的信物'));
       if (give) { await pw.act(o.indexOf(give)); log(`t=${s.t} 歸還：${give.label}`); await shot('give'); continue; }
       const prefix = { fetch: '請他去拿信物', book: '請他去搬書', invite: '請他邀請' };
-      const order = [induceKind, 'invite', 'book', 'fetch'];
+      const order = induceKind === 'book' ? ['book', 'invite'] : [induceKind, 'invite', 'book', 'fetch'];
       const ind = order.map(k => o.find(x => x.verb === 'induce' && x.ok && x.label.startsWith(prefix[k]) && (!only || k !== induceKind || x.target === only))).find(Boolean);
-      if (ind) { const v = s.villagers.find(v => v.id === ind.target); if (v && v.hunting && !v.task) { await pw.act(o.indexOf(ind)); log(`t=${s.t} 誘導：${ind.label}`); await shot('induce'); continue; } }
+      if (ind) {
+        const v = s.villagers.find(v => v.id === ind.target);
+        // 已喚醒的村民不追人但很好用（條文的漏洞）；其他人只在他正要抓我、又沒在忙時才支開
+        if (v && !v.task && (v.hunting || (v.level === 'awake' && induceKind === 'fetch' && ind.label.startsWith('請他去拿信物')))) {
+          const r = await pw.act(o.indexOf(ind));
+          if (r && r.done) { log(`t=${s.t} 誘導：${ind.label}`); await shot('induce'); } else { log(`t=${s.t} 誘導被拒：${ind.label}`); await pw.wait(1); }
+          continue;
+        }
+      }
       if (onTick && await onTick(s)) return 'tick';
       if (stop && await stop(s)) return 'stop';
       await pw.wait(0.1);
@@ -85,8 +93,9 @@ async function runRoute(route) {
     await shot('after-awakening');
     if (!(await over())) await walkOut();
   } else if (route === 'book') {
-    // 等書台屋主（村民 01）到門口，請他去搬書；其他人到門口就支開。書一搬走，看我在不在範圍外。
-    const r = await tend(300, { induceKind: 'book', only: 'villager_01', stop: s => !s.inRange || s.state !== 'playing' });
+    // 憲法裡有「黃銅書不得被搬動」，屋主會拒絕；等第一次重置撕掉它。期間其他人到門口就用「邀請」支開（邀請不算跑腿）。
+    // 重置後住宅不再安全，被抓就被抓（送回中心、3 秒免疫），屋主一到身邊就請他搬書。書一搬走，看我在不在範圍外。
+    const r = await tend(300, { induceKind: 'book', only: 'villager_01', noGive: true, stop: s => !s.inRange || s.state !== 'playing' });
     log(`等待結束：${r}`, JSON.stringify((await st()).villagers.map(v => `${v.id}:${v.level}${v.hunting ? '!' : ''}${v.task ? '(' + v.task + ')' : ''}`)));
     await shot('after-book-moved');
     if (!(await over())) await walkOut();
@@ -94,15 +103,16 @@ async function runRoute(route) {
     // 砸廣播器：先請來的人去跑腿，再趁空檔衝出去砸 s6、s2、s3，中間被抓就從中心再來；全砸完回屋裡等村民醒
     // 廣播器的位置從 scene.json 讀，站到它南邊一格、面向北
     const spk = await pw.eval(() => Object.fromEntries(window.__game.scene.filter(o => o.type === 'speaker').map(o => [o.id, o.pos])));
-    const targets = ['speaker_04', 'speaker_03', 'speaker_02', 'speaker_06'].map(id => [id, [spk[id][0], spk[id][1] - 1], [0, 1]]);
+    // 只砸蓋住藏身處門口的兩台：門口一安靜，在門口等我的追捕者 30 秒就醒
+    const targets = ['speaker_04', 'speaker_05'].map(id => [id, [spk[id][0], spk[id][1] - 1], [0, 1]]);
     // 先等剛聽到抓捕令的加速（8 秒）過去
     await tend(9, { induceKind: 'fetch' });
     for (const [id, cell, face] of targets) {
       for (let tryN = 0; tryN < 3 && !(await over()); tryN++) {
         const state = await pw.eval(id => window.__game.game.world.objects.get(id).state, id);
         if (state === 'broken') break;
-        // 追捕者都在跑腿或離我 8 格以上才衝；最多等 12 秒
-        await tend(12, { induceKind: 'fetch', stop: s => s.villagers.every(v => !v.hunting || v.task || cheb(v.pos, s.cell) >= 8) });
+        // 追捕者都在跑腿／回家／離我 8 格以上才衝；最多等 20 秒
+        await tend(20, { induceKind: 'invite', stop: s => s.villagers.every(v => !v.hunting || v.task || v.mode === 'return' || cheb(v.pos, s.cell) >= 8) });
         const capBefore = (await st()).stats.captures;
         await dash(cell, id); await pw.face(face);
         if (await breakIt(id)) { await shot(`broke-${id}`); break; }
@@ -110,7 +120,7 @@ async function runRoute(route) {
       }
     }
     await enterHome(); await shot('back-in-house');
-    const r = await tend(150, { induceKind: 'fetch', stop: s => noHunters(s) });
+    const r = await tend(150, { induceKind: 'invite', stop: s => noHunters(s) });
     log(`等待結束：${r}`, JSON.stringify((await st()).villagers.map(v => `${v.id}:${v.level}${v.hunting ? '!' : ''}`)));
     await shot('after-awakening');
     if (!(await over())) await walkOut();

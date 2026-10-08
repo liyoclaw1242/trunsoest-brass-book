@@ -3,7 +3,7 @@ import { writeFileSync } from 'node:fs';
 import { open } from './pw.js';
 
 const DIR = 'docs/playtest/m3';
-const pw = await open({ url: 'http://localhost:5173/?autostart&noopening&nohunt&noend' });
+const pw = await open({ url: 'http://localhost:5173/?autostart&noopening&nohunt&noend&noidle' });
 const results = [];
 const check = (name, ok, info = '') => { results.push({ name, ok, info }); console.log(ok ? 'PASS' : 'FAIL', name, info); };
 const doVerb = async (verb, target, ctx) => { const opts = await pw.options(); const i = opts.findIndex(o => o.verb === verb && o.target === target); if (i < 0) return { done: false, missing: true, labels: opts.map(o => o.label) }; return { ...(await pw.act(i)), i, opt: opts[i] }; };
@@ -14,7 +14,7 @@ const notesText = () => pw.eval(() => document.getElementById('notes').innerText
 
 // 1. 開場：憲法四條 + 抓捕令，玩家一條都沒聽過
 let notes = await pw.notes();
-check('開場筆記：0 條認知、5 條沒聽過', notes.filter(n => n.known).length === 0 && notes.length === 5);
+check('開場筆記：0 條認知、6 條沒聽過（憲法五條＋抓捕令）', notes.filter(n => n.known).length === 0 && notes.length === 6);
 await pw.shot(DIR, '01-start-notes');
 // 2. 廣播條與進度：等抓捕令唸完
 let bc = await pw.eval(() => window.__game.broadcast());
@@ -79,22 +79,24 @@ await pw.shot(DIR, '08-conflict-ruling');
 await pw.goto([30, 23]); await pw.face([0, -1]);
 for (let i = 0; i < 3; i++) { r = await doVerb('climb', 'fence_04'); await pw.wait(0.2); await pw.face(i % 2 ? [0, -1] : [0, 1]); }
 check('翻越三次後書寫下 fence-climb', await live('fence-climb'));
-r = await doVerb('break', 'fence_04'); await pw.wait(0.3);
 st = await pw.status();
-check('破壞圍籬 → 第十條 → 第一次重置', st.resets === 1, `rules=${st.rules}`);
+check('「圍籬不得翻越」是第十條 → 第一次重置（憲法五條被撕）', st.resets === 1, `rules=${st.rules}`);
+r = await doVerb('break', 'fence_04'); await pw.wait(0.3);
+check('破壞圍籬 → 補丁「圍籬不得被破壞」', await live('fence-break'));
 check('重置閃現「以上規則無效」', await pw.eval(() => !document.getElementById('resetflash').hidden));
 await pw.shot(DIR, '09-reset-flash');
 await pw.wait(3);
 notes = await pw.notes();
 check('筆記裡被撕掉的條文劃掉（void）', notes.filter(n => n.void).length === 5 && (await pw.eval(() => document.querySelectorAll('#notes .rule.void').length)) === 5);
 check('裁決變廢文', notes.some(n => n.dead));
-check('書重寫了更不客氣的抓捕令', await pw.eval(() => window.__game.game.world.live('capture').text.includes('必須')));
+check('抓捕令這次沒被撕（第六條以後保留）', await pw.eval(() => !!window.__game.game.world.live('capture')));
 await pw.shot(DIR, '10-after-reset-notes');
 
 // 8. 驗證 4：保護條文被撕掉 → 廣播器恢復可破壞
 await pw.eval(() => { const w = window.__game.game.world; for (let i = 0; w.resets < 2; i++) w.write({ key: `filler-${i}`, text: '（填充條文）' }); });
 await pw.wait(0.3);
 check('第二次重置後 speaker-break 失效', !(await live('speaker-break')));
+check('第二次重置撕掉舊抓捕令，書重寫了更不客氣的版本', await pw.eval(() => window.__game.game.world.live('capture').text.includes('必須')));
 check('驗證 4：廣播器不再受保護', (await pw.protectedIds(null)).filter(id => id.startsWith('speaker')).length === 0);
 await pw.goto([41, 30]); await pw.face([1, 0]);
 opts = await pw.options(); const bo2 = opts.find(o => o.verb === 'repair' && o.target === 'speaker_03');

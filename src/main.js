@@ -6,7 +6,7 @@ import { Input } from './input.js';
 
 const [scene, meta] = await Promise.all([fetch('/scene.json').then(r => r.json()), fetch('/scene.meta.json').then(r => r.json())]);
 const params = new URLSearchParams(location.search);
-const game = new Game(scene, meta, { villagers: { hunt: !params.has('nohunt') }, match: { noEnd: params.has('noend') } });
+const game = new Game(scene, meta, { villagers: { hunt: !params.has('nohunt') }, match: { noEnd: params.has('noend'), ...(params.has('noidle') ? { idleSec: 1e9 } : {}) } });
 const view = await new View(document.getElementById('gl')).load('/village.glb');
 const hud = new Hud(game);
 const input = new Input();
@@ -84,7 +84,7 @@ function loop(now) {
   drawMarkers();
   view.lookAtCell(p.pos, frames === 1);
   hud.update(dt);
-  hud.labels(game.villagers.map(v => ({ id: v.id, xy: view.project(v.fpos, 2.3), text: `${STATE[v.level]}${game.vil.hunts(v) && v.mode === 'chase' ? '・追你！' : v.task ? '・' + INDUCE[v.task.kind].slice(1) : v.level !== 'puppet' && game.vil.cooldown(v) > 0 ? '・剛幫過你' : ''}`, cls: v.level + (game.vil.hunts(v) && v.mode === 'chase' ? ' chase' : '') })));
+  hud.labels(game.villagers.map(v => ({ id: v.id, xy: view.project(v.fpos, 2.3), text: `${STATE[v.level]}${game.vil.hunts(v) && v.mode === 'chase' ? '・追你！' : v.task ? '・' + INDUCE[v.task.kind].slice(1) : v.returning ? '・回家中' : v.level !== 'puppet' && game.vil.cooldown(v) > 0 ? '・剛幫過你' : ''}`, cls: v.level + (game.vil.hunts(v) && v.mode === 'chase' ? ' chase' : '') })));
   view.render();
   requestAnimationFrame(loop);
 }

@@ -7,6 +7,8 @@ export const CONSTITUTION = [
   { key: 'no-harm', text: '不得傷害他人。' },
   { key: 'invite-only', text: '未經邀請不得進入他人住宅。', verb: 'enter', target: { type: 'house' }, cond: 'uninvited' },
   { key: 'guest-ok', text: '受市民邀請者，得進入該市民的住宅。', verb: 'enter', target: { type: 'house' }, cond: 'invited', mode: 'permit' },
+  // 第 2 輪加的預設：書從一開始就保護自己不被搬走；重置撕掉之後，搬書這條路才打開。
+  { key: 'book-move', text: '黃銅書不得被搬動。', verb: 'move', target: { id: 'book_01' }, hole: '書台沒被提到；沒聽到的人不受約束。' },
 ];
 
 /** 抓捕令。每次被重置撕掉後，書會重寫一次，措辭一次比一次不客氣。 */
@@ -31,7 +33,9 @@ export const TRIGGERS = [
   { verb: 'use', type: 'cart', by: 'outsider', count: 2,
     rule: { key: 'cart-use', text: '推車不得用於越過圍籬。', verb: 'use', target: { type: 'cart' }, hole: '只禁止「用於越過圍籬」；推去擋路、推去墊別的東西都沒說。' } },
   { verb: 'move', type: 'book', count: 1,
-    rule: { key: 'book-move', text: '黃銅書不得被搬動。', verb: 'move', target: { id: 'book_01' }, hole: '書台沒被提到。' } },
+    rule: { key: 'book-move', text: '黃銅書不得被搬動。', verb: 'move', target: { id: 'book_01' }, hole: '書台沒被提到；沒聽到的人不受約束。' } },
+  { verb: 'induce', type: 'villager', by: 'outsider', count: 3,
+    rule: { key: 'no-errand', text: '市民不得替外鄉人跑腿。', who: 'citizen', verb: 'induce', target: { type: 'villager' }, hole: '只管「市民」，已喚醒的人算不算市民沒說；邀請進屋算不算跑腿也沒說。' } },
 ];
 
 /** 書閒著沒事時自己動筆的備用條文（50 秒沒有新條文就寫一條）。每條的漏洞都能從條文文字讀出來。 */

@@ -73,6 +73,24 @@
  },
  {
   "no": 5,
+  "key": "book-move",
+  "text": "黃銅書不得被搬動。",
+  "hole": "書台沒被提到；沒聽到的人不受約束。",
+  "void": true,
+  "dead": false,
+  "mode": "forbid",
+  "verb": "move",
+  "who": "any",
+  "knownBy": [
+   "outsider",
+   "villager_01",
+   "villager_02",
+   "villager_03",
+   "villager_04"
+  ]
+ },
+ {
+  "no": 6,
   "key": "capture",
   "text": "請所有市民一起抓捕外鄉人，可採用一切手段。",
   "hole": "",
@@ -90,7 +108,7 @@
   ]
  },
  {
-  "no": 6,
+  "no": 7,
   "key": "speaker-break",
   "text": "廣播器不得被破壞。",
   "hole": "沒聽到的人不受約束；沒說不能搬走。",
@@ -107,7 +125,7 @@
   ]
  },
  {
-  "no": 7,
+  "no": 8,
   "key": "house-outsider",
   "text": "外鄉人不得進入住宅。",
   "hole": "和「受邀者得進入」衝突，裁決寫下前不追究。",
@@ -118,13 +136,14 @@
   "who": "outsider",
   "knownBy": [
    "outsider",
+   "villager_01",
    "villager_04"
   ]
  },
  {
-  "no": 8,
-  "key": "ruling:4:7",
-  "text": "第四條與第七條衝突時，以第七條為準。",
+  "no": 9,
+  "key": "ruling:4:8",
+  "text": "第四條與第八條衝突時，以第八條為準。",
   "hole": "依附的條文被撕掉就成廢文。",
   "void": true,
   "dead": true,
@@ -134,7 +153,7 @@
   "knownBy": []
  },
  {
-  "no": 9,
+  "no": 10,
   "key": "fence-climb",
   "text": "圍籬不得翻越。",
   "hole": "沒說不能破壞。",
@@ -146,31 +165,16 @@
   "knownBy": []
  },
  {
-  "no": 10,
+  "no": 11,
   "key": "fence-break",
   "text": "圍籬不得被破壞。",
   "hole": "推車可以墊腳。",
-  "void": true,
+  "void": false,
   "dead": false,
   "mode": "forbid",
   "verb": "break",
   "who": "any",
   "knownBy": []
- },
- {
-  "no": 11,
-  "key": "capture",
-  "text": "所有市民必須抓捕外鄉人。",
-  "hole": "",
-  "void": false,
-  "dead": false,
-  "mode": "require",
-  "verb": "capture",
-  "who": "citizen",
-  "knownBy": [
-   "villager_01",
-   "villager_04"
-  ]
  },
  {
   "no": 12,
@@ -217,6 +221,18 @@
   "dead": false,
   "mode": "forbid",
   "verb": null,
+  "who": "any",
+  "knownBy": []
+ },
+ {
+  "no": 16,
+  "key": "capture",
+  "text": "任何存在必須抓捕外鄉人。",
+  "hole": "",
+  "void": false,
+  "dead": false,
+  "mode": "require",
+  "verb": "capture",
   "who": "any",
   "knownBy": []
  }

@@ -14,8 +14,9 @@ const run = sec => { for (let i = 0; i < sec * 10; i++) w.tick(0.1); };
 const ok = msg => console.log('PASS', msg);
 const log = []; w.on('write', e => log.push(`第${e.rule.no}條 ${e.rule.text}`)); w.on('reset', () => log.push('—— 以上規則無效 ——'));
 
-// 開場：憲法四條，市民都知道，外鄉人沒被告知過
-assert.equal(w.active().length, 4);
+// 開場：憲法五條（第 2 輪加了「黃銅書不得被搬動」），市民都知道，外鄉人沒被告知過
+assert.equal(w.active().length, 5);
+assert.equal(w.attempt('villager_01', 'move', 'book_01', { to: [3, 3] }).refused, true);
 assert.equal(w.check('outsider', 'enter', 'house_01', { uninvited: true }).violates.length, 0);
 assert.equal(w.attempt('villager_02', 'enter', 'house_01', { uninvited: true }).refused, true);
 ok('公示才生效：同一條規則擋得住市民，擋不住沒聽過的外鄉人');
@@ -66,24 +67,27 @@ w.attempt('outsider', 'read', 'book_01');
 assert.equal(w.check('outsider', 'enter', 'house_01', { invited: true }).violates.length, 1);
 ok('矛盾：裁決寫下前不追究；裁決也要被認知才生效，且佔一條額度');
 
-// 補丁鏈＋第一次重置
+// 補丁鏈＋第一次重置（第十條是「圍籬不得翻越」；憲法五條被撕，抓捕令以後的保留）
 for (let i = 0; i < 3; i++) w.attempt('outsider', 'climb', 'fence_01');
 assert.ok(w.live('fence-climb'));
-w.attempt('outsider', 'break', 'fence_01');
 assert.equal(w.resets, 1);
 assert.equal(w.rules.find(x => x.kind === 'ruling').dead, true);
-assert.ok(w.live('capture') && w.live('capture').text.includes('必須'));
-ok('第一次重置：憲法與舊抓捕令被撕、裁決變廢文、書重寫了更不客氣的抓捕令');
+assert.equal(w.live('book-move'), null, '憲法裡的「黃銅書不得被搬動」被撕掉');
+w.attempt('outsider', 'break', 'fence_01');
+assert.ok(w.live('fence-break'), '補丁「圍籬不得被破壞」要在「不得翻越」仍生效時才寫');
+ok('第一次重置：憲法被撕（含書的保護）、裁決變廢文、補丁鏈接得上');
 
-// 驗證 4：保護條文被撕掉後，物件恢復可破壞
+// 驗證 4：保護條文被撕掉後，物件恢復可破壞；書的保護撕掉後市民搬得動書，搬了書又會被重寫
 w.attempt('outsider', 'take', 'keepsake_01');
-w.attempt('villager_01', 'move', 'book_01', { to: [3, 3] });
+assert.equal(w.attempt('villager_01', 'move', 'book_01', { to: [3, 3] }).done, true);  // 憲法那條被撕了
+assert.ok(w.live('book-move'), '搬了書，書立刻重寫「不得搬動」');
 assert.equal(w.attempt('villager_01', 'move', 'book_01', { to: [4, 4] }).done, true); // 還沒聽到，所以搬得動
 for (let i = 0; w.resets < 2; i++) w.write({ key: `filler-${i}`, text: '（填充條文）' });
 assert.equal(w.live('speaker-break'), null);
 assert.equal(w.check('outsider', 'break', 'speaker_03').violates.length, 0);
 assert.equal(w.protectedBy('speaker_03').length, 0);
-ok('驗證 4：重置撕掉保護條文後，廣播器可以再次被破壞');
+assert.ok(w.live('capture') && w.live('capture').text.includes('必須'), '舊抓捕令被撕後書重寫了更不客氣的版本');
+ok('驗證 4：重置撕掉保護條文後，廣播器可以再次被破壞；抓捕令被撕後重寫升級');
 
 // 已損壞的物件不算「受保護」（條文禁止的動作在那個狀態做不到）
 w.write({ key: 'sb2', text: '廣播器不得被破壞。', verb: 'break', target: { type: 'speaker' } }, { silent: true, knownBy: ['outsider'] });
