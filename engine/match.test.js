@@ -32,7 +32,7 @@ const OUT = [16, 52];
   ok('窗口：撕掉之後、重新公示之前走出去 → 贏');
   // 聽完新的那條就又關上了
   const s2 = fresh(); run(s2, 5);
-  for (let i = 0; s2.world.resets < 1; i++) s2.world.write({ key: `f${i}`, text: '（填充）' });
+  for (let i = 0; s2.world.resets < 1; i++) s2.world.write({ key: `f${i}`, text: '（填充）' }, { silent: true });
   s2.outsider.pos = [50, 48]; run(s2, 12);
   assert.ok(s2.world.knows('outsider', 'no-leave'), '站在廣播範圍內聽完新的一條');
   s2.outsider.pos = [...OUT]; run(s2, 0.1);
