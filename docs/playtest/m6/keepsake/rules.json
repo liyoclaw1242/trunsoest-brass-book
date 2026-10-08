@@ -1,0 +1,120 @@
+[
+ {
+  "no": 1,
+  "key": "hide",
+  "text": "此地不為外界所知。",
+  "hole": "",
+  "void": false,
+  "dead": false,
+  "mode": "forbid",
+  "verb": null,
+  "who": "any",
+  "knownBy": [
+   "villager_01",
+   "villager_02",
+   "villager_03",
+   "villager_04"
+  ]
+ },
+ {
+  "no": 2,
+  "key": "no-harm",
+  "text": "不得傷害他人。",
+  "hole": "",
+  "void": false,
+  "dead": false,
+  "mode": "forbid",
+  "verb": null,
+  "who": "any",
+  "knownBy": [
+   "villager_01",
+   "villager_02",
+   "villager_03",
+   "villager_04"
+  ]
+ },
+ {
+  "no": 3,
+  "key": "invite-only",
+  "text": "未經邀請不得進入他人住宅。",
+  "hole": "",
+  "void": false,
+  "dead": false,
+  "mode": "forbid",
+  "verb": "enter",
+  "who": "any",
+  "knownBy": [
+   "villager_01",
+   "villager_02",
+   "villager_03",
+   "villager_04"
+  ]
+ },
+ {
+  "no": 4,
+  "key": "guest-ok",
+  "text": "受市民邀請者，得進入該市民的住宅。",
+  "hole": "",
+  "void": false,
+  "dead": false,
+  "mode": "permit",
+  "verb": "enter",
+  "who": "any",
+  "knownBy": [
+   "villager_01",
+   "villager_02",
+   "villager_03",
+   "villager_04"
+  ]
+ },
+ {
+  "no": 5,
+  "key": "capture",
+  "text": "請所有市民一起抓捕外鄉人，可採用一切手段。",
+  "hole": "",
+  "void": false,
+  "dead": false,
+  "mode": "require",
+  "verb": "capture",
+  "who": "citizen",
+  "knownBy": [
+   "outsider",
+   "villager_01",
+   "villager_02",
+   "villager_03",
+   "villager_04"
+  ]
+ },
+ {
+  "no": 6,
+  "key": "door-open",
+  "text": "外鄉人不得開啟任何門。",
+  "hole": "只禁止「開啟」，沒說不能破壞門；也沒禁止市民開門（開著的門走進去就好）。",
+  "void": false,
+  "dead": false,
+  "mode": "forbid",
+  "verb": "open",
+  "who": "outsider",
+  "knownBy": [
+   "villager_01",
+   "villager_03",
+   "villager_04"
+  ]
+ },
+ {
+  "no": 7,
+  "key": "book-approach",
+  "text": "外鄉人不得靠近黃銅書。",
+  "hole": "只管「靠近」，沒說市民不能把書搬走（請村民搬書）；書離開原位之後靠近的是新位置，條文照樣算，但沒說不能遠遠地看。",
+  "void": false,
+  "dead": false,
+  "mode": "forbid",
+  "verb": "approach",
+  "who": "outsider",
+  "knownBy": [
+   "villager_01",
+   "villager_03",
+   "villager_04"
+  ]
+ }
+]

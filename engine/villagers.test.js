@@ -99,8 +99,9 @@ const hear = (s, ids) => { for (const id of ids) v(s, id).known.add(s.world.live
   const book = s.world.objects.get('book_01');
   assert.ok(moved, '書應該被搬');
   assert.ok(s.world.live('book-move'), '搬書後書寫下「黃銅書不得被搬動」');
-  assert.equal(s.grid.houseAt(book.pos), 'house_01');
-  ok('誘導：請他去搬書 → 村民搬到自己家、範圍中心跟著書');
+  assert.deepEqual(book.pos, p.home);
+  assert.deepEqual(s.grid.center(), p.home);
+  ok('誘導：請他去搬書 → 村民搬到自己家門口、範圍中心跟著書');
   p.known.add(s.world.live('book-move').no);
   let refused = 0; s.world.on('refuse', () => refused++);
   assert.equal(s.villagers.induce(p, 'book'), false); assert.equal(refused, 1);

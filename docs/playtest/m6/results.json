@@ -1,0 +1,15 @@
+{
+ "deaf": {
+  "state": "won",
+  "reason": "escaped",
+  "assim": 0,
+  "stats": {
+   "time": 71.8,
+   "written": 2,
+   "resets": 0,
+   "awakened": 4,
+   "captures": 1,
+   "idleWrites": 0
+  }
+ }
+}

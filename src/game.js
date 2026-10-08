@@ -156,7 +156,7 @@ export class Game {
     }
     for (const o of near) {
       for (const verb of o.verbs) {
-        if (verb === 'give') continue;
+        if (verb === 'give' || verb === 'approach' || verb === 'capture') continue;
         if (verb === 'take' && o.heldBy) continue;
         if (o.type === 'book' && verb === 'move') { if (!p.carrying) out.push(this.opt('move', o, { to: [...p.cell] }, '搬起黃銅書')); continue; }
         if (o.type === 'cart' && verb === 'move') { const d = sub(o.pos, p.cell); if (Math.abs(d[0]) + Math.abs(d[1]) !== 1) continue; const to = add(o.pos, d); if (g.blocked(to) || this.actorAt(to)) continue; out.push(this.opt('move', o, { to }, `推動${name(o)}`)); continue; }

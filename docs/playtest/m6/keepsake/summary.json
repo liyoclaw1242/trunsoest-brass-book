@@ -1,0 +1,106 @@
+{
+ "route": "keepsake",
+ "state": "won",
+ "reason": "escaped",
+ "stats": {
+  "time": 127.1,
+  "written": 2,
+  "resets": 0,
+  "awakened": 4,
+  "captures": 0,
+  "idleWrites": 2
+ },
+ "assim": 0,
+ "villagers": [
+  {
+   "id": "villager_01",
+   "pos": [
+    36,
+    25
+   ],
+   "level": "awake",
+   "mode": "wander",
+   "hunting": false,
+   "task": null,
+   "quiet": 0
+  },
+  {
+   "id": "villager_02",
+   "pos": [
+    22,
+    29
+   ],
+   "level": "awake",
+   "mode": "wander",
+   "hunting": false,
+   "task": null,
+   "quiet": 0
+  },
+  {
+   "id": "villager_03",
+   "pos": [
+    43,
+    34
+   ],
+   "level": "awake",
+   "mode": "wander",
+   "hunting": false,
+   "task": null,
+   "quiet": 0
+  },
+  {
+   "id": "villager_04",
+   "pos": [
+    32,
+    42
+   ],
+   "level": "awake",
+   "mode": "wander",
+   "hunting": false,
+   "task": null,
+   "quiet": 0
+  }
+ ],
+ "marks": [
+  {
+   "t": 0.5,
+   "name": "start",
+   "file": "docs/playtest/m6/keepsake/01-start.png"
+  },
+  {
+   "t": 5.7,
+   "name": "hide-in-house",
+   "file": "docs/playtest/m6/keepsake/02-hide-in-house.png"
+  },
+  {
+   "t": 7.4,
+   "name": "induce",
+   "file": "docs/playtest/m6/keepsake/03-induce.png"
+  },
+  {
+   "t": 18.3,
+   "name": "induce",
+   "file": "docs/playtest/m6/keepsake/04-induce.png"
+  },
+  {
+   "t": 35.9,
+   "name": "give",
+   "file": "docs/playtest/m6/keepsake/05-give.png"
+  },
+  {
+   "t": 119,
+   "name": "after-awakening",
+   "file": "docs/playtest/m6/keepsake/06-after-awakening.png"
+  },
+  {
+   "t": 119.2,
+   "name": "walk-out",
+   "file": "docs/playtest/m6/keepsake/07-walk-out.png"
+  },
+  {
+   "t": 127.8,
+   "name": "end",
+   "file": "docs/playtest/m6/keepsake/08-end.png"
+  }
+ ]
+}

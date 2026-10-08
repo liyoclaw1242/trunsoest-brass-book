@@ -12,10 +12,11 @@
 ## 結構
 
 ```
-engine/     規則引擎（純邏輯）與測試。已完成並通過測試
-blender/    bpy 腳本：每類物件一支，加上 build_scene.py（待建）
-public/     village.glb、scene.json（由 blender/ 產生，待建）
-src/        three.js 畫面端（待建）
+engine/     規則引擎（純邏輯）與測試：rulebook-engine、grid（格子與尋路）、villagers（村民）、match（輸贏）、session（組一局）
+blender/    bpy 腳本：每類物件一支（make_*.py）、layout.py（佈局資料）、build_scene.py
+public/     village.glb、scene.json、scene.meta.json（由 blender/ 產生）
+src/        three.js 畫面端：main（啟動、__game）、view（three）、game（串接與互動）、hud（DOM）、input
+tools/      validate-scene、check-layout、pw（Playwright 共用）、playtest（整局）、playtest-m2…m5（里程碑驗收）
 docs/       設計、規格、計畫、changelog、open-questions、playtest 紀錄
 .claude/agents/playtest-critic.md   優化回合用的評論子代理
 ```
@@ -24,7 +25,12 @@ docs/       設計、規格、計畫、changelog、open-questions、playtest 紀
 
 - `npm test`：規則引擎測試，任何時候都要通過。
 - Blender 無介面執行：`blender --background --python blender/<腳本>.py`。本機 Blender 5.2.2 不在 PATH，執行檔在 `/Applications/Blender.app/Contents/MacOS/Blender`（`npm run` 腳本裡用 `BLENDER` 環境變數覆寫）。
-- 畫面端的開發指令在 M2 建立後補在這裡。
+- `npm run dev`：Vite 開發伺服器（http://localhost:5173/）。試玩腳本都要它先開著。
+- `npm run scene`：用 Blender 重做 `public/village.glb`、`scene.json`、`scene.meta.json` 與 `docs/playtest/m1/` 兩張圖。
+- `npm run validate`：`tools/validate-scene.js`（欄位、id、動詞、glb 節點與 `__col` 對照）＋ `tools/check-layout.js`（覆蓋率、安靜角落、路線、安靜逃脫路）。
+- `node tools/playtest.js [--route keepsake|deaf] [--out dir]`：整局自動試玩，輸出事件紀錄、規則書紀錄、截圖。
+- `node tools/playtest-m2.js`…`m5.js`：各里程碑的驗收腳本。
+- 怎麼跑、網址參數、輸出格式見 `docs/playtest/HOW_TO_RUN.md`。
 
 ## 工作規則
 

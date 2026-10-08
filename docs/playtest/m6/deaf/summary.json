@@ -1,0 +1,141 @@
+{
+ "route": "deaf",
+ "state": "won",
+ "reason": "escaped",
+ "stats": {
+  "time": 71.8,
+  "written": 2,
+  "resets": 0,
+  "awakened": 4,
+  "captures": 1,
+  "idleWrites": 0
+ },
+ "assim": 0,
+ "villagers": [
+  {
+   "id": "villager_01",
+   "pos": [
+    34,
+    24
+   ],
+   "level": "awake",
+   "mode": "wander",
+   "hunting": false,
+   "task": null,
+   "quiet": 26.2
+  },
+  {
+   "id": "villager_02",
+   "pos": [
+    20,
+    30
+   ],
+   "level": "awake",
+   "mode": "wander",
+   "hunting": false,
+   "task": null,
+   "quiet": 8.8
+  },
+  {
+   "id": "villager_03",
+   "pos": [
+    40,
+    31
+   ],
+   "level": "awake",
+   "mode": "wander",
+   "hunting": false,
+   "task": null,
+   "quiet": 8.8
+  },
+  {
+   "id": "villager_04",
+   "pos": [
+    29,
+    40
+   ],
+   "level": "awake",
+   "mode": "wander",
+   "hunting": false,
+   "task": null,
+   "quiet": 0
+  }
+ ],
+ "marks": [
+  {
+   "t": 0.6,
+   "name": "start",
+   "file": "docs/playtest/m6/deaf/01-start.png"
+  },
+  {
+   "t": 5.5,
+   "name": "hide-in-house",
+   "file": "docs/playtest/m6/deaf/02-hide-in-house.png"
+  },
+  {
+   "t": 7,
+   "name": "induce",
+   "file": "docs/playtest/m6/deaf/03-induce.png"
+  },
+  {
+   "t": 16.3,
+   "name": "broke-speaker_06",
+   "file": "docs/playtest/m6/deaf/04-broke-speaker_06.png"
+  },
+  {
+   "t": 17.6,
+   "name": "induce",
+   "file": "docs/playtest/m6/deaf/05-induce.png"
+  },
+  {
+   "t": 18.6,
+   "name": "give",
+   "file": "docs/playtest/m6/deaf/06-give.png"
+  },
+  {
+   "t": 18.8,
+   "name": "induce",
+   "file": "docs/playtest/m6/deaf/07-induce.png"
+  },
+  {
+   "t": 20.1,
+   "name": "induce",
+   "file": "docs/playtest/m6/deaf/08-induce.png"
+  },
+  {
+   "t": 26.9,
+   "name": "broke-speaker_02",
+   "file": "docs/playtest/m6/deaf/09-broke-speaker_02.png"
+  },
+  {
+   "t": 33.7,
+   "name": "broke-speaker_03",
+   "file": "docs/playtest/m6/deaf/10-broke-speaker_03.png"
+  },
+  {
+   "t": 38.1,
+   "name": "back-in-house",
+   "file": "docs/playtest/m6/deaf/11-back-in-house.png"
+  },
+  {
+   "t": 44,
+   "name": "induce",
+   "file": "docs/playtest/m6/deaf/12-induce.png"
+  },
+  {
+   "t": 63.8,
+   "name": "after-awakening",
+   "file": "docs/playtest/m6/deaf/13-after-awakening.png"
+  },
+  {
+   "t": 64,
+   "name": "walk-out",
+   "file": "docs/playtest/m6/deaf/14-walk-out.png"
+  },
+  {
+   "t": 72.5,
+   "name": "end",
+   "file": "docs/playtest/m6/deaf/15-end.png"
+  }
+ ]
+}

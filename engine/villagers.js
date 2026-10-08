@@ -92,8 +92,8 @@ export class Villagers {
       const book = [...this.world.objects.values()].find(o => o.type === 'book');
       const c = this.world.check(v.id, 'move', book.id, {});
       if (c.violates.length) { this.emit('refuse', { actor: v, verb: 'move', target: book, rules: c.violates }); return false; }
-      const hc = this.grid.houses.get(house.id);
-      v.task = { kind, book: book.id, dest: hc.interior.find(c => !this.grid.blocked(c)) || hc.front, stage: 0 };
+      // 搬回「自己家」：家門口的位置（actor.home），讓範圍圓心真的移動
+      v.task = { kind, book: book.id, dest: [...v.home], stage: 0 };
     } else return false;
     v.mode = 'task'; v.path = []; v.goal = null;
     this.emit('induce', { actor: v, kind });
@@ -246,8 +246,8 @@ export class Villagers {
         const r = walkTo(ks.pos); if (r === 'fail') return fail('path');
         if (r === true) { const a = w.attempt(v.id, 'take', ks.id); if (!a.done) return fail('refused'); t.stage = 1; }
       } else {
-        // 走到外鄉人旁邊交給他
-        if (this.adjacentWalkable(v.pos, me.pos)) { const a = w.attempt(v.id, 'give', ks.id, { to: 'outsider' }); if (!a.done) return fail('refused'); v.task = null; return; }
+        // 走到外鄉人旁邊交給他（隔著門洞也遞得過去）
+        if (Math.max(Math.abs(v.pos[0] - me.pos[0]), Math.abs(v.pos[1] - me.pos[1])) <= 1) { const a = w.attempt(v.id, 'give', ks.id, { to: 'outsider' }); if (!a.done) return fail('refused'); v.task = null; return; }
         const n = this.nearestReachable(v, me.pos);
         const r = n ? walkTo(n) : 'fail';
         if (r === 'fail') return fail('path');
