@@ -1,0 +1,150 @@
+{
+ "route": "deaf",
+ "state": "lost",
+ "reason": "assimilated",
+ "stats": {
+  "time": 81.6,
+  "written": 4,
+  "resets": 1,
+  "awakened": 2,
+  "captures": 3,
+  "idleWrites": 1
+ },
+ "assim": 3,
+ "villagers": [
+  {
+   "id": "villager_01",
+   "pos": [
+    30,
+    28
+   ],
+   "level": "half",
+   "mode": "chase",
+   "hunting": true,
+   "task": null,
+   "quiet": 0,
+   "cooldown": 9.3
+  },
+  {
+   "id": "villager_02",
+   "pos": [
+    30,
+    28
+   ],
+   "level": "half",
+   "mode": "chase",
+   "hunting": true,
+   "task": null,
+   "quiet": 0,
+   "cooldown": 2.4
+  },
+  {
+   "id": "villager_03",
+   "pos": [
+    43,
+    33
+   ],
+   "level": "awake",
+   "mode": "wander",
+   "hunting": false,
+   "task": null,
+   "quiet": 0,
+   "cooldown": 0
+  },
+  {
+   "id": "villager_04",
+   "pos": [
+    30,
+    38
+   ],
+   "level": "awake",
+   "mode": "wander",
+   "hunting": false,
+   "task": null,
+   "quiet": 11.7,
+   "cooldown": 0
+  }
+ ],
+ "marks": [
+  {
+   "t": 0.6,
+   "name": "start",
+   "file": "/private/tmp/claude-501/-Users-liyoclaw-Projects-trunsoest-brass-book/1fcab9c3-d43f-4199-a337-c2e4d63b7cf9/scratchpad/r3-d/deaf/01-start.png"
+  },
+  {
+   "t": 5.5,
+   "name": "first-shelter",
+   "file": "/private/tmp/claude-501/-Users-liyoclaw-Projects-trunsoest-brass-book/1fcab9c3-d43f-4199-a337-c2e4d63b7cf9/scratchpad/r3-d/deaf/02-first-shelter.png"
+  },
+  {
+   "t": 6.9,
+   "name": "induce",
+   "file": "/private/tmp/claude-501/-Users-liyoclaw-Projects-trunsoest-brass-book/1fcab9c3-d43f-4199-a337-c2e4d63b7cf9/scratchpad/r3-d/deaf/03-induce.png"
+  },
+  {
+   "t": 7.5,
+   "name": "induce",
+   "file": "/private/tmp/claude-501/-Users-liyoclaw-Projects-trunsoest-brass-book/1fcab9c3-d43f-4199-a337-c2e4d63b7cf9/scratchpad/r3-d/deaf/04-induce.png"
+  },
+  {
+   "t": 22.4,
+   "name": "hide-in-house",
+   "file": "/private/tmp/claude-501/-Users-liyoclaw-Projects-trunsoest-brass-book/1fcab9c3-d43f-4199-a337-c2e4d63b7cf9/scratchpad/r3-d/deaf/05-hide-in-house.png"
+  },
+  {
+   "t": 23.5,
+   "name": "give",
+   "file": "/private/tmp/claude-501/-Users-liyoclaw-Projects-trunsoest-brass-book/1fcab9c3-d43f-4199-a337-c2e4d63b7cf9/scratchpad/r3-d/deaf/06-give.png"
+  },
+  {
+   "t": 23.8,
+   "name": "induce",
+   "file": "/private/tmp/claude-501/-Users-liyoclaw-Projects-trunsoest-brass-book/1fcab9c3-d43f-4199-a337-c2e4d63b7cf9/scratchpad/r3-d/deaf/07-induce.png"
+  },
+  {
+   "t": 36.5,
+   "name": "induce",
+   "file": "/private/tmp/claude-501/-Users-liyoclaw-Projects-trunsoest-brass-book/1fcab9c3-d43f-4199-a337-c2e4d63b7cf9/scratchpad/r3-d/deaf/08-induce.png"
+  },
+  {
+   "t": 37.1,
+   "name": "give",
+   "file": "/private/tmp/claude-501/-Users-liyoclaw-Projects-trunsoest-brass-book/1fcab9c3-d43f-4199-a337-c2e4d63b7cf9/scratchpad/r3-d/deaf/09-give.png"
+  },
+  {
+   "t": 40.2,
+   "name": "broke-speaker_04",
+   "file": "/private/tmp/claude-501/-Users-liyoclaw-Projects-trunsoest-brass-book/1fcab9c3-d43f-4199-a337-c2e4d63b7cf9/scratchpad/r3-d/deaf/10-broke-speaker_04.png"
+  },
+  {
+   "t": 44.7,
+   "name": "broke-speaker_05",
+   "file": "/private/tmp/claude-501/-Users-liyoclaw-Projects-trunsoest-brass-book/1fcab9c3-d43f-4199-a337-c2e4d63b7cf9/scratchpad/r3-d/deaf/11-broke-speaker_05.png"
+  },
+  {
+   "t": 48.3,
+   "name": "back-in-house",
+   "file": "/private/tmp/claude-501/-Users-liyoclaw-Projects-trunsoest-brass-book/1fcab9c3-d43f-4199-a337-c2e4d63b7cf9/scratchpad/r3-d/deaf/12-back-in-house.png"
+  },
+  {
+   "t": 56.1,
+   "name": "induce",
+   "file": "/private/tmp/claude-501/-Users-liyoclaw-Projects-trunsoest-brass-book/1fcab9c3-d43f-4199-a337-c2e4d63b7cf9/scratchpad/r3-d/deaf/13-induce.png"
+  },
+  {
+   "t": 64.9,
+   "name": "induce",
+   "file": "/private/tmp/claude-501/-Users-liyoclaw-Projects-trunsoest-brass-book/1fcab9c3-d43f-4199-a337-c2e4d63b7cf9/scratchpad/r3-d/deaf/14-induce.png"
+  },
+  {
+   "t": 82,
+   "name": "after-awakening",
+   "file": "/private/tmp/claude-501/-Users-liyoclaw-Projects-trunsoest-brass-book/1fcab9c3-d43f-4199-a337-c2e4d63b7cf9/scratchpad/r3-d/deaf/15-after-awakening.png"
+  },
+  {
+   "t": 82.7,
+   "name": "end",
+   "file": "/private/tmp/claude-501/-Users-liyoclaw-Projects-trunsoest-brass-book/1fcab9c3-d43f-4199-a337-c2e4d63b7cf9/scratchpad/r3-d/deaf/16-end.png"
+  }
+ ]
+}

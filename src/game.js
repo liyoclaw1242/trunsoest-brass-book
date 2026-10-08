@@ -3,7 +3,7 @@ import { num } from '../engine/rulebook-engine.js';
 import { dist } from '../engine/grid.js';
 import { createSession } from '../engine/session.js';
 
-export const LABEL = { enter: '進入', use: '使用', open: '開啟', take: '取走', give: '歸還', break: '破壞', repair: '修復', move: '搬動', climb: '翻越', read: '閱讀', deface: '塗毀', approach: '靠近', run: '奔跑', capture: '抓捕' };
+export const LABEL = { induce: '誘導', enter: '進入', use: '使用', open: '開啟', take: '取走', give: '歸還', break: '破壞', repair: '修復', move: '搬動', climb: '翻越', read: '閱讀', deface: '塗毀', approach: '靠近', run: '奔跑', capture: '抓捕' };
 export const TYPE = { book: '黃銅書', lectern: '書台', speaker: '廣播器', notice: '公告牌', house: '住宅', door: '門', fence: '圍籬', cart: '推車', keepsake: '信物', boundary: '界石', villager: '村民', outsider: '外鄉人' };
 export const STATE = { intact: '完好', broken: '損壞', closed: '關著', open: '開著', blank: '空白', written: '有字', defaced: '被塗毀', puppet: '人偶', half: '半同化', awake: '已喚醒', writing: '書寫中' };
 export const INDUCE = { invite: '請他邀請我進屋', fetch: '請他去拿信物', book: '請他去搬書' };
@@ -159,7 +159,10 @@ export class Game {
       const vo = w.objects.get(v.id);
       if (v.returning) { out.push({ verb: 'induce', target: v.id, label: `${name(vo)}正在回家`, ok: false, reason: 'state', violates: [], run: () => ({ done: false }) }); continue; }
       if (!this.vil.inducible(v)) { const cd = this.vil.cooldown(v); out.push({ verb: 'induce', target: v.id, label: v.level === 'puppet' ? `${name(vo)}是人偶，無法誘導` : `${name(vo)}剛幫過你（${Math.ceil(cd)} 秒後再試）`, ok: false, reason: 'state', violates: [], run: () => ({ done: false }) }); continue; }
-      for (const o of this.vil.induceOptions(v)) out.push({ verb: 'induce', kind: o.kind, target: v.id, label: `${o.label}（${name(vo)}）`, ok: true, violates: [], run: () => ({ done: this.vil.induce(v, o.kind) }) });
+      for (const o of this.vil.induceOptions(v)) {
+        const viol = this.vil.wouldRefuse(v, o.kind).map(r => r.no);
+        out.push({ verb: 'induce', kind: o.kind, target: v.id, label: `${o.label}（${name(vo)}）${viol.length ? `（他認知第${viol.map(num).join('、')}條，會拒絕）` : ''}`, ok: !viol.length, reason: viol.length ? 'rule' : null, violates: [], run: () => ({ done: this.vil.induce(v, o.kind) }) });
+      }
     }
     for (const o of near) {
       for (const verb of o.verbs) {
@@ -175,7 +178,8 @@ export class Game {
     // 門口：進入住宅
     const s = g.step(p.cell, front);
     if (s.enterHouse && s.ok) { const h = w.objects.get(s.enterHouse); out.push({ verb: 'enter', label: `進入${name(h)}`, target: h.id, ok: true, run: () => this.tryStep(p.facing) }); }
-    return out;
+    // 做不到的排到最後，不佔前面的數字鍵
+    return out.filter(o => o.ok).concat(out.filter(o => !o.ok));
   }
   opt(verb, o, ctx, label = null, after = null) {
     const c = this.world.check('outsider', verb, o.id, ctx);
@@ -207,7 +211,7 @@ export class Game {
   act(i = 0) {
     if (!this.started || this.over || this.opening > 0) return { done: false, reason: 'frozen' };
     const o = this.options()[i]; if (!o) return null;
-    if (!o.ok) { this.note('blocked', `做不到：${o.label}（${o.reason === 'state' ? '狀態不允許' : '不支援'}）`); return { done: false, reason: o.reason }; }
+    if (!o.ok) { this.note('blocked', `做不到：${o.label}（${o.reason === 'state' ? '狀態不允許' : o.reason === 'rule' ? '他會拒絕' : '不支援'}）`); return { done: false, reason: o.reason }; }
     return o.run();
   }
   /** 現在的廣播：{ rule, progress, hearing }，沒在廣播回傳 null。 */
@@ -224,7 +228,12 @@ export class Game {
   }
   /** 受規則保護的物件 id：帶 actorId 只算該角色認知到的；不帶是客觀的（設計者視角）。 */
   protectedIds(actorId = 'outsider') {
-    return [...this.world.objects.values()].filter(o => o.pos && this.world.protectedBy(o.id, actorId).length).map(o => o.id);
+    return [...this.world.objects.values()].filter(o => {
+      if (!o.pos) return false;
+      if (o.type === 'villager') { const v = this.world.actors.get(o.id); return v && this.vil.wouldRefuse(v, 'fetch').some(r => !actorId || this.world.actors.get(actorId).known.has(r.no)); }
+      if (o.type === 'house' && actorId && this.invitedTo === o.id) return false;
+      return this.world.protectedBy(o.id, actorId).length > 0;
+    }).map(o => o.id);
   }
   /** 設計者視角用：每條規則與誰認知到它。 */
   designerRules() {

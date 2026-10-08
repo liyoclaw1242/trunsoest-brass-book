@@ -8,7 +8,7 @@ export const CONSTITUTION = [
   { key: 'invite-only', text: '未經邀請不得進入他人住宅。', verb: 'enter', target: { type: 'house' }, cond: 'uninvited' },
   { key: 'guest-ok', text: '受市民邀請者，得進入該市民的住宅。', verb: 'enter', target: { type: 'house' }, cond: 'invited', mode: 'permit' },
   // 第 2 輪加的預設：書從一開始就保護自己不被搬走；重置撕掉之後，搬書這條路才打開。
-  { key: 'book-move', text: '黃銅書不得被搬動。', verb: 'move', target: { id: 'book_01' }, hole: '書台沒被提到；沒聽到的人不受約束。' },
+  { key: 'book-move', text: '黃銅書不得被搬動。', verb: 'move', target: { id: 'book_01' }, hole: '沒聽到這條的人不受約束：聽不到廣播的村民會替你搬。' },
 ];
 
 /** 抓捕令。每次被重置撕掉後，書會重寫一次，措辭一次比一次不客氣。 */
@@ -21,7 +21,7 @@ export const CAPTURE = [
 /** 同一招用到第 count 次，就被寫成條文。hole 是這條留下的漏洞，給設計者視角顯示用。 */
 export const TRIGGERS = [
   { verb: 'break', type: 'speaker', by: 'outsider', count: 2,
-    rule: { key: 'speaker-break', text: '廣播器不得被破壞。', verb: 'break', target: { type: 'speaker' }, hole: '沒聽到的人不受約束；沒說不能搬走。' } },
+    rule: { key: 'speaker-break', text: '廣播器不得被破壞。', verb: 'break', target: { type: 'speaker' }, hole: '沒聽到的人不受約束（站在壞掉的廣播器旁就聽不到）；只管「破壞」，已經壞掉的不會因此修好。' } },
   { verb: 'enter', type: 'house', by: 'outsider', count: 2,
     rule: { key: 'house-outsider', text: '外鄉人不得進入住宅。', who: 'outsider', verb: 'enter', target: { type: 'house' }, hole: '和「受邀者得進入」衝突，裁決寫下前不追究。' } },
   { verb: 'climb', type: 'fence', by: 'outsider', count: 3,
@@ -32,8 +32,8 @@ export const TRIGGERS = [
     rule: { key: 'keepsake-take', text: '外鄉人不得取走信物。', who: 'outsider', verb: 'take', target: { type: 'keepsake' }, hole: '村民可以自己去拿。' } },
   { verb: 'use', type: 'cart', by: 'outsider', count: 2,
     rule: { key: 'cart-use', text: '推車不得用於越過圍籬。', verb: 'use', target: { type: 'cart' }, hole: '只禁止「用於越過圍籬」；推去擋路、推去墊別的東西都沒說。' } },
-  { verb: 'move', type: 'book', count: 1,
-    rule: { key: 'book-move', text: '黃銅書不得被搬動。', verb: 'move', target: { id: 'book_01' }, hole: '書台沒被提到；沒聽到的人不受約束。' } },
+  { verb: 'move', type: 'book', count: 2,
+    rule: { key: 'book-move', text: '黃銅書不得被搬動。', verb: 'move', target: { id: 'book_01' }, hole: '沒聽到這條的人不受約束：聽不到廣播的村民會替你搬。' } },
   { verb: 'induce', type: 'villager', by: 'outsider', count: 3,
     rule: { key: 'no-errand', text: '市民不得替外鄉人跑腿。', who: 'citizen', verb: 'induce', target: { type: 'villager' }, hole: '只管「市民」，已喚醒的人算不算市民沒說；邀請進屋算不算跑腿也沒說。' } },
 ];
@@ -41,13 +41,13 @@ export const TRIGGERS = [
 /** 書閒著沒事時自己動筆的備用條文（50 秒沒有新條文就寫一條）。每條的漏洞都能從條文文字讀出來。 */
 export const BACKUP = [
   { key: 'door-open', text: '外鄉人不得開啟任何門。', who: 'outsider', verb: 'open', target: { type: 'door' }, hole: '只禁止「開啟」，沒說不能破壞門；也沒禁止市民開門（開著的門走進去就好）。' },
-  { key: 'book-approach', text: '外鄉人不得靠近黃銅書。', who: 'outsider', verb: 'approach', target: { type: 'book' }, hole: '只管「靠近」，沒說市民不能把書搬走（請村民搬書）；書離開原位之後靠近的是新位置，條文照樣算，但沒說不能遠遠地看。' },
+  { key: 'book-approach', text: '外鄉人不得靠近黃銅書。', who: 'outsider', verb: 'approach', target: { type: 'book' }, hole: '只管外鄉人「靠近」，沒說市民不能把書搬走（請村民搬書）；想知道規則還可以讀公告牌、聽廣播。' },
   { key: 'cart-move', text: '推車不得被搬動。', verb: 'move', target: { type: 'cart' }, hole: '沒說不能破壞，也沒說不能踩上去。' },
   { key: 'notice-deface', text: '公告牌不得被塗毀。', verb: 'deface', target: { type: 'notice' }, hole: '只管塗毀；公告牌還是可以讀，而且沒聽到這條的人不受約束。' },
   { key: 'notice-read', text: '外鄉人不得閱讀公告牌。', who: 'outsider', verb: 'read', target: { type: 'notice' }, hole: '沒說不能讀規則書本身，也沒說不能聽廣播。' },
   // 升級版：前五條都生效中（或被撕掉又重寫過）時，書把措辭寫得更嚴。每條仍留一個漏洞。
   { key: 'door-break', text: '任何存在不得破壞門。', verb: 'break', target: { type: 'door' }, hole: '門還是可以開（市民開、或請屋主邀請）；沒提圍籬和推車。' },
-  { key: 'book-touch', text: '任何存在不得搬動或閱讀黃銅書。', verb: 'read', target: { type: 'book' }, hole: '這條只判「閱讀」（搬動另有條文，撕掉後就能搬）；公告牌沒被提到。' },
+  { key: 'book-touch', text: '任何存在不得閱讀黃銅書。', verb: 'read', target: { type: 'book' }, hole: '只管閱讀；公告牌沒被提到，搬動另有條文（撕掉後就能搬）。' },
   { key: 'cart-use', text: '推車不得用於越過圍籬。', verb: 'use', target: { type: 'cart' }, hole: '只禁止用於越過圍籬；推去擋路沒說；翻越圍籬本身是另一條。' },
   { key: 'fence-any', text: '圍籬不得翻越亦不得破壞。', verb: 'climb', target: { type: 'fence' }, hole: '這條只判「翻越」；破壞另有條文（還沒寫或被撕掉時就能破壞）。' },
   { key: 'speaker-repair', text: '外鄉人不得修復廣播器。', who: 'outsider', verb: 'repair', target: { type: 'speaker' }, hole: '沒說不能破壞；市民可以修。' },

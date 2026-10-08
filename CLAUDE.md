@@ -30,6 +30,7 @@ docs/       設計、規格、計畫、changelog、open-questions、playtest 紀
 - `npm run validate`：`tools/validate-scene.js`（欄位、id、動詞、glb 節點與 `__col` 對照）＋ `tools/check-layout.js`（覆蓋率、安靜角落、路線、安靜逃脫路）。
 - `node tools/playtest.js [--route keepsake|deaf] [--out dir]`：整局自動試玩，輸出事件紀錄、規則書紀錄、截圖。
 - `node tools/playtest-m2.js`…`m5.js`：各里程碑的驗收腳本。
+- `node tools/check-sprint.js [N]`：「什麼都不做就贏」檢查（開局直奔、被抓後趁免疫直奔各 N 次）。
 - 怎麼跑、網址參數、輸出格式見 `docs/playtest/HOW_TO_RUN.md`。
 
 ## 工作規則

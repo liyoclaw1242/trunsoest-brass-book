@@ -17,20 +17,18 @@
   "no": 6
  },
  {
-  "t": 4.03,
+  "t": 4.01,
   "type": "learn",
-  "text": "聽完第六條：你、村民 01、村民 02、村民 03、村民 04認知了",
+  "text": "聽完第六條：你、村民 01、村民 03認知了",
   "no": 6,
   "learned": [
    "outsider",
    "villager_01",
-   "villager_02",
-   "villager_03",
-   "villager_04"
+   "villager_03"
   ]
  },
  {
-  "t": 6.99,
+  "t": 6.95,
   "type": "act",
   "text": "村民 01抓捕了外鄉人",
   "actor": "villager_01",
@@ -38,7 +36,7 @@
   "target": "outsider"
  },
  {
-  "t": 6.99,
+  "t": 6.95,
   "type": "assim",
   "text": "同化度 0→1（被抓）",
   "from": 0,
@@ -46,36 +44,68 @@
   "why": "captured"
  },
  {
-  "t": 6.99,
+  "t": 6.95,
   "type": "captured",
   "text": "你被村民 01抓住了，送回村子中心",
   "actor": "villager_01"
  },
  {
-  "t": 10.05,
-  "type": "broadcast",
-  "text": "廣播開始：第五條",
-  "no": 5
+  "t": 6.95,
+  "type": "act",
+  "text": "村民 01翻越了圍籬 01",
+  "actor": "villager_01",
+  "verb": "climb",
+  "target": "fence_01"
  },
  {
-  "t": 12.45,
+  "t": 7.27,
+  "type": "act",
+  "text": "村民 01翻越了圍籬 02",
+  "actor": "villager_01",
+  "verb": "climb",
+  "target": "fence_02"
+ },
+ {
+  "t": 10.02,
+  "type": "broadcast",
+  "text": "廣播開始：第六條",
+  "no": 6
+ },
+ {
+  "t": 10.46,
+  "type": "act",
+  "text": "村民 01抓捕了外鄉人",
+  "actor": "villager_01",
+  "verb": "capture",
+  "target": "outsider"
+ },
+ {
+  "t": 10.46,
+  "type": "assim",
+  "text": "同化度 1→2（被抓）",
+  "from": 1,
+  "to": 2,
+  "why": "captured"
+ },
+ {
+  "t": 10.46,
+  "type": "captured",
+  "text": "你被村民 01抓住了，送回村子中心",
+  "actor": "villager_01"
+ },
+ {
+  "t": 10.73,
   "type": "end",
   "text": "你走出了影響範圍。",
   "state": "won",
   "reason": "escaped",
   "stats": {
-   "time": 12.4,
+   "time": 10.7,
    "written": 0,
    "resets": 0,
    "awakened": 0,
-   "captures": 1,
+   "captures": 2,
    "idleWrites": 0
   }
- },
- {
-  "t": 12.62,
-  "type": "stuck",
-  "text": "村民 02過不去，先放棄",
-  "actor": "villager_02"
  }
 ]

@@ -11,13 +11,13 @@
   "text": "黃銅書察覺了你。廣播器開始唸公告……"
  },
  {
-  "t": -0.01,
+  "t": 0,
   "type": "broadcast",
   "text": "廣播開始：第六條",
   "no": 6
  },
  {
-  "t": 4,
+  "t": 4.03,
   "type": "learn",
   "text": "聽完第六條：你、村民 01、村民 02、村民 03、村民 04認知了",
   "no": 6,
@@ -30,7 +30,7 @@
   ]
  },
  {
-  "t": 5.74,
+  "t": 5.94,
   "type": "act",
   "text": "村民 01抓捕了外鄉人",
   "actor": "villager_01",
@@ -38,7 +38,7 @@
   "target": "outsider"
  },
  {
-  "t": 5.74,
+  "t": 5.94,
   "type": "assim",
   "text": "同化度 0→1（被抓）",
   "from": 0,
@@ -46,82 +46,13 @@
   "why": "captured"
  },
  {
-  "t": 5.74,
+  "t": 5.94,
   "type": "captured",
   "text": "你被村民 01抓住了，送回村子中心",
   "actor": "villager_01"
  },
  {
-  "t": 7.75,
-  "type": "act",
-  "text": "村民 01翻越了圍籬 06",
-  "actor": "villager_01",
-  "verb": "climb",
-  "target": "fence_06"
- },
- {
-  "t": 8.34,
-  "type": "act",
-  "text": "村民 02翻越了圍籬 09",
-  "actor": "villager_02",
-  "verb": "climb",
-  "target": "fence_09"
- },
- {
-  "t": 8.66,
-  "type": "act",
-  "text": "村民 02翻越了圍籬 10",
-  "actor": "villager_02",
-  "verb": "climb",
-  "target": "fence_10"
- },
- {
-  "t": 8.93,
-  "type": "act",
-  "text": "村民 01翻越了圍籬 05",
-  "actor": "villager_01",
-  "verb": "climb",
-  "target": "fence_05"
- },
- {
-  "t": 10.04,
-  "type": "broadcast",
-  "text": "廣播開始：第五條",
-  "no": 5
- },
- {
-  "t": 10.74,
-  "type": "act",
-  "text": "村民 03抓捕了外鄉人",
-  "actor": "villager_03",
-  "verb": "capture",
-  "target": "outsider"
- },
- {
-  "t": 10.74,
-  "type": "assim",
-  "text": "同化度 1→2（被抓）",
-  "from": 1,
-  "to": 2,
-  "why": "captured"
- },
- {
-  "t": 10.74,
-  "type": "captured",
-  "text": "你被村民 03抓住了，送回村子中心",
-  "actor": "villager_03"
- },
- {
-  "t": 14.07,
-  "type": "learn",
-  "text": "聽完第五條：你認知了",
-  "no": 5,
-  "learned": [
-   "outsider"
-  ]
- },
- {
-  "t": 14.26,
+  "t": 9.44,
   "type": "act",
   "text": "村民 01抓捕了外鄉人",
   "actor": "villager_01",
@@ -129,7 +60,35 @@
   "target": "outsider"
  },
  {
-  "t": 14.26,
+  "t": 9.44,
+  "type": "assim",
+  "text": "同化度 1→2（被抓）",
+  "from": 1,
+  "to": 2,
+  "why": "captured"
+ },
+ {
+  "t": 9.44,
+  "type": "captured",
+  "text": "你被村民 01抓住了，送回村子中心",
+  "actor": "villager_01"
+ },
+ {
+  "t": 10.03,
+  "type": "broadcast",
+  "text": "廣播開始：第五條",
+  "no": 5
+ },
+ {
+  "t": 12.95,
+  "type": "act",
+  "text": "村民 01抓捕了外鄉人",
+  "actor": "villager_01",
+  "verb": "capture",
+  "target": "outsider"
+ },
+ {
+  "t": 12.95,
   "type": "assim",
   "text": "同化度 2→3（被抓）",
   "from": 2,
@@ -137,13 +96,13 @@
   "why": "captured"
  },
  {
-  "t": 14.26,
+  "t": 12.95,
   "type": "end",
   "text": "你被同化了。",
   "state": "lost",
   "reason": "assimilated",
   "stats": {
-   "time": 14.2,
+   "time": 12.9,
    "written": 0,
    "resets": 0,
    "awakened": 0,
@@ -152,7 +111,7 @@
   }
  },
  {
-  "t": 14.26,
+  "t": 12.95,
   "type": "captured",
   "text": "你被村民 01抓住了，送回村子中心",
   "actor": "villager_01"

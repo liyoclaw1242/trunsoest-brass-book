@@ -59,9 +59,14 @@ export class Villagers {
     return true;
   }
   /** 這個村民現在會不會執行抓捕令。 */
-  hunts(v) { return this.opt.hunt !== false && v.level !== 'awake' && this.world.knows(v.id, 'capture') && this.world.t >= this.outsider.immuneUntil; }
+  hunts(v) { return this.opt.hunt !== false && v.level !== 'awake' && this.world.knows(v.id, 'capture'); }
   /** 可不可以誘導（人偶不行；剛幫過你的要等冷卻）。 */
   inducible(v) { return v.level !== 'puppet' && this.world.t >= v.cooldownUntil; }
+  /** 這個村民現在會不會因為條文拒絕某種誘導（給 E 選單預先標示）。 */
+  wouldRefuse(v, kind) {
+    if (v.level === 'awake' || kind === 'invite') return [];
+    return this.world.check(v.id, 'induce', v.id, {}).violates;
+  }
   /** 冷卻還剩幾秒（0 表示可以誘導）。 */
   cooldown(v) { return Math.max(0, v.cooldownUntil - this.world.t); }
   /** 任務結束：記冷卻，先走回家再恢復追捕（回家路上不抓人）。 */
@@ -90,7 +95,7 @@ export class Villagers {
     // 條文的漏洞要成真：「已喚醒的人算不算市民沒說」→ 已喚醒的不受約束；「邀請算不算跑腿沒說」→ 邀請不算。
     if (v.level !== 'awake' && kind !== 'invite') {
       const bound = this.world.check(v.id, 'induce', v.id, {});
-      if (bound.violates.length) { this.emit('refuse', { actor: v, verb: 'induce', target: this.world.objects.get(v.id), rules: bound.violates }); return false; }
+      if (bound.violates.length) { this.emit('refuse', { actor: v, verb: 'induce', target: this.world.objects.get(v.id), rules: bound.violates }); v.cooldownUntil = Math.max(v.cooldownUntil, this.world.t + 3); return false; }
     }
     const house = [...this.world.objects.values()].find(o => o.type === 'house' && o.owner === v.id);
     if (kind === 'invite') { v.task = { kind, house: house.id, stage: 0 }; }
@@ -201,7 +206,7 @@ export class Villagers {
       // 任務做完先走回家，到家附近才恢復追捕
       if (v.returning && dist(v.pos, v.home) <= 1.5) v.returning = false;
       // 抓捕判定（接了誘導任務或正在回家的村民忙著做事，不抓人）
-      if (this.hunts(v) && !v.task && !v.returning && this.adjacentWalkable(v.pos, me.pos)) {
+      if (this.hunts(v) && !v.task && !v.returning && w.t >= me.immuneUntil && this.adjacentWalkable(v.pos, me.pos)) {
         v.captureT += dt;
         if (v.captureT >= this.opt.captureSec) {
           v.captureT = 0;

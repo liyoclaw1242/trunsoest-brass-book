@@ -1,0 +1,10 @@
+第1條（已撕掉）	此地不為外界所知。	認知：villager_01,villager_02,villager_03,villager_04
+第2條（已撕掉）	不得傷害他人。	認知：villager_01,villager_02,villager_03,villager_04
+第3條（已撕掉）	未經邀請不得進入他人住宅。	認知：villager_01,villager_02,villager_03,villager_04
+第4條（已撕掉）	受市民邀請者，得進入該市民的住宅。	認知：villager_01,villager_02,villager_03,villager_04
+第5條（已撕掉）	黃銅書不得被搬動。	認知：villager_01,villager_02,villager_03,villager_04	漏洞：沒聽到這條的人不受約束：聽不到廣播的村民會替你搬。
+第6條	請所有市民一起抓捕外鄉人，可採用一切手段。	認知：outsider,villager_01,villager_02,villager_03,villager_04
+第7條	外鄉人不得進入住宅。	認知：outsider,villager_01,villager_02,villager_03	漏洞：和「受邀者得進入」衝突，裁決寫下前不追究。
+第8條	市民不得替外鄉人跑腿。	認知：outsider,villager_01,villager_02,villager_03,villager_04	漏洞：只管「市民」，已喚醒的人算不算市民沒說；邀請進屋算不算跑腿也沒說。
+第9條	廣播器不得被破壞。	認知：villager_01,villager_03	漏洞：沒聽到的人不受約束（站在壞掉的廣播器旁就聽不到）；只管「破壞」，已經壞掉的不會因此修好。
+第10條	外鄉人不得開啟任何門。	認知：villager_03	漏洞：只禁止「開啟」，沒說不能破壞門；也沒禁止市民開門（開著的門走進去就好）。

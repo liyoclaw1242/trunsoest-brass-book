@@ -11,3 +11,5 @@
 - book：等第一次重置撕掉憲法裡的書保護條文，再請屋主搬書。
 - deaf：趁空檔砸掉蓋住藏身處門口的兩台廣播器，等門口的追捕者因安靜而醒。
 路線有亂數差異，這裡是其中一次的結果。每個資料夾：`events.txt/json`、`rulebook.txt`/`rules.json`、`summary.json`、`NN-*.png`。
+
+（第 3 輪評論與處理見 changelog；改後的驗證結果在 `docs/playtest/final/`。）

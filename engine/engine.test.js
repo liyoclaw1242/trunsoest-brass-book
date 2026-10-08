@@ -80,8 +80,9 @@ ok('第一次重置：憲法被撕（含書的保護）、裁決變廢文、補�
 // 驗證 4：保護條文被撕掉後，物件恢復可破壞；書的保護撕掉後市民搬得動書，搬了書又會被重寫
 w.attempt('outsider', 'take', 'keepsake_01');
 assert.equal(w.attempt('villager_01', 'move', 'book_01', { to: [3, 3] }).done, true);  // 憲法那條被撕了
-assert.ok(w.live('book-move'), '搬了書，書立刻重寫「不得搬動」');
-assert.equal(w.attempt('villager_01', 'move', 'book_01', { to: [4, 4] }).done, true); // 還沒聽到，所以搬得動
+assert.equal(w.live('book-move'), null, '搬一次還不會被寫成條文（同一招用多了才會）');
+assert.equal(w.attempt('villager_01', 'move', 'book_01', { to: [4, 4] }).done, true);
+assert.ok(w.live('book-move'), '第二次搬動，書重寫「不得搬動」');
 for (let i = 0; w.resets < 2; i++) w.write({ key: `filler-${i}`, text: '（填充條文）' });
 assert.equal(w.live('speaker-break'), null);
 assert.equal(w.check('outsider', 'break', 'speaker_03').violates.length, 0);

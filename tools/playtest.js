@@ -95,7 +95,13 @@ async function runRoute(route) {
   } else if (route === 'book') {
     // 憲法裡有「黃銅書不得被搬動」，屋主會拒絕；等第一次重置撕掉它。期間其他人到門口就用「邀請」支開（邀請不算跑腿）。
     // 重置後住宅不再安全，被抓就被抓（送回中心、3 秒免疫），屋主一到身邊就請他搬書。書一搬走，看我在不在範圍外。
-    const r = await tend(300, { induceKind: 'book', only: 'villager_01', noGive: true, stop: s => !s.inRange || s.state !== 'playing' });
+    // 第一次重置前躲在屋裡；重置一到（住宅不再安全）就走到廣場，讓屋主來找我，被抓就當作回到中心
+    let r = await tend(200, { induceKind: 'book', only: 'villager_01', noGive: true, stop: s => !s.inRange || s.state !== 'playing' || s.resets >= 1 });
+    if (r === 'stop' && !(await over()) && (await st()).inRange) {
+      await pw.goto([30, 27]);
+      const book0 = JSON.stringify((await pw.objects()).find(o => o.id === 'book_01').pos);
+      r = await tend(120, { induceKind: 'book', only: 'villager_01', noGive: true, stop: async s => !s.inRange || s.state !== 'playing' || JSON.stringify((await pw.objects()).find(o => o.id === 'book_01').pos) !== book0 });
+    }
     log(`等待結束：${r}`, JSON.stringify((await st()).villagers.map(v => `${v.id}:${v.level}${v.hunting ? '!' : ''}${v.task ? '(' + v.task + ')' : ''}`)));
     await shot('after-book-moved');
     if (!(await over())) await walkOut();

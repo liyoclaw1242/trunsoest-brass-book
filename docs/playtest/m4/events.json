@@ -17,7 +17,7 @@
   "no": 6
  },
  {
-  "t": 4.03,
+  "t": 4.04,
   "type": "learn",
   "text": "聽完第六條：你、村民 01、村民 02、村民 03、村民 04認知了",
   "no": 6,
@@ -30,67 +30,29 @@
   ]
  },
  {
-  "t": 4.6,
+  "t": 4.08,
   "type": "act",
-  "text": "你undefined了村民 01",
+  "text": "你誘導了村民 01",
   "actor": "outsider",
   "verb": "induce",
   "target": "villager_01"
  },
  {
-  "t": 4.6,
+  "t": 4.08,
   "type": "induce",
   "text": "村民 01答應了：請他邀請我進屋",
   "actor": "villager_01",
   "kind": "invite"
  },
  {
-  "t": 5,
-  "type": "act",
-  "text": "村民 01翻越了圍籬 06",
-  "actor": "villager_01",
-  "verb": "climb",
-  "target": "fence_06"
- },
- {
-  "t": 5.34,
-  "type": "act",
-  "text": "村民 01翻越了圍籬 05",
-  "actor": "villager_01",
-  "verb": "climb",
-  "target": "fence_05"
- },
- {
-  "t": 7.11,
+  "t": 5.09,
   "type": "invited",
   "text": "村民 01邀請你進住宅 01",
   "actor": "villager_01",
   "house": "house_01"
  },
  {
-  "t": 7.57,
-  "type": "act",
-  "text": "村民 03抓捕了外鄉人",
-  "actor": "villager_03",
-  "verb": "capture",
-  "target": "outsider"
- },
- {
-  "t": 7.57,
-  "type": "assim",
-  "text": "同化度 0→1（被抓）",
-  "from": 0,
-  "to": 1,
-  "why": "captured"
- },
- {
-  "t": 7.57,
-  "type": "captured",
-  "text": "你被村民 03抓住了，送回村子中心",
-  "actor": "villager_03"
- },
- {
-  "t": 9.03,
+  "t": 6.72,
   "type": "object",
   "text": "門 01變成開著",
   "id": "door_01",
@@ -101,7 +63,7 @@
   ]
  },
  {
-  "t": 9.03,
+  "t": 6.72,
   "type": "act",
   "text": "你開啟了門 01",
   "actor": "outsider",
@@ -109,15 +71,29 @@
   "target": "door_01"
  },
  {
-  "t": 9.07,
+  "t": 6.95,
   "type": "act",
-  "text": "村民 02翻越了圍籬 06",
+  "text": "村民 02抓捕了外鄉人",
   "actor": "villager_02",
-  "verb": "climb",
-  "target": "fence_06"
+  "verb": "capture",
+  "target": "outsider"
  },
  {
-  "t": 9.35,
+  "t": 6.95,
+  "type": "assim",
+  "text": "同化度 0→1（被抓）",
+  "from": 0,
+  "to": 1,
+  "why": "captured"
+ },
+ {
+  "t": 6.95,
+  "type": "captured",
+  "text": "你被村民 02抓住了，送回村子中心",
+  "actor": "villager_02"
+ },
+ {
+  "t": 7.64,
   "type": "act",
   "text": "你靠近了黃銅書 01",
   "actor": "outsider",
@@ -125,7 +101,7 @@
   "target": "book_01"
  },
  {
-  "t": 9.35,
+  "t": 7.64,
   "type": "act",
   "text": "你進入了住宅 01",
   "actor": "outsider",
@@ -133,69 +109,27 @@
   "target": "house_01"
  },
  {
-  "t": 9.39,
-  "type": "act",
-  "text": "村民 02翻越了圍籬 05",
+  "t": 7.92,
+  "type": "protected",
+  "text": "村民 02在住宅 01門口停下（似乎有規則擋著他）",
   "actor": "villager_02",
-  "verb": "climb",
-  "target": "fence_05"
+  "house": "house_01",
+  "rules": [
+   3
+  ]
  },
  {
-  "t": 9.71,
-  "type": "act",
-  "text": "村民 02翻越了圍籬 04",
-  "actor": "villager_02",
-  "verb": "climb",
-  "target": "fence_04"
- },
- {
-  "t": 10.06,
-  "type": "broadcast",
-  "text": "廣播開始：第五條",
-  "no": 5
- },
- {
-  "t": 10.06,
-  "type": "act",
-  "text": "村民 02翻越了圍籬 03",
-  "actor": "villager_02",
-  "verb": "climb",
-  "target": "fence_03"
- },
- {
-  "t": 10.38,
-  "type": "act",
-  "text": "村民 02翻越了圍籬 02",
-  "actor": "villager_02",
-  "verb": "climb",
-  "target": "fence_02"
- },
- {
-  "t": 10.71,
-  "type": "act",
-  "text": "村民 02翻越了圍籬 03",
-  "actor": "villager_02",
-  "verb": "climb",
-  "target": "fence_03"
- },
- {
-  "t": 10.79,
-  "type": "act",
-  "text": "村民 03翻越了圍籬 06",
+  "t": 7.92,
+  "type": "protected",
+  "text": "村民 03在住宅 01門口停下（似乎有規則擋著他）",
   "actor": "villager_03",
-  "verb": "climb",
-  "target": "fence_06"
+  "house": "house_01",
+  "rules": [
+   3
+  ]
  },
  {
-  "t": 11.12,
-  "type": "act",
-  "text": "村民 03翻越了圍籬 05",
-  "actor": "villager_03",
-  "verb": "climb",
-  "target": "fence_05"
- },
- {
-  "t": 11.47,
+  "t": 9.79,
   "type": "object",
   "text": "門 04變成開著",
   "id": "door_04",
@@ -206,7 +140,7 @@
   ]
  },
  {
-  "t": 11.47,
+  "t": 9.79,
   "type": "act",
   "text": "你開啟了門 04",
   "actor": "outsider",
@@ -214,7 +148,13 @@
   "target": "door_04"
  },
  {
-  "t": 11.75,
+  "t": 10.08,
+  "type": "broadcast",
+  "text": "廣播開始：第五條",
+  "no": 5
+ },
+ {
+  "t": 10.08,
   "type": "act",
   "text": "你進入了住宅 04",
   "actor": "outsider",
@@ -222,43 +162,36 @@
   "target": "house_04"
  },
  {
-  "t": 11.75,
+  "t": 10.08,
   "type": "write",
   "text": "書寫下第七條：外鄉人不得進入住宅。",
   "no": 7
  },
  {
-  "t": 12.65,
+  "t": 10.92,
   "type": "act",
-  "text": "你undefined了村民 04",
+  "text": "你誘導了村民 04",
   "actor": "outsider",
   "verb": "induce",
   "target": "villager_04"
  },
  {
-  "t": 12.65,
+  "t": 10.92,
   "type": "induce",
   "text": "村民 04答應了：請他去拿信物",
   "actor": "villager_04",
   "kind": "fetch"
  },
  {
-  "t": 14.08,
-  "type": "learn",
-  "text": "聽完第五條：你認知了",
-  "no": 5,
-  "learned": [
-   "outsider"
-  ]
+  "t": 11.25,
+  "type": "act",
+  "text": "村民 02翻越了圍籬 10",
+  "actor": "villager_02",
+  "verb": "climb",
+  "target": "fence_10"
  },
  {
-  "t": 14.13,
-  "type": "broadcast",
-  "text": "廣播開始：第七條",
-  "no": 7
- },
- {
-  "t": 16.9,
+  "t": 13.98,
   "type": "protected",
   "text": "村民 01在住宅 04門口停下（似乎有規則擋著他）",
   "actor": "villager_01",
@@ -268,17 +201,30 @@
   ]
  },
  {
-  "t": 17.4,
-  "type": "protected",
-  "text": "村民 02在住宅 04門口停下（似乎有規則擋著他）",
-  "actor": "villager_02",
-  "house": "house_04",
-  "rules": [
-   3
-  ]
+  "t": 14.15,
+  "type": "broadcast",
+  "text": "廣播開始：第七條",
+  "no": 7
  },
  {
-  "t": 17.4,
+  "t": 16.49,
+  "type": "object",
+  "text": "信物 03被村民 04拿著",
+  "id": "keepsake_03",
+  "state": "intact",
+  "pos": null,
+  "heldBy": "villager_04"
+ },
+ {
+  "t": 16.49,
+  "type": "act",
+  "text": "村民 04取走了信物 03",
+  "actor": "villager_04",
+  "verb": "take",
+  "target": "keepsake_03"
+ },
+ {
+  "t": 16.92,
   "type": "protected",
   "text": "村民 03在住宅 04門口停下（似乎有規則擋著他）",
   "actor": "villager_03",
@@ -289,33 +235,27 @@
  },
  {
   "t": 17.7,
-  "type": "object",
-  "text": "信物 03被村民 04拿著",
-  "id": "keepsake_03",
-  "state": "intact",
-  "pos": null,
-  "heldBy": "villager_04"
+  "type": "protected",
+  "text": "村民 02在住宅 04門口停下（似乎有規則擋著他）",
+  "actor": "villager_02",
+  "house": "house_04",
+  "rules": [
+   3
+  ]
  },
  {
-  "t": 17.7,
-  "type": "act",
-  "text": "村民 04取走了信物 03",
-  "actor": "villager_04",
-  "verb": "take",
-  "target": "keepsake_03"
- },
- {
-  "t": 18.14,
+  "t": 18.18,
   "type": "learn",
-  "text": "聽完第七條：你、村民 04認知了",
+  "text": "聽完第七條：你、村民 01、村民 04認知了",
   "no": 7,
   "learned": [
    "outsider",
+   "villager_01",
    "villager_04"
   ]
  },
  {
-  "t": 23.96,
+  "t": 22.54,
   "type": "object",
   "text": "信物 03被你拿著",
   "id": "keepsake_03",
@@ -324,17 +264,11 @@
   "heldBy": "outsider"
  },
  {
-  "t": 23.96,
+  "t": 22.54,
   "type": "act",
   "text": "村民 04歸還了信物 03",
   "actor": "villager_04",
   "verb": "give",
   "target": "keepsake_03"
- },
- {
-  "t": 24.18,
-  "type": "broadcast",
-  "text": "廣播開始：第四條",
-  "no": 4
  }
 ]

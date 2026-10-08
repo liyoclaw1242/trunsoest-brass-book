@@ -22,7 +22,8 @@ const hear = (s, ids) => { for (const id of ids) v(s, id).known.add(s.world.live
   assert.ok(events.length >= 1, '應該被抓到'); assert.equal(events[0], 'villager_01');
   const first = events.length; run(s, 2);
   assert.equal(events.length, first, '被抓後 3 秒內不會再被抓');
-  ok('抓捕：相鄰 0.5 秒後 capture 事件；之後 3 秒免疫');
+  assert.equal(v(s, 'villager_01').mode, 'chase', '免疫期間村民仍在追，只是抓不到');
+  ok('抓捕：相鄰 0.5 秒後 capture 事件；之後 3 秒免疫（免疫只擋判定，不停追）');
 }
 // 2. 村民拒絕違規：外鄉人躲在別人家裡，追捕的村民不進屋（憲法第三條），在門口停下
 {
@@ -103,7 +104,7 @@ const hear = (s, ids) => { for (const id of ids) v(s, id).known.add(s.world.live
   run(s, 30);
   const book = s.world.objects.get('book_01');
   assert.ok(moved, '書應該被搬');
-  assert.ok(s.world.live('book-move'), '搬書後書重寫「黃銅書不得被搬動」');
+  assert.equal(s.world.live('book-move'), null, '搬一次還不會被寫成條文（觸發 count 2）');
   assert.deepEqual(book.pos, p.home);
   assert.deepEqual(s.grid.center(), p.home);
   ok('誘導：撕掉之後，請他去搬書 → 搬到自己家門口、範圍中心跟著書');
@@ -113,7 +114,8 @@ const hear = (s, ids) => { for (const id of ids) v(s, id).known.add(s.world.live
   assert.equal(s2.villagers.induce(q, 'book'), true);
   for (let i = 0; i < 400 && !q.carrying; i++) s2.tick(0.05);
   assert.ok(q.carrying, '應該已經拿起書');
-  q.known.add(s2.world.live('book-move').no);   // 途中聽到了
+  const rw = s2.world.write({ key: 'book-move', text: '黃銅書不得被搬動。', verb: 'move', target: { id: 'book_01' } }, { silent: true });
+  q.known.add(rw.no);   // 途中聽到了
   let fail = null; s2.world.on('taskFail', e => fail = e.why);
   s2.tick(0.05);
   assert.equal(q.carrying, null); assert.equal(fail, 'refused'); assert.ok(s2.world.objects.get('book_01').pos);

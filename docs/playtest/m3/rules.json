@@ -75,7 +75,7 @@
   "no": 5,
   "key": "book-move",
   "text": "黃銅書不得被搬動。",
-  "hole": "書台沒被提到；沒聽到的人不受約束。",
+  "hole": "沒聽到這條的人不受約束：聽不到廣播的村民會替你搬。",
   "void": true,
   "dead": false,
   "mode": "forbid",
@@ -111,7 +111,7 @@
   "no": 7,
   "key": "speaker-break",
   "text": "廣播器不得被破壞。",
-  "hole": "沒聽到的人不受約束；沒說不能搬走。",
+  "hole": "沒聽到的人不受約束（站在壞掉的廣播器旁就聽不到）；只管「破壞」，已經壞掉的不會因此修好。",
   "void": true,
   "dead": false,
   "mode": "forbid",
@@ -136,8 +136,7 @@
   "who": "outsider",
   "knownBy": [
    "outsider",
-   "villager_01",
-   "villager_04"
+   "villager_01"
   ]
  },
  {
