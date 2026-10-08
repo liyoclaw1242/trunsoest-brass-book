@@ -1,0 +1,143 @@
+[
+ {
+  "t": 0,
+  "type": "write",
+  "text": "書寫下第五條：請所有市民一起抓捕外鄉人，可採用一切手段。",
+  "no": 5
+ },
+ {
+  "t": 0,
+  "type": "start",
+  "text": "黃銅書察覺了你。廣播器開始唸公告……"
+ },
+ {
+  "t": -0.01,
+  "type": "broadcast",
+  "text": "廣播開始：第五條",
+  "no": 5
+ },
+ {
+  "t": 1.19,
+  "type": "act",
+  "text": "村民 01翻越了圍籬 06",
+  "actor": "villager_01",
+  "verb": "climb",
+  "target": "fence_06"
+ },
+ {
+  "t": 4.01,
+  "type": "learn",
+  "text": "聽完第五條：你、村民 01、村民 02、村民 03認知了",
+  "no": 5,
+  "learned": [
+   "outsider",
+   "villager_01",
+   "villager_02",
+   "villager_03"
+  ]
+ },
+ {
+  "t": 4.36,
+  "type": "act",
+  "text": "村民 01翻越了圍籬 05",
+  "actor": "villager_01",
+  "verb": "climb",
+  "target": "fence_05"
+ },
+ {
+  "t": 6.24,
+  "type": "act",
+  "text": "村民 01抓捕了外鄉人",
+  "actor": "villager_01",
+  "verb": "capture",
+  "target": "outsider"
+ },
+ {
+  "t": 6.24,
+  "type": "assim",
+  "text": "同化度 0→1（被抓）",
+  "from": 0,
+  "to": 1,
+  "why": "captured"
+ },
+ {
+  "t": 6.24,
+  "type": "captured",
+  "text": "你被村民 01抓住了，送回村子中心",
+  "actor": "villager_01"
+ },
+ {
+  "t": 10.01,
+  "type": "broadcast",
+  "text": "廣播開始：第一條",
+  "no": 1
+ },
+ {
+  "t": 10.33,
+  "type": "act",
+  "text": "村民 02抓捕了外鄉人",
+  "actor": "villager_02",
+  "verb": "capture",
+  "target": "outsider"
+ },
+ {
+  "t": 10.33,
+  "type": "assim",
+  "text": "同化度 1→2（被抓）",
+  "from": 1,
+  "to": 2,
+  "why": "captured"
+ },
+ {
+  "t": 10.33,
+  "type": "captured",
+  "text": "你被村民 02抓住了，送回村子中心",
+  "actor": "villager_02"
+ },
+ {
+  "t": 13.86,
+  "type": "act",
+  "text": "村民 03抓捕了外鄉人",
+  "actor": "villager_03",
+  "verb": "capture",
+  "target": "outsider"
+ },
+ {
+  "t": 13.86,
+  "type": "assim",
+  "text": "同化度 2→3（被抓）",
+  "from": 2,
+  "to": 3,
+  "why": "captured"
+ },
+ {
+  "t": 13.86,
+  "type": "end",
+  "text": "你被同化了。",
+  "state": "lost",
+  "reason": "assimilated",
+  "stats": {
+   "time": 13.8,
+   "written": 0,
+   "resets": 0,
+   "awakened": 0,
+   "captures": 3,
+   "idleWrites": 0
+  }
+ },
+ {
+  "t": 13.86,
+  "type": "captured",
+  "text": "你被村民 03抓住了，送回村子中心",
+  "actor": "villager_03"
+ },
+ {
+  "t": 14.05,
+  "type": "learn",
+  "text": "聽完第一條：你認知了",
+  "no": 1,
+  "learned": [
+   "outsider"
+  ]
+ }
+]

@@ -29,6 +29,23 @@ export class Hud {
     }
     for (const el of have.values()) el.remove();
   }
+  /** 開始畫面。 */
+  showStart(onStart) {
+    const o = this.el.overlay; o.hidden = false; o.className = 'start';
+    o.innerHTML = `<h1>規則書</h1><div class="small">你誤入了一個烏托邦。這裡有一本會自己寫律法的黃銅書，它會針對你的行為不斷寫下新規則，村民會照著規則抓你。<br>
+    規則要被公示、而且你聽完整條，才管得到你——聽不聽廣播，是你的選擇。<br>
+    目標：在書活過來之前，走出它的影響範圍（白色虛線圈，邊緣有界石）。<br><br>
+    WASD／方向鍵移動　E 互動（數字鍵選其他動作）　N 收合筆記　Tab 設計者視角</div><button id="btn-start">開始</button>`;
+    o.querySelector('#btn-start').onclick = () => { o.hidden = true; onStart(); };
+  }
+  /** 結局畫面。 */
+  showEnd(state, reason, st) {
+    const o = this.el.overlay; o.hidden = false; o.className = state;
+    const title = state === 'won' ? '你離開了' : reason === 'assimilated' ? '你成了市民' : '書活過來了';
+    const sub = state === 'won' ? '你走出了黃銅書的影響範圍。' : reason === 'assimilated' ? '同化度到了 3。你再也不想離開這裡。' : '第三次重置。書已經不需要你了。';
+    const mm = Math.floor(st.time / 60), ss = String(Math.floor(st.time % 60)).padStart(2, '0');
+    o.innerHTML = `<h1>${title}</h1><div class="small">${sub}</div><div class="small" style="margin-top:16px">用時 ${mm}:${ss}　書寫了 ${st.written} 條（其中 ${st.idleWrites} 條是它閒著寫的）　重置 ${st.resets} 次　喚醒了 ${st.awakened} 個村民　被抓 ${st.captures} 次</div><button onclick="location.reload()">再玩一次</button>`;
+  }
   toggleDesigner() { this.designer = !this.designer; this.el.designer.hidden = !this.designer; }
   renderNotes() {
     const g = this.game, notes = g.world.notes('outsider'), bc = g.broadcast();
@@ -66,7 +83,7 @@ export class Hud {
   toast(text, cls = '', sec = 2) { const t = this.el.toast; t.textContent = text; t.className = cls; t.hidden = false; this.toastTimer = sec; }
   update(dt) {
     const g = this.game, s = g.status();
-    this.el.status.textContent = `位置 (${s.cell[0]}, ${s.cell[1]})${s.house ? `  在${s.house}內` : ''}\n${s.inBroadcast ? '聽得到廣播' : '聽不到廣播'}  ${s.inRange ? '影響範圍內' : '影響範圍外'}\n生效 ${s.rules}/${s.max} 條  重置 ${s.resets} 次${s.held.length ? `\n身上：${s.held.join('、')}` : ''}${s.carrying ? '\n搬著黃銅書' : ''}`;
+    this.el.status.textContent = `${Math.floor(s.t / 60)}:${String(Math.floor(s.t % 60)).padStart(2, '0')}  位置 (${s.cell[0]}, ${s.cell[1]})${s.house ? `  在${s.house}內` : ''}\n${s.inBroadcast ? '聽得到廣播' : '聽不到廣播'}  ${s.inRange ? '影響範圍內' : '影響範圍外'}\n生效 ${s.rules}/${s.max} 條  重置 ${s.resets}/3 次\n同化度 ${'■'.repeat(s.assim)}${'□'.repeat(s.assimMax - s.assim)} ${s.assim}/${s.assimMax}${s.held.length ? `\n身上：${s.held.join('、')}` : ''}${s.carrying ? '\n搬著黃銅書' : ''}${s.opening > 0 ? `\n（聽公告中 ${s.opening.toFixed(0)} 秒）` : ''}`;
     const opts = g.options();
     this.el.prompt.innerHTML = opts.slice(0, 9).map((o, i) => `<span class="${o.ok ? '' : 'blocked'}${o.violates?.length ? ' violates' : ''}"><b>${i === 0 ? 'E' : i + 1}</b>${o.label}${o.violates?.length ? `（違反第${o.violates.map(num).join('、')}條）` : ''}</span>`).join('');
     if (this.toastTimer > 0) { this.toastTimer -= dt; if (this.toastTimer <= 0) this.el.toast.hidden = true; }

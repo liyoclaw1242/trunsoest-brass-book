@@ -5,7 +5,8 @@ import { Hud } from './hud.js';
 import { Input } from './input.js';
 
 const [scene, meta] = await Promise.all([fetch('/scene.json').then(r => r.json()), fetch('/scene.meta.json').then(r => r.json())]);
-const game = new Game(scene, meta);
+const params = new URLSearchParams(location.search);
+const game = new Game(scene, meta, { villagers: { hunt: !params.has('nohunt') }, match: { noEnd: params.has('noend') } });
 const view = await new View(document.getElementById('gl')).load('/village.glb');
 const hud = new Hud(game);
 const input = new Input();
@@ -59,6 +60,11 @@ function drawMarkers() {
   if (bc) for (const o of w.objects.values()) if (o.type === 'speaker' && o.state === 'intact') view.tag(o.pos, 0xff4444, 3.4, 0.25);
 }
 
+function startGame() { game.start({ opening: params.has('noopening') ? 0 : undefined }); }
+if (params.has('autostart')) startGame(); else hud.showStart(startGame);
+game.world.on('end', ({ state, reason, stats }) => hud.showEnd(state, reason, stats));
+game.on(e => { if (e.type === 'assim') hud.toast(e.text, e.text.includes('被抓') ? '' : 'info', 2.5); else if (e.type === 'idle') hud.toast(e.text, 'info', 3); });
+
 let last = performance.now(), frames = 0;
 function loop(now) {
   const dt = Math.min(0.1, (now - last) / 1000); last = now; frames++;
@@ -97,6 +103,8 @@ window.__game = {
   rules: () => game.world.rules.map(r => ({ no: r.no, key: r.key, text: r.text, void: r.void, dead: r.dead, hole: r.hole })),
   objects: () => [...game.world.objects.values()].map(o => ({ id: o.id, type: o.type, state: o.state, pos: o.pos, heldBy: o.heldBy })),
   frames: () => frames,
+  start: () => startGame(),
+  match: () => ({ state: game.match.state, reason: game.match.reason, assim: game.match.assim, stats: { ...game.match.stats } }),
   broadcast: () => game.broadcast(),
   quiet: () => game.quietCell(),
   protectedIds: a => game.protectedIds(a),

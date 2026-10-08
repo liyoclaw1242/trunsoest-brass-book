@@ -1,0 +1,72 @@
+[
+ {
+  "name": "開始畫面：說明與開始鈕",
+  "ok": true,
+  "info": "規則書\n你誤入了一個烏托邦。這裡有一本會自己寫律法的黃銅書，它會針對你的行為不斷"
+ },
+ {
+  "name": "按開始後進入聽公告（約 4 秒不能動）",
+  "ok": true,
+  "info": "opening=3.6"
+ },
+ {
+  "name": "天真直奔邊界的結果（資料）",
+  "ok": true,
+  "info": "goto=blocked state=playing captures=1 t=2.6s"
+ },
+ {
+  "name": "第二次直奔的結果（資料）",
+  "ok": true,
+  "info": "goto=ok state=won captures=1"
+ },
+ {
+  "name": "贏：走出影響範圍 → won/escaped",
+  "ok": true,
+  "info": "{\"state\":\"won\",\"reason\":\"escaped\",\"assim\":1,\"stats\":{\"time\":12.2,\"written\":0,\"resets\":0,\"awakened\":0,\"captures\":1,\"idleWrites\":0}}"
+ },
+ {
+  "name": "結局畫面列出用時／寫了幾條／重置／喚醒",
+  "ok": true,
+  "info": "你離開了 你走出了黃銅書的影響範圍。 用時 0:12　書寫了 0 條（其中 0 條是它閒著寫的）　重置 0 次　喚醒了 0 個村民　被抓 1 次 再玩一次"
+ },
+ {
+  "name": "站著不動，被抓到三次",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "輸：同化度 3 → lost/assimilated",
+  "ok": true,
+  "info": "{\"state\":\"lost\",\"reason\":\"assimilated\",\"assim\":3,\"stats\":{\"time\":13.8,\"written\":0,\"resets\":0,\"awakened\":0,\"captures\":3,\"idleWrites\":0}}"
+ },
+ {
+  "name": "結局畫面：你成了市民",
+  "ok": true,
+  "info": "你成了市民 同化度到了 3。你再也不想離開這裡。 用時 0:13　書寫了 0 條（其中 0 條是它閒著寫的）　重置 0 次　喚醒了 0 個村民　被抓 3 次 再"
+ },
+ {
+  "name": "事件紀錄有三次同化度上升",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "輸：第三次重置 → lost/alive",
+  "ok": true,
+  "info": "{\"state\":\"lost\",\"reason\":\"alive\",\"assim\":0,\"stats\":{\"time\":0.2,\"written\":16,\"resets\":3,\"awakened\":0,\"captures\":0,\"idleWrites\":0}}"
+ },
+ {
+  "name": "結局畫面：書活過來了",
+  "ok": true,
+  "info": "書活過來了 第三次重置。書已經不需要你了。 用時 0:00　書寫了 15 條（其中 0 條是它閒著寫的）　重置 3 次　喚醒了 0 個村民　被抓 0 次 再玩一"
+ },
+ {
+  "name": "躲在屋裡 50 秒後書自己動筆",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "備用條文有漏洞文字（設計者視角）",
+  "ok": true,
+  "info": "書閒不住，自己動筆了：第六條"
+ }
+]

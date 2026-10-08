@@ -7,12 +7,17 @@
  },
  {
   "t": 0,
+  "type": "start",
+  "text": "黃銅書察覺了你。廣播器開始唸公告……"
+ },
+ {
+  "t": 0.01,
   "type": "broadcast",
   "text": "廣播開始：第五條",
   "no": 5
  },
  {
-  "t": 0.42,
+  "t": 0.56,
   "type": "object",
   "text": "廣播器 01變成損壞",
   "id": "speaker_01",
@@ -23,7 +28,7 @@
   ]
  },
  {
-  "t": 0.42,
+  "t": 0.56,
   "type": "act",
   "text": "你破壞了廣播器 01",
   "actor": "outsider",
@@ -31,7 +36,7 @@
   "target": "speaker_01"
  },
  {
-  "t": 0.65,
+  "t": 0.78,
   "type": "object",
   "text": "廣播器 01變成完好",
   "id": "speaker_01",
@@ -42,7 +47,7 @@
   ]
  },
  {
-  "t": 0.65,
+  "t": 0.78,
   "type": "act",
   "text": "你修復了廣播器 01",
   "actor": "outsider",
@@ -50,7 +55,7 @@
   "target": "speaker_01"
  },
  {
-  "t": 1.37,
+  "t": 2.37,
   "type": "act",
   "text": "你閱讀了公告牌 01",
   "actor": "outsider",
@@ -58,7 +63,7 @@
   "target": "notice_01"
  },
  {
-  "t": 1.37,
+  "t": 2.37,
   "type": "object",
   "text": "公告牌 01變成被塗毀",
   "id": "notice_01",
@@ -69,7 +74,7 @@
   ]
  },
  {
-  "t": 1.37,
+  "t": 2.37,
   "type": "act",
   "text": "你塗毀了公告牌 01",
   "actor": "outsider",
@@ -77,7 +82,7 @@
   "target": "notice_01"
  },
  {
-  "t": 2.79,
+  "t": 4.58,
   "type": "object",
   "text": "門 01變成開著",
   "id": "door_01",
@@ -88,7 +93,7 @@
   ]
  },
  {
-  "t": 2.79,
+  "t": 4.58,
   "type": "act",
   "text": "你開啟了門 01",
   "actor": "outsider",
@@ -96,7 +101,15 @@
   "target": "door_01"
  },
  {
-  "t": 2.97,
+  "t": 4.91,
+  "type": "act",
+  "text": "你靠近了黃銅書 01",
+  "actor": "outsider",
+  "verb": "approach",
+  "target": "book_01"
+ },
+ {
+  "t": 4.91,
   "type": "violation",
   "text": "你違反了第三條（進入住宅 01）",
   "actor": "outsider",
@@ -107,7 +120,7 @@
   ]
  },
  {
-  "t": 2.97,
+  "t": 4.91,
   "type": "act",
   "text": "你進入了住宅 01",
   "actor": "outsider",
@@ -115,7 +128,7 @@
   "target": "house_01"
  },
  {
-  "t": 3.63,
+  "t": 5.81,
   "type": "act",
   "text": "你閱讀了黃銅書 01",
   "actor": "outsider",
@@ -123,7 +136,7 @@
   "target": "book_01"
  },
  {
-  "t": 3.63,
+  "t": 5.81,
   "type": "object",
   "text": "黃銅書 01移到 (30,32)",
   "id": "book_01",
@@ -134,7 +147,7 @@
   ]
  },
  {
-  "t": 3.63,
+  "t": 5.81,
   "type": "act",
   "text": "你搬動了黃銅書 01",
   "actor": "outsider",
@@ -142,30 +155,19 @@
   "target": "book_01"
  },
  {
-  "t": 3.63,
+  "t": 5.81,
   "type": "write",
   "text": "書寫下第六條：黃銅書不得被搬動。",
   "no": 6
  },
  {
-  "t": 4.03,
-  "type": "learn",
-  "text": "聽完第五條：村民 02、村民 03、村民 04認知了",
-  "no": 5,
-  "learned": [
-   "villager_02",
-   "villager_03",
-   "villager_04"
-  ]
- },
- {
-  "t": 4.06,
+  "t": 5.87,
   "type": "broadcast",
   "text": "廣播開始：第六條",
   "no": 6
  },
  {
-  "t": 4.5,
+  "t": 7.28,
   "type": "object",
   "text": "黃銅書 01移到 (31,28)",
   "id": "book_01",
@@ -176,7 +178,7 @@
   ]
  },
  {
-  "t": 5.92,
+  "t": 9.44,
   "type": "act",
   "text": "你翻越了圍籬 04",
   "actor": "outsider",
@@ -184,7 +186,7 @@
   "target": "fence_04"
  },
  {
-  "t": 6.13,
+  "t": 9.64,
   "type": "object",
   "text": "圍籬 04變成損壞",
   "id": "fence_04",
@@ -195,7 +197,7 @@
   ]
  },
  {
-  "t": 6.13,
+  "t": 9.64,
   "type": "act",
   "text": "你破壞了圍籬 04",
   "actor": "outsider",
@@ -203,7 +205,16 @@
   "target": "fence_04"
  },
  {
-  "t": 7.85,
+  "t": 9.91,
+  "type": "learn",
+  "text": "聽完第六條：你認知了",
+  "no": 6,
+  "learned": [
+   "outsider"
+  ]
+ },
+ {
+  "t": 12.47,
   "type": "object",
   "text": "推車 01移到 (33,23)",
   "id": "cart_01",
@@ -214,7 +225,7 @@
   ]
  },
  {
-  "t": 7.85,
+  "t": 12.47,
   "type": "act",
   "text": "你搬動了推車 01",
   "actor": "outsider",
@@ -222,7 +233,7 @@
   "target": "cart_01"
  },
  {
-  "t": 8.01,
+  "t": 12.74,
   "type": "object",
   "text": "推車 01移到 (32,23)",
   "id": "cart_01",
@@ -233,7 +244,7 @@
   ]
  },
  {
-  "t": 8.01,
+  "t": 12.74,
   "type": "act",
   "text": "你搬動了推車 01",
   "actor": "outsider",
@@ -241,20 +252,7 @@
   "target": "cart_01"
  },
  {
-  "t": 8.07,
-  "type": "learn",
-  "text": "聽完第六條：你、村民 01、村民 02、村民 03、村民 04認知了",
-  "no": 6,
-  "learned": [
-   "outsider",
-   "villager_01",
-   "villager_02",
-   "villager_03",
-   "villager_04"
-  ]
- },
- {
-  "t": 8.55,
+  "t": 13.57,
   "type": "act",
   "text": "你使用了推車 01",
   "actor": "outsider",
@@ -262,7 +260,7 @@
   "target": "cart_01"
  },
  {
-  "t": 9.43,
+  "t": 14.93,
   "type": "object",
   "text": "推車 01變成損壞",
   "id": "cart_01",
@@ -273,7 +271,7 @@
   ]
  },
  {
-  "t": 9.43,
+  "t": 14.93,
   "type": "act",
   "text": "你破壞了推車 01",
   "actor": "outsider",
@@ -281,7 +279,13 @@
   "target": "cart_01"
  },
  {
-  "t": 11.38,
+  "t": 15.95,
+  "type": "broadcast",
+  "text": "廣播開始：第一條",
+  "no": 1
+ },
+ {
+  "t": 17.86,
   "type": "object",
   "text": "信物 04被你拿著",
   "id": "keepsake_04",
@@ -290,7 +294,7 @@
   "heldBy": "outsider"
  },
  {
-  "t": 11.38,
+  "t": 17.86,
   "type": "act",
   "text": "你取走了信物 04",
   "actor": "outsider",
@@ -298,19 +302,52 @@
   "target": "keepsake_04"
  },
  {
-  "t": 11.38,
+  "t": 17.86,
   "type": "write",
   "text": "書寫下第七條：外鄉人不得取走信物。",
   "no": 7
  },
  {
-  "t": 11.41,
+  "t": 20.08,
   "type": "broadcast",
   "text": "廣播開始：第七條",
   "no": 7
  },
  {
-  "t": 14.2,
+  "t": 30.12,
+  "type": "broadcast",
+  "text": "廣播開始：第七條",
+  "no": 7
+ },
+ {
+  "t": 30.27,
+  "type": "level",
+  "text": "村民 01從半同化變成已喚醒（太久沒聽到廣播）",
+  "actor": "villager_01",
+  "from": "half",
+  "to": "awake",
+  "why": "quiet"
+ },
+ {
+  "t": 30.27,
+  "type": "level",
+  "text": "村民 02從人偶變成半同化（太久沒聽到廣播）",
+  "actor": "villager_02",
+  "from": "puppet",
+  "to": "half",
+  "why": "quiet"
+ },
+ {
+  "t": 30.27,
+  "type": "level",
+  "text": "村民 03從半同化變成已喚醒（太久沒聽到廣播）",
+  "actor": "villager_03",
+  "from": "half",
+  "to": "awake",
+  "why": "quiet"
+ },
+ {
+  "t": 34.92,
   "type": "object",
   "text": "信物 04被村民 01拿著",
   "id": "keepsake_04",
@@ -319,7 +356,7 @@
   "heldBy": "villager_01"
  },
  {
-  "t": 14.2,
+  "t": 34.92,
   "type": "act",
   "text": "你歸還了信物 04",
   "actor": "outsider",
@@ -327,40 +364,90 @@
   "target": "keepsake_04"
  },
  {
-  "t": 15.42,
+  "t": 40.21,
+  "type": "broadcast",
+  "text": "廣播開始：第七條",
+  "no": 7
+ },
+ {
+  "t": 44.23,
   "type": "learn",
-  "text": "聽完第七條：你、村民 01、村民 02、村民 03、村民 04認知了",
+  "text": "聽完第七條：你認知了",
   "no": 7,
   "learned": [
-   "outsider",
-   "villager_01",
-   "villager_02",
-   "villager_03",
-   "villager_04"
+   "outsider"
   ]
  },
  {
-  "t": 21.46,
-  "type": "broadcast",
-  "text": "廣播開始：第一條",
-  "no": 1
- },
- {
-  "t": 31.49,
-  "type": "broadcast",
-  "text": "廣播開始：第二條",
-  "no": 2
- },
- {
-  "t": 41.52,
-  "type": "broadcast",
-  "text": "廣播開始：第三條",
-  "no": 3
- },
- {
-  "t": 51.56,
+  "t": 50.24,
   "type": "broadcast",
   "text": "廣播開始：第四條",
   "no": 4
+ },
+ {
+  "t": 60.28,
+  "type": "broadcast",
+  "text": "廣播開始：第五條",
+  "no": 5
+ },
+ {
+  "t": 60.28,
+  "type": "level",
+  "text": "村民 02從半同化變成已喚醒（太久沒聽到廣播）",
+  "actor": "villager_02",
+  "from": "half",
+  "to": "awake",
+  "why": "quiet"
+ },
+ {
+  "t": 67.91,
+  "type": "write",
+  "text": "書寫下第八條：外鄉人不得開啟任何門。",
+  "no": 8
+ },
+ {
+  "t": 67.91,
+  "type": "idle",
+  "text": "書閒不住，自己動筆了：第八條",
+  "no": 8
+ },
+ {
+  "t": 67.99,
+  "type": "broadcast",
+  "text": "廣播開始：第八條",
+  "no": 8
+ },
+ {
+  "t": 78.08,
+  "type": "broadcast",
+  "text": "廣播開始：第八條",
+  "no": 8
+ },
+ {
+  "t": 88.21,
+  "type": "broadcast",
+  "text": "廣播開始：第八條",
+  "no": 8
+ },
+ {
+  "t": 98.31,
+  "type": "broadcast",
+  "text": "廣播開始：第八條",
+  "no": 8
+ },
+ {
+  "t": 102.39,
+  "type": "learn",
+  "text": "聽完第八條：你認知了",
+  "no": 8,
+  "learned": [
+   "outsider"
+  ]
+ },
+ {
+  "t": 108.39,
+  "type": "broadcast",
+  "text": "廣播開始：第一條",
+  "no": 1
  }
 ]

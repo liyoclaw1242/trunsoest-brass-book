@@ -7,7 +7,7 @@
  {
   "name": "走到村民 01 旁",
   "ok": true,
-  "info": "[36,27]"
+  "info": "[36,23]"
  },
  {
   "name": "誘導：請他邀請我進屋",
@@ -37,12 +37,12 @@
  {
   "name": "事件紀錄：被誰抓住",
   "ok": true,
-  "info": "你被村民 01抓住了，送回村子中心"
+  "info": "你被村民 03抓住了，送回村子中心"
  },
  {
   "name": "被抓後在出生點附近（3 秒免疫內）",
   "ok": true,
-  "info": "[30,26]"
+  "info": "[30,28]"
  },
  {
   "name": "躲在 house_04 內",
@@ -67,7 +67,7 @@
  {
   "name": "村民 04 拿到信物後交給你",
   "ok": true,
-  "info": "{\"t\":18.5,\"cell\":[30,46],\"house\":\"house_04\",\"inBroadcast\":true,\"inRange\":true,\"held\":[\"keepsake_03\"],\"carrying\":null,\"rules\":6,\"max\":10,\"resets\":0,\"invitedTo\":null,\"captures\":1,\"villagers\":[{\"id\":\"villager_01\",\"pos\":[30,44],\"level\":\"half\",\"mode\":\"wander\",\"hunting\":true,\"task\":null,\"quiet\":0},{\"id\":\"villager_02\",\"pos\":[30,44],\"level\":\"puppet\",\"mode\":\"wander\",\"hunting\":true,\"task\":null,\"quiet\":0},{\"id\":\"villager_03\",\"pos\":[35,43],\"level\":\"half\",\"mode\":\"wander\",\"hunting\":true,\"task\":null,\"quiet\":0},{\"id\":\"villager_04\",\"pos\":[30,45],\"level\":\"awake\",\"mode\":\"wander\",\"hunting\":false,\"task\":null,\"quiet\":0}]}"
+  "info": "{\"t\":26.2,\"state\":\"playing\",\"reason\":null,\"assim\":1,\"assimMax\":3,\"opening\":0,\"stats\":{\"time\":26.2,\"written\":1,\"resets\":0,\"awakened\":0,\"captures\":1,\"idleWrites\":0},\"cell\":[30,46],\"house\":\"house_04\",\"inBroadcast\":true,\"inRange\":true,\"held\":[\"keepsake_03\"],\"carrying\":null,\"rules\":6,\"max\":10,\"resets\":0,\"invitedTo\":null,\"captures\":1,\"villagers\":[{\"id\":\"villager_01\",\"pos\":[30,44],\"level\":\"half\",\"mode\":\"wander\",\"hunting\":true,\"task\":null,\"quiet\":0},{\"id\":\"villager_02\",\"pos\":[30,44],\"level\":\"puppet\",\"mode\":\"chase\",\"hunting\":true,\"task\":null,\"quiet\":0},{\"id\":\"villager_03\",\"pos\":[30,44],\"level\":\"half\",\"mode\":\"wander\",\"hunting\":true,\"task\":null,\"quiet\":0},{\"id\":\"villager_04\",\"pos\":[30,45],\"level\":\"awake\",\"mode\":\"wander\",\"hunting\":false,\"task\":null,\"quiet\":0}]}"
  },
  {
   "name": "追捕的村民沒進入 house_04",
@@ -82,6 +82,6 @@
  {
   "name": "對人偶顯示「無法誘導」",
   "ok": true,
-  "info": "歸還信物 03給村民 02|歸還信物 03給村民 04|村民 02是人偶，無法誘導|請他邀請我進屋（村民 04）|請他去拿信物（村民 04）|請他去搬書（村民 04）|開啟門 04|破壞門 04"
+  "info": "歸還信物 03給村民 01|歸還信物 03給村民 02|歸還信物 03給村民 03|歸還信物 03給村民 04|請他邀請我進屋（村民 01）|請他去拿信物（村民 01）|請他去搬書（村民 01）|村民 02是人偶，無法誘導|請他邀請我進屋（村民 03）|請他去拿信物（村民 03）|請他去搬書（村民 03）|請他邀請我進屋（村民 04）|請他去拿信物（村民 04）|請他去搬書（村民 04）|開啟門 04|破壞門 04"
  }
 ]

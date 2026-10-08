@@ -3,7 +3,7 @@ import { writeFileSync } from 'node:fs';
 import { open } from './pw.js';
 
 const DIR = 'docs/playtest/m3';
-const pw = await open();
+const pw = await open({ url: 'http://localhost:5173/?autostart&noopening&nohunt&noend' });
 const results = [];
 const check = (name, ok, info = '') => { results.push({ name, ok, info }); console.log(ok ? 'PASS' : 'FAIL', name, info); };
 const doVerb = async (verb, target, ctx) => { const opts = await pw.options(); const i = opts.findIndex(o => o.verb === verb && o.target === target); if (i < 0) return { done: false, missing: true, labels: opts.map(o => o.label) }; return { ...(await pw.act(i)), i, opt: opts[i] }; };
@@ -32,7 +32,7 @@ let st = await pw.status(); check('站在壞掉的廣播器旁聽不到廣播', 
 await pw.wait(6);
 check('驗證 2：新條文沒被你認知', !(await knows('speaker-break')));
 let dr = await pw.eval(() => window.__game.designerRules()); const sb = dr.find(x => x.key === 'speaker-break');
-check('v2（聽不到）不認知、v3/v4（範圍內）認知', !sb.knownBy.includes('villager_02') && sb.knownBy.includes('villager_03') && sb.knownBy.includes('villager_04'), sb.knownBy.join(','));
+check('v2（在壞掉的廣播器旁）不認知、範圍內的村民認知', !sb.knownBy.includes('villager_02') && sb.knownBy.length >= 2, sb.knownBy.join(','));
 await pw.eval(() => window.__game.designer(true));
 await pw.shot(DIR, '03-speaker-break-unheard');
 
@@ -45,7 +45,7 @@ await pw.shot(DIR, '04-protected-objective-only');
 // 5. 驗證 1：走進 speaker_03 範圍聽完 → 金色外框出現，破壞變成違規
 check('走到 speaker_03 範圍內', await pw.goto([40, 27]) === 'ok');
 st = await pw.status(); check('在廣播範圍內', st.inBroadcast === true);
-check('聽完「廣播器不得被破壞」（複誦優先唸沒聽過的）', await waitLearn('speaker-break', 30));
+check('聽完「廣播器不得被破壞」（複誦優先唸沒聽過的、最新優先）', await waitLearn('speaker-break', 45));
 mine = await pw.protectedIds('outsider');
 check('玩家視角現在看到廣播器受保護', mine.filter(id => id.startsWith('speaker')).length === 6, mine.join(','));
 await pw.goto([41, 27]); await pw.face([1, 0]); await pw.goto([41, 30]); await pw.face([1, 0]);
@@ -60,9 +60,9 @@ await pw.shot(DIR, '06-violation');
 // 6. 矛盾：進屋兩次 → 「外鄉人不得進入住宅」；讀書後受邀進入 → conflict → 裁決
 check('走到 house_01 門前', await pw.goto([30, 29]) === 'ok'); await pw.face([0, 1]);
 await doVerb('open', 'door_01'); await pw.walk([[0, 1]]);
-await doVerb('enter', 'house_01'); await pw.wait(0.3);
-await pw.walk([[0, -1]]); await pw.wait(0.2); await pw.face([0, 1]);
-await doVerb('enter', 'house_01'); await pw.wait(0.3);
+await doVerb('enter', 'house_01'); await pw.settle();
+await pw.walk([[0, -1]]); await pw.settle(); await pw.face([0, 1]);
+await doVerb('enter', 'house_01'); await pw.settle();
 check('第二次進屋後書寫下 house-outsider', await live('house-outsider'));
 await pw.goto([30, 32]); await pw.face([-1, 0]);
 r = await doVerb('read', 'book_01'); check('讀規則書後認知全部', (await pw.notes()).every(n => n.known || n.void));
@@ -70,7 +70,7 @@ await pw.shot(DIR, '07-read-book');
 await pw.goto([30, 30]); await pw.wait(0.2);
 await pw.eval(() => window.__game.invite('house_01'));
 const before = await pw.eval(() => window.__game.game.world.active().length);
-await pw.face([0, 1]); await doVerb('enter', 'house_01'); await pw.wait(0.4);
+await pw.face([0, 1]); await doVerb('enter', 'house_01'); await pw.settle();
 log = await pw.log();
 check('受邀進入：conflict 事件、不追究、書多寫一條裁決', log.some(e => e.type === 'conflict') && (await pw.eval(() => window.__game.game.world.active().length)) === before + 1);
 await pw.shot(DIR, '08-conflict-ruling');

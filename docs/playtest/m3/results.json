@@ -7,7 +7,7 @@
  {
   "name": "廣播條顯示正在唸的條文與進度",
   "ok": true,
-  "info": "{\"key\":\"capture\",\"progress\":0.12104999999999999}"
+  "info": "{\"key\":\"capture\",\"progress\":0.13927500000000004}"
  },
  {
   "name": "聽完抓捕令後認知",
@@ -50,9 +50,9 @@
   "info": ""
  },
  {
-  "name": "v2（聽不到）不認知、v3/v4（範圍內）認知",
+  "name": "v2（在壞掉的廣播器旁）不認知、範圍內的村民認知",
   "ok": true,
-  "info": "villager_03,villager_04"
+  "info": "villager_01,villager_03"
  },
  {
   "name": "protectedBy：客觀受保護的廣播器有、玩家認知的沒有",
@@ -70,14 +70,14 @@
   "info": ""
  },
  {
-  "name": "聽完「廣播器不得被破壞」（複誦優先唸沒聽過的）",
+  "name": "聽完「廣播器不得被破壞」（複誦優先唸沒聽過的、最新優先）",
   "ok": true,
   "info": ""
  },
  {
   "name": "玩家視角現在看到廣播器受保護",
   "ok": true,
-  "info": "house_01,house_02,house_03,house_04,speaker_01,speaker_02,speaker_03,speaker_04,speaker_05,speaker_06"
+  "info": "speaker_01,speaker_02,speaker_03,speaker_04,speaker_05,speaker_06"
  },
  {
   "name": "破壞選項標示會違反第幾條",
@@ -117,7 +117,7 @@
  {
   "name": "破壞圍籬 → 第十條 → 第一次重置",
   "ok": true,
-  "info": "rules=6"
+  "info": "rules=7"
  },
  {
   "name": "重置閃現「以上規則無效」",

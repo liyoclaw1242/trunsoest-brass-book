@@ -20,7 +20,7 @@ export class Villagers {
    */
   constructor(world, grid, opt = {}) {
     this.world = world; this.grid = grid;
-    this.opt = { stepSec: 0.3, chaseStepSec: 0.22, boostStepSec: 0.14, boostSec: 8, quietSec: 30, captureSec: 0.5, giveUpSec: 4, wanderRadius: 3, noticeDist: 14, immuneSec: 3, ...opt };
+    this.opt = { stepSec: 0.35, chaseStepSec: 0.22, boostStepSec: 0.15, boostSec: 8, quietSec: 30, captureSec: 0.5, giveUpSec: 4, wanderRadius: 3, noticeDist: 14, immuneSec: 3, ...opt };
     this.rng = opt.rng || Math.random;
     this.list = [...world.actors.values()].filter(a => a.kind === 'citizen');
     for (const a of this.list) Object.assign(a, { level: a.level || 'puppet', fpos: [...a.pos], move: null, path: [], goal: null, mode: 'wander', task: null, quiet: 0, boostUntil: 0, waitUntil: 0, captureT: 0, idle: 0, repath: 0 });
@@ -32,6 +32,11 @@ export class Villagers {
       if (verb === 'give' && target?.type === 'keepsake' && target.heldBy && target.owner === target.heldBy) {
         const v = world.actors.get(target.heldBy); if (v && v.kind === 'citizen') this.demote(v, 'keepsake');
       }
+    });
+    // 剛聽到抓捕令的村民「可採用一切手段」：先加速 boostSec 秒
+    world.on('broadcastEnd', ({ rule, learned }) => {
+      if (rule.key !== 'capture') return;
+      for (const id of learned) { const v = world.actors.get(id); if (v && v.kind === 'citizen') v.boostUntil = world.t + this.opt.boostSec; }
     });
     world.on('violation', ({ actor }) => {
       if (actor.kind !== 'outsider') return;
@@ -54,7 +59,7 @@ export class Villagers {
     return true;
   }
   /** 這個村民現在會不會執行抓捕令。 */
-  hunts(v) { return v.level !== 'awake' && this.world.knows(v.id, 'capture') && this.world.t >= this.outsider.immuneUntil; }
+  hunts(v) { return this.opt.hunt !== false && v.level !== 'awake' && this.world.knows(v.id, 'capture') && this.world.t >= this.outsider.immuneUntil; }
   /** 可不可以誘導。 */
   inducible(v) { return v.level !== 'puppet'; }
 

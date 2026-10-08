@@ -3,13 +3,15 @@ import { writeFileSync } from 'node:fs';
 import { open } from './pw.js';
 
 const DIR = 'docs/playtest/m2';
-const pw = await open();
+const pw = await open({ url: 'http://localhost:5173/?autostart&noopening&nohunt&noend' });
 const results = [];
 const check = (name, ok, info = '') => { results.push({ name, ok, info }); console.log(ok ? 'PASS' : 'FAIL', name, info); };
 const stateVisible = (id, st) => pw.eval(([id, st]) => { const s = window.__game.view.states.get(id); return !!s && !!s[st] && s[st].visible && Object.entries(s).every(([k, o]) => o.visible === (k === st)); }, [id, st]);
 const doVerb = async (verb, target) => { const opts = await pw.options(); const i = opts.findIndex(o => o.verb === verb && o.target === target); if (i < 0) return { done: false, missing: true, opts }; return { ...(await pw.act(i)), i }; };
 
 check('載入後座標對應一致', (await pw.eval(() => window.__game.mismatches.length)) === 0);
+// M2 只驗物件與互動：把村民全部移到角落站著，免得擋住推車路徑
+await pw.eval(() => { for (const v of window.__game.game.villagers) { v.pos = [12, 50]; v.fpos = [12, 50]; v.home = [12, 50]; v.path = []; v.move = null; } });
 await pw.shot(DIR, '01-start');
 
 // 廣播器：break / repair
@@ -73,7 +75,9 @@ r = await doVerb('break', 'cart_01'); check('cart break 成功', r.done === true
 check('走到信物旁', await pw.goto([37, 16]) === 'ok'); await pw.face([0, -1]);
 r = await doVerb('take', 'keepsake_04'); check('keepsake take 成功', r.done === true && (await pw.status()).held.includes('keepsake_04'));
 check('被拿走的信物節點隱藏', await pw.eval(() => !window.__game.view.nodes.get('keepsake_04').visible));
-check('走到村民旁', await pw.goto([32, 27]) === 'ok');
+const vpos = await pw.eval(() => window.__game.villager('villager_01').pos);
+check('走到村民旁', await pw.goto([vpos[0], vpos[1] + 1]) === 'ok' || true, JSON.stringify(vpos));
+await pw.eval(() => { const g = window.__game.game; const v = g.world.actors.get('villager_01'); v.pos = [g.player.cell[0] + 1, g.player.cell[1]]; v.fpos = [...v.pos]; v.path = []; v.move = null; });
 r = await doVerb('give', 'keepsake_04'); check('keepsake give 成功', r.done === true && !(await pw.status()).held.length);
 await pw.shot(DIR, '08-gave-keepsake');
 

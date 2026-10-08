@@ -12,7 +12,8 @@
 ],
 "verbs": [
 "read",
-"move"
+"move",
+"approach"
 ],
 "radius": 20
 },
@@ -733,8 +734,8 @@
 "id": "villager_01",
 "type": "villager",
 "pos": [
-37,
-27
+35,
+23
 ],
 "state": "half",
 "tags": [
@@ -751,8 +752,8 @@
 "id": "villager_02",
 "type": "villager",
 "pos": [
-16,
-33
+21,
+31
 ],
 "state": "puppet",
 "tags": [
@@ -769,7 +770,7 @@
 "id": "villager_03",
 "type": "villager",
 "pos": [
-44,
+40,
 33
 ],
 "state": "half",
@@ -806,7 +807,7 @@
 "type": "outsider",
 "pos": [
 30,
-26
+28
 ],
 "state": "intact",
 "tags": [

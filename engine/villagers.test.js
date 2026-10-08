@@ -17,7 +17,7 @@ const hear = (s, ids) => { for (const id of ids) v(s, id).known.add(s.world.live
 {
   const s = fresh(); hear(s, ['villager_01']);
   const events = []; s.world.on('captured', e => events.push(e.actor.id));
-  s.outsider.pos = [34, 25];           // villager_01 在 (37,27)
+  s.outsider.pos = [33, 25];           // villager_01 在 (35,23)
   run(s, 6);
   assert.ok(events.length >= 1, '應該被抓到'); assert.equal(events[0], 'villager_01');
   const first = events.length; run(s, 2);
@@ -70,7 +70,7 @@ const hear = (s, ids) => { for (const id of ids) v(s, id).known.add(s.world.live
 {
   const s = fresh();
   const p = v(s, 'villager_01');       // half，屋主 house_01
-  s.outsider.pos = [36, 27];
+  s.outsider.pos = [34, 23];
   assert.equal(s.villagers.induce(p, 'invite'), true);
   let invited = null; s.world.on('invited', e => invited = e.house);
   run(s, 15);
@@ -81,7 +81,7 @@ const hear = (s, ids) => { for (const id of ids) v(s, id).known.add(s.world.live
 // 6. 誘導：去拿信物（條文只禁止外鄉人拿）
 {
   const s = fresh();
-  const p = v(s, 'villager_03');       // half，在 (44,33)；最近的信物 keepsake_02 在 (45,25)
+  const p = v(s, 'villager_03');       // half，在 (40,33)；最近的信物 keepsake_02 在 (45,25)
   s.world.write({ key: 'keepsake-take', text: '外鄉人不得取走信物。', who: 'outsider', verb: 'take', target: { type: 'keepsake' } }, { knownBy: ['outsider', 'villager_03'] });
   s.outsider.pos = [42, 33];
   assert.equal(s.villagers.induce(p, 'fetch'), true);
@@ -92,7 +92,7 @@ const hear = (s, ids) => { for (const id of ids) v(s, id).known.add(s.world.live
 // 7. 誘導：搬書（搬回自己家）；書的條文若認知到會拒絕
 {
   const s = fresh();
-  const p = v(s, 'villager_01'); s.outsider.pos = [36, 27];
+  const p = v(s, 'villager_01'); s.outsider.pos = [34, 23];
   assert.equal(s.villagers.induce(p, 'book'), true);
   let moved = null; s.world.on('bookMoved', e => moved = e.pos);
   run(s, 30);

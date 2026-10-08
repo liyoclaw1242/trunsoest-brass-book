@@ -4,7 +4,7 @@ import math
 
 CENTER = (29, 32)
 RADIUS = 20
-START = (30, 26)          # 外鄉人出生點／被抓後送回的「村子中心」
+START = (30, 28)          # 外鄉人出生點／被抓後送回的「村子中心」：書台正門前
 
 VILLAGER_COLORS = {
     'villager_01': (0.9, 0.35, 0.3),   # 紅
@@ -57,9 +57,9 @@ OBJECTS = [
     # 界石
     *[dict(type='boundary', id=f'boundary_{i+1:02d}', pos=p) for i, p in enumerate(boundary_ring())],
     # 角色
-    dict(type='villager', id='villager_01', pos=(37, 27), state='half'),
-    dict(type='villager', id='villager_02', pos=(16, 33), state='puppet'),
-    dict(type='villager', id='villager_03', pos=(44, 33), state='half'),
+    dict(type='villager', id='villager_01', pos=(35, 23), state='half'),
+    dict(type='villager', id='villager_02', pos=(21, 31), state='puppet'),
+    dict(type='villager', id='villager_03', pos=(40, 33), state='half'),
     dict(type='villager', id='villager_04', pos=(30, 41), state='awake'),
     dict(type='outsider', id='outsider', pos=START),
 ]

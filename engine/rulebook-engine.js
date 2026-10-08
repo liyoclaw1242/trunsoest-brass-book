@@ -146,7 +146,7 @@ export class World {
         if (!act.length) return;
         // 優先唸「現在在範圍內、還沒聽過」的條文；都聽過了才輪流複誦
         const here = [...this.actors.values()].filter(a => this.inBroadcast(a.pos));
-        const unheard = act.filter(r => here.some(a => !a.known.has(r.no)));
+        const unheard = act.filter(r => here.some(a => !a.known.has(r.no))).sort((a, b) => b.no - a.no);   // 最新的先唸
         const pool = unheard.length ? unheard : act;
         no = pool[this.cursor++ % pool.length].no;
       }

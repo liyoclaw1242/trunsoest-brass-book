@@ -14,7 +14,7 @@ function findChrome() {
   return undefined;
 }
 
-export async function open({ url = 'http://localhost:5173/', width = 1280, height = 800, headless = true } = {}) {
+export async function open({ url = 'http://localhost:5173/?autostart&noopening', width = 1280, height = 800, headless = true } = {}) {
   const browser = await chromium.launch({ headless, executablePath: findChrome(), args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
   const page = await browser.newPage({ viewport: { width, height } });
   const console_ = [];
@@ -52,6 +52,8 @@ export async function open({ url = 'http://localhost:5173/', width = 1280, heigh
       return 'ok';
     },
     face: d => page.evaluate(d => window.__game.face(d), d),
+    /** 等玩家的移動結束。 */
+    settle: () => page.waitForFunction(() => !window.__game.game.moving, null, { timeout: 5000 }).then(() => page.waitForTimeout(60)),
     protectedIds: a => page.evaluate(a => window.__game.protectedIds(a), a),
     place: c => page.evaluate(c => window.__game.place(c), c),
     close: () => browser.close(),

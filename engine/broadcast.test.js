@@ -16,7 +16,7 @@ const run = (w, sec) => { for (let i = 0; i < sec * 10; i++) w.tick(0.1); };
   const c = w.write({ key: 'c', text: 'C' }, { silent: true, knownBy: ['v1'] });
   const order = []; w.on('broadcastStart', e => order.push(e.rule.key));
   run(w, 12);
-  assert.deepEqual(order.slice(0, 2), ['b', 'c'], `先唸沒聽過的 b、c，實際 ${order}`);
+  assert.deepEqual(order.slice(0, 2), ['c', 'b'], `先唸沒聽過的 c、b（最新優先），實際 ${order}`);
   assert.ok(w.knows('outsider', 'b') && w.knows('outsider', 'c'));
   ok('複誦優先唸範圍內有人還沒聽過的條文');
   const n = order.length;

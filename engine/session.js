@@ -3,6 +3,7 @@ import { World } from './rulebook-engine.js';
 import { setup } from './rules.default.js';
 import { Grid } from './grid.js';
 import { Villagers } from './villagers.js';
+import { Match } from './match.js';
 
 export function createSession(scene, meta, opt = {}) {
   const world = new World(scene, opt.world || {});
@@ -13,5 +14,7 @@ export function createSession(scene, meta, opt = {}) {
   }
   setup(world);
   const villagers = new Villagers(world, grid, opt.villagers || {});
-  return { world, grid, outsider, villagers, tick(dt) { world.tick(dt); villagers.tick(dt); } };
+  const session = { world, grid, outsider, villagers, tick(dt) { world.tick(dt); villagers.tick(dt); session.match.tick(dt); } };
+  session.match = new Match(session, opt.match || {});
+  return session;
 }

@@ -34,6 +34,15 @@ export const TRIGGERS = [
     rule: { key: 'book-move', text: '黃銅書不得被搬動。', verb: 'move', target: { id: 'book_01' }, hole: '書台沒被提到。' } },
 ];
 
+/** 書閒著沒事時自己動筆的備用條文（50 秒沒有新條文就寫一條）。每條的漏洞都能從條文文字讀出來。 */
+export const BACKUP = [
+  { key: 'door-open', text: '外鄉人不得開啟任何門。', who: 'outsider', verb: 'open', target: { type: 'door' }, hole: '只禁止「開啟」，沒說不能破壞門；也沒禁止市民開門（開著的門走進去就好）。' },
+  { key: 'book-approach', text: '外鄉人不得靠近黃銅書。', who: 'outsider', verb: 'approach', target: { type: 'book' }, hole: '只管「靠近」，沒說市民不能把書搬走（請村民搬書）；書離開原位之後靠近的是新位置，條文照樣算，但沒說不能遠遠地看。' },
+  { key: 'cart-move', text: '推車不得被搬動。', verb: 'move', target: { type: 'cart' }, hole: '沒說不能破壞，也沒說不能踩上去。' },
+  { key: 'notice-deface', text: '公告牌不得被塗毀。', verb: 'deface', target: { type: 'notice' }, hole: '只管塗毀；公告牌還是可以讀，而且沒聽到這條的人不受約束。' },
+  { key: 'notice-read', text: '外鄉人不得閱讀公告牌。', who: 'outsider', verb: 'read', target: { type: 'notice' }, hole: '沒說不能讀規則書本身，也沒說不能聽廣播。' },
+];
+
 function captureDef(world) {
   const v = CAPTURE[Math.min(world.resets, CAPTURE.length - 1)];
   return { key: 'capture', verb: 'capture', mode: 'require', ...v };

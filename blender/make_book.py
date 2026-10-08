@@ -2,7 +2,7 @@
 import rb
 
 def make(id, pos, **kw):
-    p = rb.parent_empty(id, pos, rb.props('book', ['read', 'move'], ['range-center']))
+    p = rb.parent_empty(id, pos, rb.props('book', ['read', 'move', 'approach'], ['range-center']))
     z = kw.get('z', 1.05)  # 書台高度
     s = rb.state_root(p, 'closed')
     rb.box(s, f'{id}__closed_cover', (0.7, 0.5, 0.14), (0, 0, z + 0.07), rb.BRASS)

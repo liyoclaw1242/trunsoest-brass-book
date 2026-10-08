@@ -9,7 +9,7 @@ export const STATE = { intact: '完好', broken: '損壞', closed: '關著', ope
 export const INDUCE = { invite: '請他邀請我進屋', fetch: '請他去拿信物', book: '請他去搬書' };
 export const name = o => o ? `${TYPE[o.type] || o.type}${o.id.replace(/^[a-z]+_?/, '') ? ' ' + o.id.split('_').pop() : ''}` : '';
 
-const STEP = 0.16;                 // 走一格的秒數
+const STEP = 0.25;                 // 走一格的秒數（村民追捕 0.22、加速 0.15）
 const add = (a, b) => [a[0] + b[0], a[1] + b[1]];
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1]];
 const eq = (a, b) => a && b && a[0] === b[0] && a[1] === b[1];
@@ -28,9 +28,20 @@ export class Game {
     this.listeners = [];
     const me = this.session.outsider;
     this.player = { actor: me, cell: [...meta.start], pos: [...meta.start], from: null, to: null, k: 0, facing: [0, -1], house: null, carrying: null };
+    this.match = this.session.match;
+    this.opening = 0;                  // 開場聽公告的秒數（期間不能動）
     this.hookEvents();
-    this.world.outsiderArrived();
   }
+  /** 按下開始：書頒布抓捕令，玩家站著聽完（4 秒）才能動。 */
+  start(opt = {}) {
+    if (this.match.started) return;
+    this.world.outsiderArrived();
+    this.match.start();
+    this.opening = opt.opening ?? this.world.opt.announceSec;
+    this.note('start', '黃銅書察覺了你。廣播器開始唸公告……');
+  }
+  get started() { return !!this.match.started; }
+  get over() { return this.match.state !== 'playing'; }
   get invitedTo() { return this.player.actor.invitedTo; }
   set invitedTo(h) { this.player.actor.invitedTo = h; }
   on(fn) { this.listeners.push(fn); }
@@ -60,6 +71,9 @@ export class Game {
     w.on('taskFail', ({ actor, kind, why }) => this.note('refuse', `${name(w.objects.get(actor.id))}做不到：${INDUCE[kind]}（${why === 'path' ? '走不到' : why === 'refused' ? '違反規則' : why}）`, { actor: actor.id, kind, why }));
     w.on('bookMoved', ({ actor, pos }) => this.note('object', `${name(w.objects.get(actor.id))}把黃銅書搬到 (${pos})`, { actor: actor.id, pos }));
     w.on('stuck', ({ actor }) => this.note('stuck', `${name(w.objects.get(actor.id))}過不去，先放棄`, { actor: actor.id }));
+    w.on('assim', ({ from, to, why }) => this.note('assim', to > from ? `同化度 ${from}→${to}（被抓）` : `同化度 ${from}→${to}（安靜處消退）`, { from, to, why }));
+    w.on('idleWrite', ({ rule }) => this.note('idle', `書閒不住，自己動筆了：第${num(rule.no)}條`, { no: rule.no }));
+    w.on('end', ({ state, reason, stats }) => this.note('end', state === 'won' ? '你走出了影響範圍。' : reason === 'assimilated' ? '你被同化了。' : '書活過來了。', { state, reason, stats }));
     w.on('act', ({ actor, verb, target }) => this.note('act', `${actor.id === 'outsider' ? '你' : name(w.objects.get(actor.id))}${LABEL[verb]}了${name(target) || ''}`, { actor: actor.id, verb, target: target?.id }));
   }
 
@@ -69,10 +83,14 @@ export class Game {
   tryStep(dir) {
     const p = this.player;
     if (p.to) return 'moving';
+    if (!this.started || this.over || this.opening > 0) return 'frozen';
     p.facing = dir;
     const next = add(p.cell, dir);
     const s = this.grid.step(p.cell, next);
     if (!s.ok) return 'blocked';
+    // 靠近黃銅書（從不相鄰走到相鄰）算一次 approach
+    const book = [...this.world.objects.values()].find(o => o.type === 'book');
+    if (book && book.pos && !book.heldBy && cheb(next, book.pos) <= 1 && cheb(p.cell, book.pos) > 1) this.world.attempt('outsider', 'approach', book.id, {});
     if (s.enterHouse) {
       const h = this.world.objects.get(s.enterHouse);
       const ctx = this.invitedTo === h.id ? { invited: true } : { uninvited: true };
@@ -104,6 +122,8 @@ export class Game {
     if (h !== p.house) { if (p.house && this.invitedTo === p.house) this.invitedTo = null; p.house = h; }
   }
   tick(dt) {
+    if (!this.started) return;
+    if (this.opening > 0) this.opening = Math.max(0, this.opening - dt);
     this.t += dt;
     const p = this.player;
     if (p.to) {
@@ -178,6 +198,7 @@ export class Game {
   actorAt(cell) { return [...this.world.actors.values()].find(a => eq(a.pos, cell)) || null; }
   /** 執行第 i 個選項（0 = E）。 */
   act(i = 0) {
+    if (!this.started || this.over || this.opening > 0) return { done: false, reason: 'frozen' };
     const o = this.options()[i]; if (!o) return null;
     if (!o.ok) { this.note('blocked', `做不到：${o.label}（${o.reason === 'state' ? '狀態不允許' : '不支援'}）`); return { done: false, reason: o.reason }; }
     return o.run();
@@ -206,7 +227,7 @@ export class Game {
   /** 給 HUD／試玩腳本看的狀態摘要。 */
   status() {
     const p = this.player, w = this.world;
-    return { t: +this.t.toFixed(1), cell: [...p.cell], house: p.house, inBroadcast: w.inBroadcast(p.cell), inRange: this.grid.inRange(p.cell), held: [...p.actor.held], carrying: p.carrying, rules: w.active().length, max: w.opt.max, resets: w.resets, invitedTo: this.invitedTo, captures: this.captures || 0,
+    return { t: +this.t.toFixed(1), state: this.match.state, reason: this.match.reason, assim: this.match.assim, assimMax: this.match.opt.loseAssim, opening: Math.ceil(this.opening * 10) / 10, stats: { ...this.match.stats }, cell: [...p.cell], house: p.house, inBroadcast: w.inBroadcast(p.cell), inRange: this.grid.inRange(p.cell), held: [...p.actor.held], carrying: p.carrying, rules: w.active().length, max: w.opt.max, resets: w.resets, invitedTo: this.invitedTo, captures: this.captures || 0,
       villagers: this.villagers.map(v => ({ id: v.id, pos: [...v.pos], level: v.level, mode: v.mode, hunting: this.vil.hunts(v), task: v.task?.kind || null, quiet: +v.quiet.toFixed(1) })) };
   }
 }

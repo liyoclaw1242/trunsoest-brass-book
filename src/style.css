@@ -40,3 +40,4 @@ html, body { margin: 0; height: 100%; background: #1b1d1a; color: #eee; font: 14
 #labels .label { position: absolute; left: 0; top: 0; font-size: 11px; padding: 1px 6px; border-radius: 3px; background: rgba(0,0,0,.6); color: #ddd; white-space: nowrap; }
 #labels .label.puppet { color: #ccc; } #labels .label.half { color: #fd9; } #labels .label.awake { color: #8f8; }
 #labels .label.chase { background: rgba(160,0,0,.85); color: #fff; font-weight: bold; }
+#overlay.won h1 { color: #8f8; } #overlay.lost h1 { color: #f66; } #overlay.start h1 { letter-spacing: 16px; }
