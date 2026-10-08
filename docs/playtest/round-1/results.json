@@ -1,0 +1,28 @@
+{
+ "keepsake": {
+  "state": "won",
+  "reason": "escaped",
+  "assim": 0,
+  "stats": {
+   "time": 253.9,
+   "written": 6,
+   "resets": 1,
+   "awakened": 3,
+   "captures": 0,
+   "idleWrites": 5
+  }
+ },
+ "deaf": {
+  "state": "won",
+  "reason": "escaped",
+  "assim": 1,
+  "stats": {
+   "time": 67.3,
+   "written": 2,
+   "resets": 0,
+   "awakened": 4,
+   "captures": 2,
+   "idleWrites": 0
+  }
+ }
+}

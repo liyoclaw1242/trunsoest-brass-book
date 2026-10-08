@@ -33,7 +33,7 @@ const overlayText = pw => pw.eval(() => document.getElementById('overlay').hidde
     const r2 = await pw.goto([26, 12]); const s2 = await pw.status();
     check('第二次直奔的結果（資料）', true, `goto=${r2} state=${s2.state} captures=${s2.stats.captures}`);
   }
-  if ((await pw.status()).state !== 'won') { await pw.place([27, 13]); await pw.walk([[-1, 0]]); await pw.wait(0.3); }
+  if ((await pw.status()).state !== 'won') { await pw.place([27, 13]); await pw.walk([[0, -1]]); await pw.wait(0.3); }   // (27,12) 離圓心 20.1 格，範圍外
   const m = await pw.eval(() => window.__game.match());
   check('贏：走出影響範圍 → won/escaped', m.state === 'won' && m.reason === 'escaped', JSON.stringify(m));
   const t = await overlayText(pw);

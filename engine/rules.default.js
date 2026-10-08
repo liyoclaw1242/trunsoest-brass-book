@@ -41,6 +41,12 @@ export const BACKUP = [
   { key: 'cart-move', text: '推車不得被搬動。', verb: 'move', target: { type: 'cart' }, hole: '沒說不能破壞，也沒說不能踩上去。' },
   { key: 'notice-deface', text: '公告牌不得被塗毀。', verb: 'deface', target: { type: 'notice' }, hole: '只管塗毀；公告牌還是可以讀，而且沒聽到這條的人不受約束。' },
   { key: 'notice-read', text: '外鄉人不得閱讀公告牌。', who: 'outsider', verb: 'read', target: { type: 'notice' }, hole: '沒說不能讀規則書本身，也沒說不能聽廣播。' },
+  // 升級版：前五條都生效中（或被撕掉又重寫過）時，書把措辭寫得更嚴。每條仍留一個漏洞。
+  { key: 'door-break', text: '任何存在不得破壞門。', verb: 'break', target: { type: 'door' }, hole: '門還是可以開（市民開、或請屋主邀請）；沒提圍籬和推車。' },
+  { key: 'book-touch', text: '任何存在不得搬動或閱讀黃銅書。', verb: 'read', target: { type: 'book' }, hole: '這條只判「閱讀」（搬動另有條文，撕掉後就能搬）；公告牌沒被提到。' },
+  { key: 'cart-use', text: '推車不得用於越過圍籬。', verb: 'use', target: { type: 'cart' }, hole: '只禁止用於越過圍籬；推去擋路沒說；翻越圍籬本身是另一條。' },
+  { key: 'fence-any', text: '圍籬不得翻越亦不得破壞。', verb: 'climb', target: { type: 'fence' }, hole: '這條只判「翻越」；破壞另有條文（還沒寫或被撕掉時就能破壞）。' },
+  { key: 'speaker-repair', text: '外鄉人不得修復廣播器。', who: 'outsider', verb: 'repair', target: { type: 'speaker' }, hole: '沒說不能破壞；市民可以修。' },
 ];
 
 function captureDef(world) {

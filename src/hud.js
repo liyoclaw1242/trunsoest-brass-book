@@ -12,8 +12,12 @@ export class Hud {
     this.designer = false;
     this.flash = 0;
     this.lastGone = [];
-    game.world.on('reset', ({ gone }) => { this.flash = 2.5; this.lastGone = gone.map(r => r.no); });
-    const f = document.createElement('div'); f.id = 'resetflash'; f.hidden = true; f.innerHTML = '<h1>以上規則無效</h1><div class="small"></div>'; document.getElementById('hud').appendChild(f);
+    game.world.on('reset', ({ gone }) => {
+      this.flash = 4; const known = game.player.actor.known;
+      this.lastGone = gone.map(r => `<div class="${known.has(r.no) ? '' : 'unknown'}">第${num(r.no)}條　${r.text}${known.has(r.no) ? '' : '　（你沒聽過這條）'}</div>`);
+      this.lastGoneNote = `撕掉 ${gone.length} 條，其中 ${gone.filter(r => !known.has(r.no)).length} 條你從沒聽過`;
+    });
+    const f = document.createElement('div'); f.id = 'resetflash'; f.hidden = true; f.innerHTML = '<h1>以上規則無效</h1><div class="small"></div><div class="list"></div>'; document.getElementById('hud').appendChild(f);
     this.el.flash = f;
   }
   /** 村民頭上的 DOM 標籤。 */
@@ -88,6 +92,6 @@ export class Hud {
     this.el.prompt.innerHTML = opts.slice(0, 9).map((o, i) => `<span class="${o.ok ? '' : 'blocked'}${o.violates?.length ? ' violates' : ''}"><b>${i === 0 ? 'E' : i + 1}</b>${o.label}${o.violates?.length ? `（違反第${o.violates.map(num).join('、')}條）` : ''}</span>`).join('');
     if (this.toastTimer > 0) { this.toastTimer -= dt; if (this.toastTimer <= 0) this.el.toast.hidden = true; }
     this.renderNotes(); this.renderBroadcast(); this.renderDesigner();
-    if (this.flash > 0) { this.flash -= dt; this.el.flash.hidden = false; this.el.flash.querySelector('.small').textContent = `撕掉第${this.lastGone.map(num).join('、')}條`; if (this.flash <= 0) this.el.flash.hidden = true; }
+    if (this.flash > 0) { this.flash -= dt; this.el.flash.hidden = false; this.el.flash.querySelector('.small').textContent = this.lastGoneNote; this.el.flash.querySelector('.list').innerHTML = this.lastGone.join(''); if (this.flash <= 0) this.el.flash.hidden = true; }
   }
 }

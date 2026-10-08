@@ -56,7 +56,15 @@ const run = (s, sec) => { for (let i = 0; i < sec * 20; i++) s.tick(0.05); };
   const s = fresh();
   s.world.write({ key: 'x', text: 'x' });
   s.villagers.demote(s.world.actors.get('villager_02'), 'test');
-  assert.equal(s.match.stats.written, 1); assert.equal(s.match.stats.awakened, 1);
-  ok('統計：書寫條數、喚醒人數');
+  s.villagers.demote(s.world.actors.get('villager_02'), 'test');
+  assert.equal(s.match.stats.written, 1); assert.equal(s.match.stats.awakened, 1, '同一人降兩級只算一個');
+  ok('統計：書寫條數、喚醒人數（以人計）');
+  // 第一次重置後書還會繼續動筆（備用條文 10 條 > 保留 5 條）
+  const s3 = fresh({ match: { idleSec: 1 } });
+  s3.outsider.pos = [30, 46];
+  run(s3, 60);
+  assert.ok(s3.world.resets >= 3, `躲著不動書也會一路寫到第三次重置，實際 ${s3.world.resets}`);
+  assert.equal(s3.match.state, 'lost'); assert.equal(s3.match.reason, 'alive');
+  ok('書在重置後仍會自己動筆，被動玩家最終會因第三次重置判輸');
 }
 console.log('match.test 全部通過');

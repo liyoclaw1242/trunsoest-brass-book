@@ -12,22 +12,22 @@
  {
   "name": "天真直奔邊界的結果（資料）",
   "ok": true,
-  "info": "goto=blocked state=playing captures=1 t=2.6s"
+  "info": "goto=blocked state=playing captures=1 t=2.5s"
  },
  {
   "name": "第二次直奔的結果（資料）",
   "ok": true,
-  "info": "goto=ok state=won captures=1"
+  "info": "goto=blocked state=playing captures=2"
  },
  {
   "name": "贏：走出影響範圍 → won/escaped",
   "ok": true,
-  "info": "{\"state\":\"won\",\"reason\":\"escaped\",\"assim\":1,\"stats\":{\"time\":12.2,\"written\":0,\"resets\":0,\"awakened\":0,\"captures\":1,\"idleWrites\":0}}"
+  "info": "{\"state\":\"won\",\"reason\":\"escaped\",\"assim\":2,\"stats\":{\"time\":12.2,\"written\":0,\"resets\":0,\"awakened\":0,\"captures\":2,\"idleWrites\":0}}"
  },
  {
   "name": "結局畫面列出用時／寫了幾條／重置／喚醒",
   "ok": true,
-  "info": "你離開了 你走出了黃銅書的影響範圍。 用時 0:12　書寫了 0 條（其中 0 條是它閒著寫的）　重置 0 次　喚醒了 0 個村民　被抓 1 次 再玩一次"
+  "info": "你離開了 你走出了黃銅書的影響範圍。 用時 0:12　書寫了 0 條（其中 0 條是它閒著寫的）　重置 0 次　喚醒了 0 個村民　被抓 2 次 再玩一次"
  },
  {
   "name": "站著不動，被抓到三次",
@@ -37,12 +37,12 @@
  {
   "name": "輸：同化度 3 → lost/assimilated",
   "ok": true,
-  "info": "{\"state\":\"lost\",\"reason\":\"assimilated\",\"assim\":3,\"stats\":{\"time\":13.8,\"written\":0,\"resets\":0,\"awakened\":0,\"captures\":3,\"idleWrites\":0}}"
+  "info": "{\"state\":\"lost\",\"reason\":\"assimilated\",\"assim\":3,\"stats\":{\"time\":12.9,\"written\":0,\"resets\":0,\"awakened\":0,\"captures\":3,\"idleWrites\":0}}"
  },
  {
   "name": "結局畫面：你成了市民",
   "ok": true,
-  "info": "你成了市民 同化度到了 3。你再也不想離開這裡。 用時 0:13　書寫了 0 條（其中 0 條是它閒著寫的）　重置 0 次　喚醒了 0 個村民　被抓 3 次 再"
+  "info": "你成了市民 同化度到了 3。你再也不想離開這裡。 用時 0:12　書寫了 0 條（其中 0 條是它閒著寫的）　重置 0 次　喚醒了 0 個村民　被抓 3 次 再"
  },
  {
   "name": "事件紀錄有三次同化度上升",

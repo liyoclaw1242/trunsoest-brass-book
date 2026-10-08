@@ -38,7 +38,7 @@ await pw.shot(DIR, '03-speaker-break-unheard');
 
 // 4. 驗證 3、5：保護外框 —— 客觀上受保護（設計者視角青色），玩家視角沒有
 let mine = await pw.protectedIds('outsider'), all = await pw.protectedIds(null);
-check('protectedBy：客觀受保護的廣播器有、玩家認知的沒有', mine.length === 0 && all.filter(id => id.startsWith('speaker')).length === 6, `mine=${mine.length} all=${all.length}`);
+check('protectedBy：客觀受保護的（完好）廣播器有、玩家認知的沒有；壞掉的兩台不算', mine.length === 0 && all.filter(id => id.startsWith('speaker')).length === 4, `mine=${mine.length} all=${all.length}`);
 await pw.eval(() => window.__game.designer(false));
 await pw.shot(DIR, '04-protected-objective-only');
 
@@ -47,7 +47,7 @@ check('走到 speaker_03 範圍內', await pw.goto([40, 27]) === 'ok');
 st = await pw.status(); check('在廣播範圍內', st.inBroadcast === true);
 check('聽完「廣播器不得被破壞」（複誦優先唸沒聽過的、最新優先）', await waitLearn('speaker-break', 45));
 mine = await pw.protectedIds('outsider');
-check('玩家視角現在看到廣播器受保護', mine.filter(id => id.startsWith('speaker')).length === 6, mine.join(','));
+check('玩家視角現在看到完好的廣播器受保護', mine.filter(id => id.startsWith('speaker')).length === 4, mine.join(','));
 await pw.goto([41, 27]); await pw.face([1, 0]); await pw.goto([41, 30]); await pw.face([1, 0]);
 let opts = await pw.options(); const bo = opts.find(o => o.verb === 'break' && o.target === 'speaker_03');
 check('破壞選項標示會違反第幾條', bo && bo.violates.length === 1, JSON.stringify(bo));

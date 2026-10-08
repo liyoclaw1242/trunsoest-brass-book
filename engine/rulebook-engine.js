@@ -269,10 +269,11 @@ export class World {
     }
   }
 
-  /** 給畫面端畫「受規則保護」用。帶 actorId 時只回傳該角色認知到的。 */
+  /** 給畫面端畫「受規則保護」用。帶 actorId 時只回傳該角色認知到的。物件目前的狀態做不到那個動詞（例如已損壞）就不算受保護。 */
   protectedBy(objectId, actorId = null) {
     const o = this.objects.get(objectId), a = actorId && this.actors.get(actorId);
     return this.rules.filter(r => !r.void && !r.dead && r.mode === 'forbid' && r.target
-      && (r.target.id === o.id || r.target.type === o.type) && (!a || a.known.has(r.no)));
+      && (r.target.id === o.id || r.target.type === o.type) && (!a || a.known.has(r.no))
+      && (!STATE_OK[r.verb] || STATE_OK[r.verb](o)));
   }
 }

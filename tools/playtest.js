@@ -29,7 +29,9 @@ async function runRoute(route) {
       const o = await opts();
       const give = o.find(x => x.verb === 'give' && s.villagers.some(v => cheb(v.pos, s.cell) <= 1 && x.label.includes(x.target.replace('keepsake_', '')) && x.label.endsWith(`村民 ${x.target.split('_')[1]}`)));
       if (give) { await pw.act(o.indexOf(give)); log(`t=${s.t} 歸還：${give.label}`); await shot('give'); continue; }
-      const ind = o.find(x => x.verb === 'induce' && x.ok && x.label.startsWith(induceKind === 'fetch' ? '請他去拿信物' : induceKind === 'book' ? '請他去搬書' : '請他邀請'));
+      const prefix = { fetch: '請他去拿信物', book: '請他去搬書', invite: '請他邀請' };
+      const order = [induceKind, 'invite', 'book', 'fetch'];
+      const ind = order.map(k => o.find(x => x.verb === 'induce' && x.ok && x.label.startsWith(prefix[k]))).find(Boolean);
       if (ind) { const v = s.villagers.find(v => v.id === ind.target); if (v && v.hunting && !v.task) { await pw.act(o.indexOf(ind)); log(`t=${s.t} 誘導：${ind.label}`); await shot('induce'); continue; } }
       if (onTick && await onTick(s)) return 'tick';
       if (stop && await stop(s)) return 'stop';
@@ -47,27 +49,33 @@ async function runRoute(route) {
     await shot('walk-out');
     return dash(goal, '範圍外');
   };
+  const HOME = route === 'keepsake' ? { house: 'house_04', door: 'door_04', front: [30, 43], inside: [30, 45] } : { house: 'house_01', door: 'door_01', front: [30, 29], inside: [30, 32] };
   const enterHome = async () => {
-    // 回到 house_01 內
-    const s = await st(); if (s.house === 'house_01') return true;
-    await pw.goto([30, 29]); await pw.face([0, 1]);
-    const d = await pw.eval(() => window.__game.game.world.objects.get('door_01').state);
-    if (d === 'closed') await act(o => o.verb === 'open' && o.target === 'door_01');
-    await pw.walk([[0, 1]]); await pw.settle(); await act(o => o.verb === 'enter'); await pw.settle();
-    await pw.goto([30, 32]); await pw.settle();
-    return (await st()).house === 'house_01';
+    // 回到藏身的住宅內（被抓就從中心再試，最多 4 次）
+    for (let i = 0; i < 4; i++) {
+      const s = await st(); if (s.state !== 'playing') return false; if (s.house === HOME.house) { await pw.goto(HOME.inside); await pw.settle(); return true; }
+      await pw.goto(HOME.front); await pw.face([0, 1]);
+      const d = await pw.eval(id => window.__game.game.world.objects.get(id).state, HOME.door);
+      if (d === 'closed') await act(o => o.verb === 'open' && o.target === HOME.door);
+      await pw.walk([[0, 1]]); await pw.settle(); await act(o => o.verb === 'enter'); await pw.settle();
+    }
+    return (await st()).house === HOME.house;
   };
 
   // ---- 共同開場：聽完公告、砸掉眼前的廣播器、進屋 ----
   await shot('start');
   while ((await st()).opening > 0) await pw.wait(0.2);
   await breakIt('speaker_01');
+  if (route === 'keepsake') {
+    // 先把第一個衝過來的半同化村民支開，再往北跑到已喚醒村民 04 的家
+    await tend(3, { induceKind: 'fetch', stop: s => s.villagers.some(v => v.task) });
+  }
   await enterHome(); await shot('hide-in-house');
   log(`t=${(await st()).t} 進屋，在 ${JSON.stringify((await st()).cell)}`);
 
   if (route === 'keepsake') {
-    // 在屋裡等：誰到門口就請他去拿信物；拿到就還給主人（主人到門口時）。四個人都醒了就走出去。
-    const r = await tend(240, { induceKind: 'fetch', stop: s => noHunters(s) });
+    // 在屋裡等：誰到門口就請他去拿信物；拿到就還給主人（主人到門口時）。沒有人在追（醒了或正在跑腿）就走出去。
+    const r = await tend(300, { induceKind: 'fetch', stop: s => noHunters(s) });
     log(`等待結束：${r}`, JSON.stringify((await st()).villagers.map(v => `${v.id}:${v.level}${v.hunting ? '!' : ''}`)));
     await shot('after-awakening');
     if (!(await over())) await walkOut();

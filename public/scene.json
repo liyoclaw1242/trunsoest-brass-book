@@ -200,7 +200,7 @@
 "id": "speaker_03",
 "type": "speaker",
 "pos": [
-42,
+40,
 30
 ],
 "state": "intact",
@@ -212,7 +212,7 @@
 "break",
 "repair"
 ],
-"radius": 8
+"radius": 11
 },
 {
 "id": "speaker_04",

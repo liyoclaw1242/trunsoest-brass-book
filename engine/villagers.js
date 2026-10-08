@@ -20,10 +20,10 @@ export class Villagers {
    */
   constructor(world, grid, opt = {}) {
     this.world = world; this.grid = grid;
-    this.opt = { stepSec: 0.35, chaseStepSec: 0.22, boostStepSec: 0.15, boostSec: 8, quietSec: 30, captureSec: 0.5, giveUpSec: 4, wanderRadius: 3, noticeDist: 14, immuneSec: 3, ...opt };
+    this.opt = { stepSec: 0.35, chaseStepSec: 0.22, boostStepSec: 0.15, boostSec: 8, quietSec: 30, captureSec: 0.5, giveUpSec: 4, wanderRadius: 3, noticeDist: 14, immuneSec: 3, induceCooldownSec: 20, ...opt };
     this.rng = opt.rng || Math.random;
     this.list = [...world.actors.values()].filter(a => a.kind === 'citizen');
-    for (const a of this.list) Object.assign(a, { level: a.level || 'puppet', fpos: [...a.pos], move: null, path: [], goal: null, mode: 'wander', task: null, quiet: 0, boostUntil: 0, waitUntil: 0, captureT: 0, idle: 0, repath: 0 });
+    for (const a of this.list) Object.assign(a, { level: a.level || 'puppet', fpos: [...a.pos], move: null, path: [], goal: null, mode: 'wander', task: null, quiet: 0, boostUntil: 0, waitUntil: 0, captureT: 0, idle: 0, repath: 0, cooldownUntil: 0, lastStuck: null });
     this.outsider = world.actors.get('outsider');
     this.outsider.immuneUntil = this.outsider.immuneUntil || 0;
     this.outsider.invitedTo = this.outsider.invitedTo || null;
@@ -60,8 +60,12 @@ export class Villagers {
   }
   /** 這個村民現在會不會執行抓捕令。 */
   hunts(v) { return this.opt.hunt !== false && v.level !== 'awake' && this.world.knows(v.id, 'capture') && this.world.t >= this.outsider.immuneUntil; }
-  /** 可不可以誘導。 */
-  inducible(v) { return v.level !== 'puppet'; }
+  /** 可不可以誘導（人偶不行；剛幫過你的要等冷卻）。 */
+  inducible(v) { return v.level !== 'puppet' && this.world.t >= v.cooldownUntil; }
+  /** 冷卻還剩幾秒（0 表示可以誘導）。 */
+  cooldown(v) { return Math.max(0, v.cooldownUntil - this.world.t); }
+  /** 任務結束：記冷卻。 */
+  endTask(v) { v.task = null; v.cooldownUntil = this.world.t + this.opt.induceCooldownSec; }
 
   // ---------- 誘導 ----------
   /**
@@ -81,7 +85,7 @@ export class Villagers {
     return out;
   }
   induce(v, kind) {
-    if (!this.inducible(v)) { this.emit('induceFail', { actor: v, kind, reason: 'puppet' }); return false; }
+    if (!this.inducible(v)) { this.emit('induceFail', { actor: v, kind, reason: v.level === 'puppet' ? 'puppet' : 'cooldown' }); return false; }
     const house = [...this.world.objects.values()].find(o => o.type === 'house' && o.owner === v.id);
     if (kind === 'invite') { v.task = { kind, house: house.id, stage: 0 }; }
     else if (kind === 'fetch') {
@@ -214,7 +218,18 @@ export class Villagers {
       if (!this.goTo(v, me.pos)) {
         const near = this.nearestReachable(v, me.pos);
         if (near && !eq(near, v.pos)) this.goTo(v, near);
-        else { v.path = []; v.waitUntil = this.world.t + this.opt.giveUpSec; this.emit('stuck', { actor: v }); return; }
+        else {
+          v.path = []; v.waitUntil = this.world.t + this.opt.giveUpSec;
+          // 為什麼過不去？外鄉人在他不能進的住宅裡 → 是規則擋著他；同一人同一地點只說一次
+          const h = this.grid.houseAt(me.pos);
+          const key = `${h || 'x'}:${v.pos}`;
+          if (v.lastStuck !== key) {
+            v.lastStuck = key;
+            if (h) { const c = this.world.check(v.id, 'enter', h, { uninvited: true }); this.emit('blockedByRule', { actor: v, house: h, rules: c.violates }); }
+            else this.emit('stuck', { actor: v });
+          }
+          return;
+        }
       }
     }
     const r = this.stepAlong(v);
@@ -233,12 +248,12 @@ export class Villagers {
     const t = v.task, w = this.world, me = this.outsider;
     if (v.move) return;
     const walkTo = goal => { if (eq(v.pos, goal)) return true; if (!v.path.length || !eq(v.goal, goal)) { if (!this.goTo(v, goal)) { const n = this.nearestReachable(v, goal); if (!n || eq(n, v.pos)) return 'fail'; this.goTo(v, n); } } const r = this.stepAlong(v); return r === 'refused' || r === 'blocked' ? 'fail' : false; };
-    const fail = why => { this.emit('taskFail', { actor: v, kind: t.kind, why }); v.task = null; };
+    const fail = why => { this.emit('taskFail', { actor: v, kind: t.kind, why }); this.endTask(v); };
     if (t.kind === 'invite') {
       const hc = this.grid.houses.get(t.house);
       const r = walkTo(hc.front);
       if (r === 'fail') return fail('path');
-      if (r === true) { me.invitedTo = t.house; this.emit('invited', { actor: v, house: t.house }); v.task = null; }
+      if (r === true) { me.invitedTo = t.house; this.emit('invited', { actor: v, house: t.house }); this.endTask(v); }
     } else if (t.kind === 'fetch') {
       const ks = w.objects.get(t.keepsake);
       if (t.stage === 0) {
@@ -247,7 +262,7 @@ export class Villagers {
         if (r === true) { const a = w.attempt(v.id, 'take', ks.id); if (!a.done) return fail('refused'); t.stage = 1; }
       } else {
         // 走到外鄉人旁邊交給他（隔著門洞也遞得過去）
-        if (Math.max(Math.abs(v.pos[0] - me.pos[0]), Math.abs(v.pos[1] - me.pos[1])) <= 1) { const a = w.attempt(v.id, 'give', ks.id, { to: 'outsider' }); if (!a.done) return fail('refused'); v.task = null; return; }
+        if (Math.max(Math.abs(v.pos[0] - me.pos[0]), Math.abs(v.pos[1] - me.pos[1])) <= 1) { const a = w.attempt(v.id, 'give', ks.id, { to: 'outsider' }); if (!a.done) return fail('refused'); this.endTask(v); return; }
         const n = this.nearestReachable(v, me.pos);
         const r = n ? walkTo(n) : 'fail';
         if (r === 'fail') return fail('path');
@@ -264,7 +279,7 @@ export class Villagers {
         if (r === true) { const a = w.attempt(v.id, 'move', book.id, { to: [...v.pos] }); if (!a.done) return fail('refused'); v.carrying = book.id; t.stage = 1; }
       } else {
         const r = walkTo(t.dest); if (r === 'fail') { this.dropBook(v); return fail('path'); }
-        if (r === true) { this.dropBook(v); v.task = null; this.emit('bookMoved', { actor: v, pos: book.pos }); }
+        if (r === true) { this.dropBook(v); this.endTask(v); this.emit('bookMoved', { actor: v, pos: book.pos }); }
       }
     }
   }

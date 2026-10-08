@@ -17,22 +17,30 @@ check('村民頭上標籤顯示三種同化程度', lab.includes('人偶') && la
 await pw.shot(DIR, '01-levels');
 
 // 1. 抓捕令廣播結束前，走到村民 01 旁邊誘導「邀請我進屋」
-const v1 = await villager('villager_01');
-check('走到村民 01 旁', await pw.goto([v1.pos[0] - 1, v1.pos[1]]) === 'ok', JSON.stringify(v1.pos));
-await pw.face([1, 0]);
-let r = await doOpt(o => o.verb === 'induce' && o.label.startsWith('請他邀請我進屋'));
-if (r.missing) { const v = await villager('villager_01'); await pw.goto([v.pos[0] - 1, v.pos[1]]); await pw.face([1, 0]); r = await doOpt(o => o.verb === 'induce' && o.label.startsWith('請他邀請我進屋')); }
-check('誘導：請他邀請我進屋', r.done === true, r.labels?.join('|'));
+// 走到村民 01 旁邊（他會巡邏走動、抓捕令廣播完會衝過來，所以多試幾次）
+let r = { missing: true };
+for (let i = 0; i < 6 && r.missing; i++) {
+  const v1 = await villager('villager_01');
+  const spots = [[v1.pos[0] - 1, v1.pos[1]], [v1.pos[0] + 1, v1.pos[1]], [v1.pos[0], v1.pos[1] - 1], [v1.pos[0], v1.pos[1] + 1]];
+  for (const sp of spots) { if (await pw.goto(sp) === 'ok') break; }
+  r = await doOpt(o => o.verb === 'induce' && o.target === 'villager_01' && o.label.startsWith('請他邀請我進屋'));
+  if (r.missing) await pw.wait(0.3);
+}
+check('走到村民 01 旁並誘導：請他邀請我進屋', r.done === true, r.labels?.join('|'));
 await pw.shot(DIR, '02-induce-invite');
 check('村民 01 走回自家門口並邀請', await until(async () => (await pw.status()).invitedTo === 'house_01', 20));
 await pw.shot(DIR, '03-invited');
-// 受邀進入：對照「未經邀請不得進入」不違規（但外鄉人沒聽過憲法，所以要看 ctx 是 invited）
-await pw.goto([30, 29]); await pw.face([0, 1]);
-await doOpt(o => o.verb === 'open' && o.target === 'door_01'); await pw.walk([[0, 1]]);
-const before = (await pw.log()).filter(e => e.type === 'violation').length;
-r = await doOpt(o => o.verb === 'enter'); await pw.wait(0.3);
+// 受邀進入：對照「未經邀請不得進入」不違規（但外鄉人沒聽過憲法，所以要看 ctx 是 invited）。被加速的村民抓到就從中心再試（免疫 3 秒）
+let entered = false, before = (await pw.log()).filter(e => e.type === 'violation').length;
+for (let i = 0; i < 4 && !entered; i++) {
+  await pw.goto([30, 29]); await pw.face([0, 1]);
+  if ((await pw.eval(() => window.__game.game.world.objects.get('door_01').state)) === 'closed') await doOpt(o => o.verb === 'open' && o.target === 'door_01');
+  await pw.walk([[0, 1]]); await pw.settle();
+  r = await doOpt(o => o.verb === 'enter'); await pw.settle();
+  entered = (await pw.status()).house === 'house_01';
+}
 const st = await pw.status();
-check('受邀後進入住宅、沒有違規', st.house === 'house_01' && (await pw.log()).filter(e => e.type === 'violation').length === before);
+check('受邀後進入住宅、沒有違規', entered && (await pw.log()).filter(e => e.type === 'violation').length === before, `tries ok=${entered} captures=${st.stats.captures}`);
 
 // 2. 村民追捕看得見：走出屋外，等追捕標籤出現
 await pw.goto([30, 28]); await pw.wait(0.5);

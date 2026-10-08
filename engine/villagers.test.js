@@ -107,4 +107,22 @@ const hear = (s, ids) => { for (const id of ids) v(s, id).known.add(s.world.live
   assert.equal(s.villagers.induce(p, 'book'), false); assert.equal(refused, 1);
   ok('誘導：認知到「不得搬動」的村民拒絕搬書');
 }
+// 8. 誘導冷卻：任務結束後 20 秒內不接受誘導；被規則擋在門口會發 blockedByRule（同一地點只一次）
+{
+  const s = fresh();
+  const p = v(s, 'villager_01'); s.outsider.pos = [34, 23];
+  assert.equal(s.villagers.induce(p, 'invite'), true); run(s, 15);
+  assert.equal(s.outsider.invitedTo, 'house_01');
+  let why = null; s.world.on('induceFail', e => why = e.reason);
+  assert.equal(s.villagers.induce(p, 'fetch'), false); assert.equal(why, 'cooldown'); assert.ok(s.villagers.cooldown(p) > 0);
+  run(s, 21); assert.equal(s.villagers.inducible(p), true);
+  ok('誘導冷卻：剛幫過的村民 20 秒內不接受誘導');
+  const s2 = fresh(); hear(s2, ['villager_02']);
+  s2.world.objects.get('door_03').state = 'open'; s2.outsider.pos = [44, 37];
+  const blocked = []; s2.world.on('blockedByRule', e => blocked.push(`${e.actor.id}@${e.house}:${e.rules.map(r => r.key)}`));
+  run(s2, 20);
+  assert.ok(blocked.length >= 1 && blocked[0].startsWith('villager_02@house_03:invite-only'), `${blocked}`);
+  assert.ok(blocked.length <= 3, `同一地點不該一直重複，實際 ${blocked.length} 次`);
+  ok('被憲法第三條擋在門口 → blockedByRule 事件（附條文），不洗版');
+}
 console.log('villagers.test 全部通過');

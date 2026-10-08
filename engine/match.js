@@ -19,7 +19,9 @@ export class Match {
     const w = this.world;
     w.on('write', () => { if (this.started) { this.stats.written++; this.lastWrite = this.t; } });
     w.on('reset', () => { this.stats.resets = w.resets; if (this.started && w.resets >= this.opt.aliveResets) this.end('lost', 'alive'); });
-    w.on('level', ({ from, to }) => { if (['puppet', 'half', 'awake'].indexOf(to) > ['puppet', 'half', 'awake'].indexOf(from)) this.stats.awakened++; });
+    const L = ['puppet', 'half', 'awake'];
+    this.startLevel = new Map([...w.actors.values()].filter(a => a.kind === 'citizen').map(a => [a.id, a.level]));
+    w.on('level', ({ actor }) => { this.stats.awakened = [...w.actors.values()].filter(a => a.kind === 'citizen' && L.indexOf(a.level) > L.indexOf(this.startLevel.get(a.id))).length; });
     w.on('captured', () => { this.stats.captures++; this.setAssim(this.assim + 1, 'captured'); });
   }
   on(type, fn) { (this.listeners[type] ||= []).push(fn); return this; }

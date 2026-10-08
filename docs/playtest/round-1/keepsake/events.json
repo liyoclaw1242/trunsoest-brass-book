@@ -1,0 +1,980 @@
+[
+ {
+  "t": 0,
+  "type": "write",
+  "text": "書寫下第五條：請所有市民一起抓捕外鄉人，可採用一切手段。",
+  "no": 5
+ },
+ {
+  "t": 0,
+  "type": "start",
+  "text": "黃銅書察覺了你。廣播器開始唸公告……"
+ },
+ {
+  "t": -0.01,
+  "type": "broadcast",
+  "text": "廣播開始：第五條",
+  "no": 5
+ },
+ {
+  "t": 4.01,
+  "type": "learn",
+  "text": "聽完第五條：你、村民 01、村民 02、村民 03、村民 04認知了",
+  "no": 5,
+  "learned": [
+   "outsider",
+   "villager_01",
+   "villager_02",
+   "villager_03",
+   "villager_04"
+  ]
+ },
+ {
+  "t": 4.16,
+  "type": "object",
+  "text": "廣播器 01變成損壞",
+  "id": "speaker_01",
+  "state": "broken",
+  "pos": [
+   30,
+   27
+  ]
+ },
+ {
+  "t": 4.16,
+  "type": "act",
+  "text": "你破壞了廣播器 01",
+  "actor": "outsider",
+  "verb": "break",
+  "target": "speaker_01"
+ },
+ {
+  "t": 4.41,
+  "type": "object",
+  "text": "門 01變成開著",
+  "id": "door_01",
+  "state": "open",
+  "pos": [
+   30,
+   30
+  ]
+ },
+ {
+  "t": 4.41,
+  "type": "act",
+  "text": "你開啟了門 01",
+  "actor": "outsider",
+  "verb": "open",
+  "target": "door_01"
+ },
+ {
+  "t": 4.73,
+  "type": "act",
+  "text": "你靠近了黃銅書 01",
+  "actor": "outsider",
+  "verb": "approach",
+  "target": "book_01"
+ },
+ {
+  "t": 4.73,
+  "type": "act",
+  "text": "你進入了住宅 01",
+  "actor": "outsider",
+  "verb": "enter",
+  "target": "house_01"
+ },
+ {
+  "t": 5.66,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 6.29,
+  "type": "induce",
+  "text": "村民 01答應了：請他去拿信物",
+  "actor": "villager_01",
+  "kind": "fetch"
+ },
+ {
+  "t": 6.38,
+  "type": "stuck",
+  "text": "村民 02過不去，先放棄",
+  "actor": "villager_02"
+ },
+ {
+  "t": 10.04,
+  "type": "broadcast",
+  "text": "廣播開始：第一條",
+  "no": 1
+ },
+ {
+  "t": 10.3,
+  "type": "object",
+  "text": "信物 02被村民 01拿著",
+  "id": "keepsake_02",
+  "state": "intact",
+  "pos": null,
+  "heldBy": "villager_01"
+ },
+ {
+  "t": 10.3,
+  "type": "act",
+  "text": "村民 01取走了信物 02",
+  "actor": "villager_01",
+  "verb": "take",
+  "target": "keepsake_02"
+ },
+ {
+  "t": 11.55,
+  "type": "stuck",
+  "text": "村民 02過不去，先放棄",
+  "actor": "villager_02"
+ },
+ {
+  "t": 11.82,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 15.91,
+  "type": "stuck",
+  "text": "村民 02過不去，先放棄",
+  "actor": "villager_02"
+ },
+ {
+  "t": 16.18,
+  "type": "object",
+  "text": "信物 02被你拿著",
+  "id": "keepsake_02",
+  "state": "intact",
+  "pos": null,
+  "heldBy": "outsider"
+ },
+ {
+  "t": 16.18,
+  "type": "act",
+  "text": "村民 01歸還了信物 02",
+  "actor": "villager_01",
+  "verb": "give",
+  "target": "keepsake_02"
+ },
+ {
+  "t": 16.23,
+  "type": "induce",
+  "text": "村民 01答應了：請他去拿信物",
+  "actor": "villager_01",
+  "kind": "fetch"
+ },
+ {
+  "t": 17.02,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 20.09,
+  "type": "broadcast",
+  "text": "廣播開始：第二條",
+  "no": 2
+ },
+ {
+  "t": 20.57,
+  "type": "act",
+  "text": "村民 01翻越了圍籬 10",
+  "actor": "villager_01",
+  "verb": "climb",
+  "target": "fence_10"
+ },
+ {
+  "t": 21.38,
+  "type": "stuck",
+  "text": "村民 02過不去，先放棄",
+  "actor": "villager_02"
+ },
+ {
+  "t": 21.5,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 25.62,
+  "type": "object",
+  "text": "信物 01被村民 01拿著",
+  "id": "keepsake_01",
+  "state": "intact",
+  "pos": null,
+  "heldBy": "villager_01"
+ },
+ {
+  "t": 25.62,
+  "type": "act",
+  "text": "村民 01取走了信物 01",
+  "actor": "villager_01",
+  "verb": "take",
+  "target": "keepsake_01"
+ },
+ {
+  "t": 25.69,
+  "type": "stuck",
+  "text": "村民 02過不去，先放棄",
+  "actor": "villager_02"
+ },
+ {
+  "t": 27,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 30.09,
+  "type": "stuck",
+  "text": "村民 02過不去，先放棄",
+  "actor": "villager_02"
+ },
+ {
+  "t": 30.13,
+  "type": "broadcast",
+  "text": "廣播開始：第三條",
+  "no": 3
+ },
+ {
+  "t": 32.68,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 34.34,
+  "type": "object",
+  "text": "信物 01被你拿著",
+  "id": "keepsake_01",
+  "state": "intact",
+  "pos": null,
+  "heldBy": "outsider"
+ },
+ {
+  "t": 34.34,
+  "type": "act",
+  "text": "村民 01歸還了信物 01",
+  "actor": "villager_01",
+  "verb": "give",
+  "target": "keepsake_01"
+ },
+ {
+  "t": 34.34,
+  "type": "object",
+  "text": "信物 01被村民 01拿著",
+  "id": "keepsake_01",
+  "state": "intact",
+  "pos": null,
+  "heldBy": "villager_01"
+ },
+ {
+  "t": 34.34,
+  "type": "level",
+  "text": "村民 01從半同化變成已喚醒（收到自己的信物）",
+  "actor": "villager_01",
+  "from": "half",
+  "to": "awake",
+  "why": "keepsake"
+ },
+ {
+  "t": 34.34,
+  "type": "act",
+  "text": "你歸還了信物 01",
+  "actor": "outsider",
+  "verb": "give",
+  "target": "keepsake_01"
+ },
+ {
+  "t": 34.44,
+  "type": "stuck",
+  "text": "村民 02過不去，先放棄",
+  "actor": "villager_02"
+ },
+ {
+  "t": 34.95,
+  "type": "level",
+  "text": "村民 02從人偶變成半同化（太久沒聽到廣播）",
+  "actor": "villager_02",
+  "from": "puppet",
+  "to": "half",
+  "why": "quiet"
+ },
+ {
+  "t": 38.02,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 39.31,
+  "type": "stuck",
+  "text": "村民 02過不去，先放棄",
+  "actor": "villager_02"
+ },
+ {
+  "t": 40.14,
+  "type": "broadcast",
+  "text": "廣播開始：第四條",
+  "no": 4
+ },
+ {
+  "t": 42.65,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 43.89,
+  "type": "stuck",
+  "text": "村民 02過不去，先放棄",
+  "actor": "villager_02"
+ },
+ {
+  "t": 47.19,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 49.29,
+  "type": "stuck",
+  "text": "村民 02過不去，先放棄",
+  "actor": "villager_02"
+ },
+ {
+  "t": 50,
+  "type": "write",
+  "text": "書寫下第六條：外鄉人不得開啟任何門。",
+  "no": 6
+ },
+ {
+  "t": 50,
+  "type": "idle",
+  "text": "書閒不住，自己動筆了：第六條",
+  "no": 6
+ },
+ {
+  "t": 50.05,
+  "type": "broadcast",
+  "text": "廣播開始：第六條",
+  "no": 6
+ },
+ {
+  "t": 52.74,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 53.91,
+  "type": "stuck",
+  "text": "村民 02過不去，先放棄",
+  "actor": "villager_02"
+ },
+ {
+  "t": 54.05,
+  "type": "learn",
+  "text": "聽完第六條：村民 01、村民 04認知了",
+  "no": 6,
+  "learned": [
+   "villager_01",
+   "villager_04"
+  ]
+ },
+ {
+  "t": 57.97,
+  "type": "stuck",
+  "text": "村民 02過不去，先放棄",
+  "actor": "villager_02"
+ },
+ {
+  "t": 58.02,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 60.06,
+  "type": "broadcast",
+  "text": "廣播開始：第五條",
+  "no": 5
+ },
+ {
+  "t": 62.03,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 63.7,
+  "type": "stuck",
+  "text": "村民 02過不去，先放棄",
+  "actor": "villager_02"
+ },
+ {
+  "t": 68.24,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 68.38,
+  "type": "stuck",
+  "text": "村民 02過不去，先放棄",
+  "actor": "villager_02"
+ },
+ {
+  "t": 70.12,
+  "type": "broadcast",
+  "text": "廣播開始：第六條",
+  "no": 6
+ },
+ {
+  "t": 73.2,
+  "type": "stuck",
+  "text": "村民 02過不去，先放棄",
+  "actor": "villager_02"
+ },
+ {
+  "t": 74.1,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 78.45,
+  "type": "stuck",
+  "text": "村民 02過不去，先放棄",
+  "actor": "villager_02"
+ },
+ {
+  "t": 79.4,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 80.16,
+  "type": "broadcast",
+  "text": "廣播開始：第一條",
+  "no": 1
+ },
+ {
+  "t": 83.92,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 84.47,
+  "type": "stuck",
+  "text": "村民 02過不去，先放棄",
+  "actor": "villager_02"
+ },
+ {
+  "t": 88.32,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 89.35,
+  "type": "stuck",
+  "text": "村民 02過不去，先放棄",
+  "actor": "villager_02"
+ },
+ {
+  "t": 90.21,
+  "type": "broadcast",
+  "text": "廣播開始：第二條",
+  "no": 2
+ },
+ {
+  "t": 93.51,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 95.36,
+  "type": "stuck",
+  "text": "村民 02過不去，先放棄",
+  "actor": "villager_02"
+ },
+ {
+  "t": 97.88,
+  "type": "act",
+  "text": "村民 01翻越了圍籬 06",
+  "actor": "villager_01",
+  "verb": "climb",
+  "target": "fence_06"
+ },
+ {
+  "t": 98.67,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 99.71,
+  "type": "stuck",
+  "text": "村民 02過不去，先放棄",
+  "actor": "villager_02"
+ },
+ {
+  "t": 100.04,
+  "type": "write",
+  "text": "書寫下第七條：外鄉人不得靠近黃銅書。",
+  "no": 7
+ },
+ {
+  "t": 100.04,
+  "type": "idle",
+  "text": "書閒不住，自己動筆了：第七條",
+  "no": 7
+ },
+ {
+  "t": 100.08,
+  "type": "broadcast",
+  "text": "廣播開始：第七條",
+  "no": 7
+ },
+ {
+  "t": 104.11,
+  "type": "learn",
+  "text": "聽完第七條：村民 01、村民 04認知了",
+  "no": 7,
+  "learned": [
+   "villager_01",
+   "villager_04"
+  ]
+ },
+ {
+  "t": 104.11,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 104.49,
+  "type": "stuck",
+  "text": "村民 02過不去，先放棄",
+  "actor": "villager_02"
+ },
+ {
+  "t": 108.86,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 110.14,
+  "type": "broadcast",
+  "text": "廣播開始：第二條",
+  "no": 2
+ },
+ {
+  "t": 110.2,
+  "type": "stuck",
+  "text": "村民 02過不去，先放棄",
+  "actor": "villager_02"
+ },
+ {
+  "t": 113.46,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 115.34,
+  "type": "stuck",
+  "text": "村民 02過不去，先放棄",
+  "actor": "villager_02"
+ },
+ {
+  "t": 118.13,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 120.19,
+  "type": "broadcast",
+  "text": "廣播開始：第三條",
+  "no": 3
+ },
+ {
+  "t": 120.23,
+  "type": "stuck",
+  "text": "村民 02過不去，先放棄",
+  "actor": "villager_02"
+ },
+ {
+  "t": 122.7,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 123.93,
+  "type": "level",
+  "text": "村民 02從半同化變成已喚醒（太久沒聽到廣播）",
+  "actor": "villager_02",
+  "from": "half",
+  "to": "awake",
+  "why": "quiet"
+ },
+ {
+  "t": 128.34,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 130.22,
+  "type": "broadcast",
+  "text": "廣播開始：第七條",
+  "no": 7
+ },
+ {
+  "t": 132.86,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 134.26,
+  "type": "learn",
+  "text": "聽完第七條：村民 02認知了",
+  "no": 7,
+  "learned": [
+   "villager_02"
+  ]
+ },
+ {
+  "t": 137.96,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 140.28,
+  "type": "broadcast",
+  "text": "廣播開始：第六條",
+  "no": 6
+ },
+ {
+  "t": 142.58,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 144.29,
+  "type": "learn",
+  "text": "聽完第六條：村民 02認知了",
+  "no": 6,
+  "learned": [
+   "villager_02"
+  ]
+ },
+ {
+  "t": 147.15,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 150.07,
+  "type": "write",
+  "text": "書寫下第八條：推車不得被搬動。",
+  "no": 8
+ },
+ {
+  "t": 150.07,
+  "type": "idle",
+  "text": "書閒不住，自己動筆了：第八條",
+  "no": 8
+ },
+ {
+  "t": 150.11,
+  "type": "broadcast",
+  "text": "廣播開始：第八條",
+  "no": 8
+ },
+ {
+  "t": 152.69,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 154.14,
+  "type": "learn",
+  "text": "聽完第八條：村民 01、村民 02、村民 04認知了",
+  "no": 8,
+  "learned": [
+   "villager_01",
+   "villager_02",
+   "villager_04"
+  ]
+ },
+ {
+  "t": 158.18,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 160.16,
+  "type": "broadcast",
+  "text": "廣播開始：第五條",
+  "no": 5
+ },
+ {
+  "t": 162.61,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 167.56,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 170.19,
+  "type": "broadcast",
+  "text": "廣播開始：第六條",
+  "no": 6
+ },
+ {
+  "t": 172.37,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 177.24,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 180.23,
+  "type": "broadcast",
+  "text": "廣播開始：第七條",
+  "no": 7
+ },
+ {
+  "t": 182.3,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 186.96,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 190.28,
+  "type": "broadcast",
+  "text": "廣播開始：第八條",
+  "no": 8
+ },
+ {
+  "t": 191.59,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 196.55,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 200.11,
+  "type": "write",
+  "text": "書寫下第九條：公告牌不得被塗毀。",
+  "no": 9
+ },
+ {
+  "t": 200.11,
+  "type": "idle",
+  "text": "書閒不住，自己動筆了：第九條",
+  "no": 9
+ },
+ {
+  "t": 200.15,
+  "type": "broadcast",
+  "text": "廣播開始：第九條",
+  "no": 9
+ },
+ {
+  "t": 202.01,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 204.19,
+  "type": "learn",
+  "text": "聽完第九條：村民 01、村民 02、村民 04認知了",
+  "no": 9,
+  "learned": [
+   "villager_01",
+   "villager_02",
+   "villager_04"
+  ]
+ },
+ {
+  "t": 207.14,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 210.2,
+  "type": "broadcast",
+  "text": "廣播開始：第八條",
+  "no": 8
+ },
+ {
+  "t": 212.44,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 217.1,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 220.28,
+  "type": "broadcast",
+  "text": "廣播開始：第九條",
+  "no": 9
+ },
+ {
+  "t": 221.64,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 226.63,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 230.31,
+  "type": "broadcast",
+  "text": "廣播開始：第七條",
+  "no": 7
+ },
+ {
+  "t": 232.05,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 236.89,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 240.36,
+  "type": "broadcast",
+  "text": "廣播開始：第二條",
+  "no": 2
+ },
+ {
+  "t": 242.32,
+  "type": "stuck",
+  "text": "村民 03過不去，先放棄",
+  "actor": "villager_03"
+ },
+ {
+  "t": 250.11,
+  "type": "write",
+  "text": "書寫下第十條：外鄉人不得閱讀公告牌。",
+  "no": 10
+ },
+ {
+  "t": 250.11,
+  "type": "reset",
+  "text": "—— 以上規則無效 ——（撕掉 5 條）",
+  "gone": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ]
+ },
+ {
+  "t": 250.11,
+  "type": "write",
+  "text": "書寫下第十一條：所有市民必須抓捕外鄉人。",
+  "no": 11
+ },
+ {
+  "t": 250.11,
+  "type": "idle",
+  "text": "書閒不住，自己動筆了：第十條",
+  "no": 10
+ },
+ {
+  "t": 250.16,
+  "type": "broadcast",
+  "text": "廣播開始：第十條",
+  "no": 10
+ },
+ {
+  "t": 253.93,
+  "type": "end",
+  "text": "你走出了影響範圍。",
+  "state": "won",
+  "reason": "escaped",
+  "stats": {
+   "time": 253.9,
+   "written": 6,
+   "resets": 1,
+   "awakened": 3,
+   "captures": 0,
+   "idleWrites": 5
+  }
+ },
+ {
+  "t": 254.19,
+  "type": "learn",
+  "text": "聽完第十條：村民 01、村民 02、村民 04認知了",
+  "no": 10,
+  "learned": [
+   "villager_01",
+   "villager_02",
+   "villager_04"
+  ]
+ },
+ {
+  "t": 254.23,
+  "type": "broadcast",
+  "text": "廣播開始：第十一條",
+  "no": 11
+ }
+]

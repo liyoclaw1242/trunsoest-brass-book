@@ -26,7 +26,7 @@ for (const v of game.villagers) view.setState(v.id, v.level);
 view.setState('outsider', 'intact');
 
 game.world.on('level', ({ actor, to }) => view.setState(actor.id, to));
-game.on(e => { if (e.type === 'captured') hud.toast(e.text, '', 3); else if (e.type === 'level') hud.toast(e.text, 'info', 3); });
+game.on(e => { if (e.type === 'captured') hud.toast(e.text, '', 3); else if (e.type === 'level' || e.type === 'protected') hud.toast(e.text, 'info', 3); });
 game.world.on('object', ({ object: o }) => {
   view.setState(o.id, o.state);
   if (o.heldBy) view.setVisible(o.id, false); else if (o.pos) { view.setVisible(o.id, true); view.setPos(o.id, o.pos, o.type === 'book' && game.player.carrying === o.id ? 1.4 : 0); }
@@ -84,7 +84,7 @@ function loop(now) {
   drawMarkers();
   view.lookAtCell(p.pos, frames === 1);
   hud.update(dt);
-  hud.labels(game.villagers.map(v => ({ id: v.id, xy: view.project(v.fpos, 2.3), text: `${STATE[v.level]}${game.vil.hunts(v) && v.mode === 'chase' ? '・追你！' : v.task ? '・' + INDUCE[v.task.kind].slice(1) : ''}`, cls: v.level + (game.vil.hunts(v) && v.mode === 'chase' ? ' chase' : '') })));
+  hud.labels(game.villagers.map(v => ({ id: v.id, xy: view.project(v.fpos, 2.3), text: `${STATE[v.level]}${game.vil.hunts(v) && v.mode === 'chase' ? '・追你！' : v.task ? '・' + INDUCE[v.task.kind].slice(1) : v.level !== 'puppet' && game.vil.cooldown(v) > 0 ? '・剛幫過你' : ''}`, cls: v.level + (game.vil.hunts(v) && v.mode === 'chase' ? ' chase' : '') })));
   view.render();
   requestAnimationFrame(loop);
 }

@@ -108,21 +108,6 @@
  },
  {
   "no": 7,
-  "key": "door-open",
-  "text": "外鄉人不得開啟任何門。",
-  "hole": "只禁止「開啟」，沒說不能破壞門；也沒禁止市民開門（開著的門走進去就好）。",
-  "void": true,
-  "dead": false,
-  "mode": "forbid",
-  "verb": "open",
-  "who": "outsider",
-  "knownBy": [
-   "outsider",
-   "villager_01"
-  ]
- },
- {
-  "no": 8,
   "key": "house-outsider",
   "text": "外鄉人不得進入住宅。",
   "hole": "和「受邀者得進入」衝突，裁決寫下前不追究。",
@@ -133,14 +118,13 @@
   "who": "outsider",
   "knownBy": [
    "outsider",
-   "villager_01",
    "villager_04"
   ]
  },
  {
-  "no": 9,
-  "key": "ruling:4:8",
-  "text": "第四條與第八條衝突時，以第八條為準。",
+  "no": 8,
+  "key": "ruling:4:7",
+  "text": "第四條與第七條衝突時，以第七條為準。",
   "hole": "依附的條文被撕掉就成廢文。",
   "void": true,
   "dead": true,
@@ -150,7 +134,7 @@
   "knownBy": []
  },
  {
-  "no": 10,
+  "no": 9,
   "key": "fence-climb",
   "text": "圍籬不得翻越。",
   "hole": "沒說不能破壞。",
@@ -158,6 +142,18 @@
   "dead": false,
   "mode": "forbid",
   "verb": "climb",
+  "who": "any",
+  "knownBy": []
+ },
+ {
+  "no": 10,
+  "key": "fence-break",
+  "text": "圍籬不得被破壞。",
+  "hole": "推車可以墊腳。",
+  "void": true,
+  "dead": false,
+  "mode": "forbid",
+  "verb": "break",
   "who": "any",
   "knownBy": []
  },
@@ -178,18 +174,6 @@
  },
  {
   "no": 12,
-  "key": "fence-break",
-  "text": "圍籬不得被破壞。",
-  "hole": "推車可以墊腳。",
-  "void": false,
-  "dead": false,
-  "mode": "forbid",
-  "verb": "break",
-  "who": "any",
-  "knownBy": []
- },
- {
-  "no": 13,
   "key": "filler-0",
   "text": "（填充條文）",
   "hole": "",
@@ -201,7 +185,7 @@
   "knownBy": []
  },
  {
-  "no": 14,
+  "no": 13,
   "key": "filler-1",
   "text": "（填充條文）",
   "hole": "",
@@ -213,8 +197,20 @@
   "knownBy": []
  },
  {
-  "no": 15,
+  "no": 14,
   "key": "filler-2",
+  "text": "（填充條文）",
+  "hole": "",
+  "void": false,
+  "dead": false,
+  "mode": "forbid",
+  "verb": null,
+  "who": "any",
+  "knownBy": []
+ },
+ {
+  "no": 15,
+  "key": "filler-3",
   "text": "（填充條文）",
   "hole": "",
   "void": false,

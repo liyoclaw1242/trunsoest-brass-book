@@ -85,4 +85,10 @@ assert.equal(w.check('outsider', 'break', 'speaker_03').violates.length, 0);
 assert.equal(w.protectedBy('speaker_03').length, 0);
 ok('驗證 4：重置撕掉保護條文後，廣播器可以再次被破壞');
 
+// 已損壞的物件不算「受保護」（條文禁止的動作在那個狀態做不到）
+w.write({ key: 'sb2', text: '廣播器不得被破壞。', verb: 'break', target: { type: 'speaker' } }, { silent: true, knownBy: ['outsider'] });
+assert.equal(w.protectedBy('speaker_03', 'outsider').length, 1);
+assert.equal(w.protectedBy('speaker_01', 'outsider').length, 0);   // speaker_01 早就壞了
+ok('protectedBy：壞掉的廣播器不畫保護外框');
+
 console.log('\n規則書這一局寫下的內容：\n' + log.join('\n'));

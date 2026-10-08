@@ -36,7 +36,7 @@ OBJECTS = [
     # 廣播器
     dict(type='speaker', id='speaker_01', pos=(30, 27), radius=8),
     dict(type='speaker', id='speaker_02', pos=(17, 30), radius=8),
-    dict(type='speaker', id='speaker_03', pos=(42, 30), radius=8),
+    dict(type='speaker', id='speaker_03', pos=(40, 30), radius=11),
     dict(type='speaker', id='speaker_04', pos=(23, 43), radius=8),
     dict(type='speaker', id='speaker_05', pos=(38, 43), radius=8),
     dict(type='speaker', id='speaker_06', pos=(30, 17), radius=10),
