@@ -144,7 +144,11 @@ export class World {
         if ((this.idle += dt) < this.opt.recitalGap) return;
         const act = this.active();
         if (!act.length) return;
-        no = act[this.cursor++ % act.length].no;
+        // 優先唸「現在在範圍內、還沒聽過」的條文；都聽過了才輪流複誦
+        const here = [...this.actors.values()].filter(a => this.inBroadcast(a.pos));
+        const unheard = act.filter(r => here.some(a => !a.known.has(r.no)));
+        const pool = unheard.length ? unheard : act;
+        no = pool[this.cursor++ % pool.length].no;
       }
       this.idle = 0;
       const listeners = new Set();

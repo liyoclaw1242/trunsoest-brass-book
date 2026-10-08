@@ -52,6 +52,7 @@ export async function open({ url = 'http://localhost:5173/', width = 1280, heigh
       return 'ok';
     },
     face: d => page.evaluate(d => window.__game.face(d), d),
+    protectedIds: a => page.evaluate(a => window.__game.protectedIds(a), a),
     place: c => page.evaluate(c => window.__game.place(c), c),
     close: () => browser.close(),
   };

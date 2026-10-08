@@ -89,9 +89,11 @@ export class View {
   /** 物件外框（受規則保護）。 */
   outline(id, color, size = 1.2, h = 2.2) {
     const n = this.nodes.get(id); if (!n) return null;
+    const house = id.startsWith('house_');
+    if (house) { size = 4.3; h = 2.6; }
     const g = new THREE.EdgesGeometry(new THREE.BoxGeometry(size, h, size));
     const box = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.95 }));
-    box.position.set(n.position.x, h / 2, n.position.z); this.markers.add(box); return box;
+    box.position.set(n.position.x - (house ? 0.5 : 0), h / 2, n.position.z + (house ? 0.5 : 0)); this.markers.add(box); return box;
   }
   /** 角色頭頂的小標記（顏色方塊／箭頭）。 */
   tag(cell, color, h = 2.4, size = 0.35) {

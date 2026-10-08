@@ -1,0 +1,157 @@
+[
+ {
+  "name": "開場筆記：0 條認知、5 條沒聽過",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "廣播條顯示正在唸的條文與進度",
+  "ok": true,
+  "info": "{\"key\":\"capture\",\"progress\":0.12104999999999999}"
+ },
+ {
+  "name": "聽完抓捕令後認知",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "筆記裡顯示抓捕令內容",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "破壞 speaker_01",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "走到 speaker_02 旁",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "破壞 speaker_02",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "書寫下 speaker-break",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "站在壞掉的廣播器旁聽不到廣播",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "驗證 2：新條文沒被你認知",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "v2（聽不到）不認知、v3/v4（範圍內）認知",
+  "ok": true,
+  "info": "villager_03,villager_04"
+ },
+ {
+  "name": "protectedBy：客觀受保護的廣播器有、玩家認知的沒有",
+  "ok": true,
+  "info": "mine=0 all=10"
+ },
+ {
+  "name": "走到 speaker_03 範圍內",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "在廣播範圍內",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "聽完「廣播器不得被破壞」（複誦優先唸沒聽過的）",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "玩家視角現在看到廣播器受保護",
+  "ok": true,
+  "info": "house_01,house_02,house_03,house_04,speaker_01,speaker_02,speaker_03,speaker_04,speaker_05,speaker_06"
+ },
+ {
+  "name": "破壞選項標示會違反第幾條",
+  "ok": true,
+  "info": "{\"verb\":\"break\",\"target\":\"speaker_03\",\"label\":\"破壞廣播器 03\",\"ok\":true,\"violates\":[6]}"
+ },
+ {
+  "name": "破壞受保護的廣播器 → violation 事件",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "走到 house_01 門前",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "第二次進屋後書寫下 house-outsider",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "讀規則書後認知全部",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "受邀進入：conflict 事件、不追究、書多寫一條裁決",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "翻越三次後書寫下 fence-climb",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "破壞圍籬 → 第十條 → 第一次重置",
+  "ok": true,
+  "info": "rules=6"
+ },
+ {
+  "name": "重置閃現「以上規則無效」",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "筆記裡被撕掉的條文劃掉（void）",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "裁決變廢文",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "書重寫了更不客氣的抓捕令",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "第二次重置後 speaker-break 失效",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "驗證 4：廣播器不再受保護",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "修復／破壞選項不再標違規",
+  "ok": true,
+  "info": "{\"verb\":\"repair\",\"target\":\"speaker_03\",\"label\":\"修復廣播器 03\",\"ok\":true,\"violates\":[]}"
+ }
+]

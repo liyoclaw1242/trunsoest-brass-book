@@ -163,6 +163,27 @@ export class Game {
     if (!o.ok) { this.note('blocked', `做不到：${o.label}（${o.reason === 'state' ? '狀態不允許' : '不支援'}）`); return { done: false, reason: o.reason }; }
     return o.run();
   }
+  /** 現在的廣播：{ rule, progress, hearing }，沒在廣播回傳 null。 */
+  broadcast() {
+    const n = this.world.now; if (!n) return null;
+    return { rule: this.world.rule(n.no), progress: 1 - n.left / this.world.opt.announceSec, hearing: n.listeners.has('outsider') };
+  }
+  /** 從玩家所在格到最近「聽不到廣播」的可走格要走幾步，以及那一格。 */
+  quietCell() {
+    const w = this.world, g = this.grid;
+    if (!w.inBroadcast(this.player.cell)) return { steps: 0, cell: [...this.player.cell] };
+    const r = g.minCost(this.player.cell, c => !w.inBroadcast(c), () => true, c => !g.blocked(c));
+    return r ? { steps: r.cost, cell: r.cell, path: r.path } : null;
+  }
+  /** 受規則保護的物件 id：帶 actorId 只算該角色認知到的；不帶是客觀的（設計者視角）。 */
+  protectedIds(actorId = 'outsider') {
+    return [...this.world.objects.values()].filter(o => o.pos && this.world.protectedBy(o.id, actorId).length).map(o => o.id);
+  }
+  /** 設計者視角用：每條規則與誰認知到它。 */
+  designerRules() {
+    return this.world.rules.map(r => ({ no: r.no, key: r.key, text: r.text, hole: r.hole || (r.kind === 'ruling' ? '依附的條文被撕掉就成廢文。' : ''), void: r.void, dead: r.dead, mode: r.mode, verb: r.verb, who: r.who,
+      knownBy: [...this.world.actors.values()].filter(a => a.known.has(r.no)).map(a => a.id) }));
+  }
   /** 給 HUD／試玩腳本看的狀態摘要。 */
   status() {
     const p = this.player, w = this.world;

@@ -1,0 +1,222 @@
+[
+ {
+  "no": 1,
+  "key": "hide",
+  "text": "此地不為外界所知。",
+  "hole": "",
+  "void": true,
+  "dead": false,
+  "mode": "forbid",
+  "verb": null,
+  "who": "any",
+  "knownBy": [
+   "outsider",
+   "villager_01",
+   "villager_02",
+   "villager_03",
+   "villager_04"
+  ]
+ },
+ {
+  "no": 2,
+  "key": "no-harm",
+  "text": "不得傷害他人。",
+  "hole": "",
+  "void": true,
+  "dead": false,
+  "mode": "forbid",
+  "verb": null,
+  "who": "any",
+  "knownBy": [
+   "outsider",
+   "villager_01",
+   "villager_02",
+   "villager_03",
+   "villager_04"
+  ]
+ },
+ {
+  "no": 3,
+  "key": "invite-only",
+  "text": "未經邀請不得進入他人住宅。",
+  "hole": "",
+  "void": true,
+  "dead": false,
+  "mode": "forbid",
+  "verb": "enter",
+  "who": "any",
+  "knownBy": [
+   "outsider",
+   "villager_01",
+   "villager_02",
+   "villager_03",
+   "villager_04"
+  ]
+ },
+ {
+  "no": 4,
+  "key": "guest-ok",
+  "text": "受市民邀請者，得進入該市民的住宅。",
+  "hole": "",
+  "void": true,
+  "dead": false,
+  "mode": "permit",
+  "verb": "enter",
+  "who": "any",
+  "knownBy": [
+   "outsider",
+   "villager_01",
+   "villager_02",
+   "villager_03",
+   "villager_04"
+  ]
+ },
+ {
+  "no": 5,
+  "key": "capture",
+  "text": "請所有市民一起抓捕外鄉人，可採用一切手段。",
+  "hole": "",
+  "void": true,
+  "dead": false,
+  "mode": "require",
+  "verb": "capture",
+  "who": "citizen",
+  "knownBy": [
+   "outsider",
+   "villager_01",
+   "villager_02",
+   "villager_03",
+   "villager_04"
+  ]
+ },
+ {
+  "no": 6,
+  "key": "speaker-break",
+  "text": "廣播器不得被破壞。",
+  "hole": "沒聽到的人不受約束；沒說不能搬走。",
+  "void": true,
+  "dead": false,
+  "mode": "forbid",
+  "verb": "break",
+  "who": "any",
+  "knownBy": [
+   "outsider",
+   "villager_03",
+   "villager_04"
+  ]
+ },
+ {
+  "no": 7,
+  "key": "house-outsider",
+  "text": "外鄉人不得進入住宅。",
+  "hole": "和「受邀者得進入」衝突，裁決寫下前不追究。",
+  "void": true,
+  "dead": false,
+  "mode": "forbid",
+  "verb": "enter",
+  "who": "outsider",
+  "knownBy": [
+   "outsider",
+   "villager_04"
+  ]
+ },
+ {
+  "no": 8,
+  "key": "ruling:4:7",
+  "text": "第四條與第七條衝突時，以第七條為準。",
+  "hole": "依附的條文被撕掉就成廢文。",
+  "void": true,
+  "dead": true,
+  "mode": "forbid",
+  "verb": null,
+  "who": "any",
+  "knownBy": [
+   "outsider",
+   "villager_04"
+  ]
+ },
+ {
+  "no": 9,
+  "key": "fence-climb",
+  "text": "圍籬不得翻越。",
+  "hole": "沒說不能破壞。",
+  "void": true,
+  "dead": false,
+  "mode": "forbid",
+  "verb": "climb",
+  "who": "any",
+  "knownBy": []
+ },
+ {
+  "no": 10,
+  "key": "fence-break",
+  "text": "圍籬不得被破壞。",
+  "hole": "推車可以墊腳。",
+  "void": true,
+  "dead": false,
+  "mode": "forbid",
+  "verb": "break",
+  "who": "any",
+  "knownBy": []
+ },
+ {
+  "no": 11,
+  "key": "capture",
+  "text": "所有市民必須抓捕外鄉人。",
+  "hole": "",
+  "void": false,
+  "dead": false,
+  "mode": "require",
+  "verb": "capture",
+  "who": "citizen",
+  "knownBy": []
+ },
+ {
+  "no": 12,
+  "key": "filler-0",
+  "text": "（填充條文）",
+  "hole": "",
+  "void": false,
+  "dead": false,
+  "mode": "forbid",
+  "verb": null,
+  "who": "any",
+  "knownBy": []
+ },
+ {
+  "no": 13,
+  "key": "filler-1",
+  "text": "（填充條文）",
+  "hole": "",
+  "void": false,
+  "dead": false,
+  "mode": "forbid",
+  "verb": null,
+  "who": "any",
+  "knownBy": []
+ },
+ {
+  "no": 14,
+  "key": "filler-2",
+  "text": "（填充條文）",
+  "hole": "",
+  "void": false,
+  "dead": false,
+  "mode": "forbid",
+  "verb": null,
+  "who": "any",
+  "knownBy": []
+ },
+ {
+  "no": 15,
+  "key": "filler-3",
+  "text": "（填充條文）",
+  "hole": "",
+  "void": false,
+  "dead": false,
+  "mode": "forbid",
+  "verb": null,
+  "who": "any",
+  "knownBy": []
+ }
+]

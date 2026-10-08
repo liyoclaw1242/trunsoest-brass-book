@@ -32,3 +32,7 @@ html, body { margin: 0; height: 100%; background: #1b1d1a; color: #eee; font: 14
 #overlay.reset h1 { color: #f55; letter-spacing: 6px; }
 #notes:empty, #log:empty, #prompt:empty { display: none; }
 [hidden] { display: none !important; }
+#resetflash { inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(60,0,0,.55); }
+#resetflash h1 { font-size: 64px; letter-spacing: 12px; color: #fff; text-shadow: 0 0 24px #f00; margin: 0; }
+#resetflash .small { font-size: 18px; color: #fcc; margin-top: 12px; }
+#notes.collapsed { display: none; }

@@ -30,11 +30,35 @@ game.world.on('object', ({ object: o }) => {
 });
 game.on(e => { if (e.type === 'violation') hud.toast(e.text, '', 2.5); else if (e.type === 'refuse' || e.type === 'conflict') hud.toast(e.text, 'info', 2.5); else if (e.type === 'blocked') hud.toast(e.text, 'info', 1.5); });
 
+function drawMarkers() {
+  const p = game.player, w = game.world;
+  view.clearMarkers();
+  // 影響範圍
+  view.circle(game.grid.center(), game.grid.radius, 0xffffff, 0.5, 0.06, true);
+  // 完好廣播器的範圍圈；玩家在裡面的那圈填色
+  for (const o of w.objects.values()) if (o.type === 'speaker' && o.state === 'intact') {
+    const inside = Math.hypot(o.pos[0] - p.cell[0], o.pos[1] - p.cell[1]) <= (o.radius ?? 8);
+    view.circle(o.pos, o.radius ?? 8, inside ? 0xff5544 : 0xcc8877, inside ? 0.9 : 0.45);
+    if (inside) view.disc(o.pos, o.radius ?? 8, 0xff5544, 0.08);
+  }
+  // 最近的安靜格
+  const q = game.quietCell(); if (q && q.steps) view.cellBox(q.cell, 0x88ddff, 0.5);
+  // 受規則保護：玩家認知到的畫金色；設計者視角再畫客觀的（青色）
+  const mine = new Set(game.protectedIds('outsider'));
+  for (const id of mine) view.outline(id, 0xffcc33);
+  if (hud.designer) for (const id of game.protectedIds(null)) if (!mine.has(id)) view.outline(id, 0x33ddff, 1.3, 2.4);
+  // 廣播中的廣播器頭上標記
+  const bc = game.broadcast();
+  if (bc) for (const o of w.objects.values()) if (o.type === 'speaker' && o.state === 'intact') view.tag(o.pos, 0xff4444, 3.4, 0.25);
+}
+
 let last = performance.now(), frames = 0;
 function loop(now) {
   const dt = Math.min(0.1, (now - last) / 1000); last = now; frames++;
   for (const code of input.take()) {
     if (code === 'KeyE') game.act(0);
+    else if (code === 'Tab') hud.toggleDesigner();
+    else if (code === 'KeyN') hud.el.notes.classList.toggle('collapsed');
     else if (/^Digit[2-9]$/.test(code)) game.act(+code.slice(5) - 1);
   }
   const d = input.dir(); if (d) game.tryStep(d);
@@ -43,6 +67,7 @@ function loop(now) {
   view.setPos('outsider', p.pos);
   if (p.carrying) view.setPos(p.carrying, p.pos, 1.4);
   for (const h of view.roofs.keys()) view.setRoof(h, p.house !== h);
+  drawMarkers();
   view.lookAtCell(p.pos, frames === 1);
   hud.update(dt);
   view.render();
@@ -63,4 +88,10 @@ window.__game = {
   rules: () => game.world.rules.map(r => ({ no: r.no, key: r.key, text: r.text, void: r.void, dead: r.dead, hole: r.hole })),
   objects: () => [...game.world.objects.values()].map(o => ({ id: o.id, type: o.type, state: o.state, pos: o.pos, heldBy: o.heldBy })),
   frames: () => frames,
+  broadcast: () => game.broadcast(),
+  quiet: () => game.quietCell(),
+  protectedIds: a => game.protectedIds(a),
+  designer: on => { if (hud.designer !== on) hud.toggleDesigner(); },
+  invite: h => { game.player.invitedTo = h; },
+  designerRules: () => game.designerRules(),
 };
