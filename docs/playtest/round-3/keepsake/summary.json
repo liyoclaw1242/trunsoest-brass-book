@@ -1,0 +1,135 @@
+{
+ "route": "keepsake",
+ "state": "won",
+ "reason": "escaped",
+ "stats": {
+  "time": 69,
+  "written": 3,
+  "resets": 0,
+  "awakened": 2,
+  "captures": 0,
+  "idleWrites": 1
+ },
+ "assim": 0,
+ "villagers": [
+  {
+   "id": "villager_01",
+   "pos": [
+    37,
+    21
+   ],
+   "level": "awake",
+   "mode": "wander",
+   "hunting": false,
+   "task": null,
+   "quiet": 0,
+   "cooldown": 0
+  },
+  {
+   "id": "villager_02",
+   "pos": [
+    21,
+    43
+   ],
+   "level": "half",
+   "mode": "return",
+   "hunting": true,
+   "task": null,
+   "quiet": 0,
+   "cooldown": 17
+  },
+  {
+   "id": "villager_03",
+   "pos": [
+    41,
+    40
+   ],
+   "level": "half",
+   "mode": "task",
+   "hunting": true,
+   "task": "invite",
+   "quiet": 0,
+   "cooldown": 0
+  },
+  {
+   "id": "villager_04",
+   "pos": [
+    31,
+    38
+   ],
+   "level": "awake",
+   "mode": "wander",
+   "hunting": false,
+   "task": null,
+   "quiet": 1.3,
+   "cooldown": 0
+  }
+ ],
+ "marks": [
+  {
+   "t": 0.6,
+   "name": "start",
+   "file": "docs/playtest/round-3/keepsake/01-start.png"
+  },
+  {
+   "t": 5.5,
+   "name": "first-shelter",
+   "file": "docs/playtest/round-3/keepsake/02-first-shelter.png"
+  },
+  {
+   "t": 6,
+   "name": "induce",
+   "file": "docs/playtest/round-3/keepsake/03-induce.png"
+  },
+  {
+   "t": 7.6,
+   "name": "induce",
+   "file": "docs/playtest/round-3/keepsake/04-induce.png"
+  },
+  {
+   "t": 14.6,
+   "name": "give",
+   "file": "docs/playtest/round-3/keepsake/05-give.png"
+  },
+  {
+   "t": 14.8,
+   "name": "induce",
+   "file": "docs/playtest/round-3/keepsake/06-induce.png"
+  },
+  {
+   "t": 23.4,
+   "name": "hide-in-house",
+   "file": "docs/playtest/round-3/keepsake/07-hide-in-house.png"
+  },
+  {
+   "t": 37.5,
+   "name": "give",
+   "file": "docs/playtest/round-3/keepsake/08-give.png"
+  },
+  {
+   "t": 57.1,
+   "name": "induce",
+   "file": "docs/playtest/round-3/keepsake/09-induce.png"
+  },
+  {
+   "t": 64,
+   "name": "induce",
+   "file": "docs/playtest/round-3/keepsake/10-induce.png"
+  },
+  {
+   "t": 64.4,
+   "name": "after-awakening",
+   "file": "docs/playtest/round-3/keepsake/11-after-awakening.png"
+  },
+  {
+   "t": 64.8,
+   "name": "walk-out",
+   "file": "docs/playtest/round-3/keepsake/12-walk-out.png"
+  },
+  {
+   "t": 69.9,
+   "name": "end",
+   "file": "docs/playtest/round-3/keepsake/13-end.png"
+  }
+ ]
+}

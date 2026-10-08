@@ -1,0 +1,155 @@
+{
+ "route": "deaf",
+ "state": "lost",
+ "reason": "assimilated",
+ "stats": {
+  "time": 86.9,
+  "written": 4,
+  "resets": 1,
+  "awakened": 2,
+  "captures": 3,
+  "idleWrites": 1
+ },
+ "assim": 3,
+ "villagers": [
+  {
+   "id": "villager_01",
+   "pos": [
+    34,
+    24
+   ],
+   "level": "awake",
+   "mode": "wander",
+   "hunting": false,
+   "task": null,
+   "quiet": 0,
+   "cooldown": 0
+  },
+  {
+   "id": "villager_02",
+   "pos": [
+    28,
+    28
+   ],
+   "level": "half",
+   "mode": "wander",
+   "hunting": false,
+   "task": null,
+   "quiet": 0.4,
+   "cooldown": 0
+  },
+  {
+   "id": "villager_03",
+   "pos": [
+    30,
+    28
+   ],
+   "level": "half",
+   "mode": "wander",
+   "hunting": false,
+   "task": null,
+   "quiet": 0,
+   "cooldown": 8.1
+  },
+  {
+   "id": "villager_04",
+   "pos": [
+    30,
+    38
+   ],
+   "level": "awake",
+   "mode": "wander",
+   "hunting": false,
+   "task": null,
+   "quiet": 14.3,
+   "cooldown": 0
+  }
+ ],
+ "marks": [
+  {
+   "t": 0.5,
+   "name": "start",
+   "file": "docs/playtest/round-3/deaf/01-start.png"
+  },
+  {
+   "t": 5.7,
+   "name": "first-shelter",
+   "file": "docs/playtest/round-3/deaf/02-first-shelter.png"
+  },
+  {
+   "t": 6,
+   "name": "induce",
+   "file": "docs/playtest/round-3/deaf/03-induce.png"
+  },
+  {
+   "t": 6.8,
+   "name": "induce",
+   "file": "docs/playtest/round-3/deaf/04-induce.png"
+  },
+  {
+   "t": 15.1,
+   "name": "give",
+   "file": "docs/playtest/round-3/deaf/05-give.png"
+  },
+  {
+   "t": 15.4,
+   "name": "induce",
+   "file": "docs/playtest/round-3/deaf/06-induce.png"
+  },
+  {
+   "t": 23.7,
+   "name": "hide-in-house",
+   "file": "docs/playtest/round-3/deaf/07-hide-in-house.png"
+  },
+  {
+   "t": 35.1,
+   "name": "induce",
+   "file": "docs/playtest/round-3/deaf/08-induce.png"
+  },
+  {
+   "t": 38.4,
+   "name": "induce",
+   "file": "docs/playtest/round-3/deaf/09-induce.png"
+  },
+  {
+   "t": 41.5,
+   "name": "broke-speaker_04",
+   "file": "docs/playtest/round-3/deaf/10-broke-speaker_04.png"
+  },
+  {
+   "t": 46.1,
+   "name": "broke-speaker_05",
+   "file": "docs/playtest/round-3/deaf/11-broke-speaker_05.png"
+  },
+  {
+   "t": 49.7,
+   "name": "back-in-house",
+   "file": "docs/playtest/round-3/deaf/12-back-in-house.png"
+  },
+  {
+   "t": 54,
+   "name": "give",
+   "file": "docs/playtest/round-3/deaf/13-give.png"
+  },
+  {
+   "t": 58.7,
+   "name": "induce",
+   "file": "docs/playtest/round-3/deaf/14-induce.png"
+  },
+  {
+   "t": 67.3,
+   "name": "induce",
+   "file": "docs/playtest/round-3/deaf/15-induce.png"
+  },
+  {
+   "t": 87.3,
+   "name": "after-awakening",
+   "file": "docs/playtest/round-3/deaf/16-after-awakening.png"
+  },
+  {
+   "t": 88.1,
+   "name": "end",
+   "file": "docs/playtest/round-3/deaf/17-end.png"
+  }
+ ]
+}

@@ -1,0 +1,41 @@
+{
+ "keepsake": {
+  "state": "won",
+  "reason": "escaped",
+  "assim": 0,
+  "stats": {
+   "time": 69,
+   "written": 3,
+   "resets": 0,
+   "awakened": 2,
+   "captures": 0,
+   "idleWrites": 1
+  }
+ },
+ "book": {
+  "state": "lost",
+  "reason": "assimilated",
+  "assim": 3,
+  "stats": {
+   "time": 100.7,
+   "written": 5,
+   "resets": 1,
+   "awakened": 0,
+   "captures": 3,
+   "idleWrites": 2
+  }
+ },
+ "deaf": {
+  "state": "lost",
+  "reason": "assimilated",
+  "assim": 3,
+  "stats": {
+   "time": 86.9,
+   "written": 4,
+   "resets": 1,
+   "awakened": 2,
+   "captures": 3,
+   "idleWrites": 1
+  }
+ }
+}

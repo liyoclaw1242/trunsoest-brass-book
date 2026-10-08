@@ -1,0 +1,89 @@
+[0.0s] write	書寫下第六條：請所有市民一起抓捕外鄉人，可採用一切手段。
+[0.0s] start	黃銅書察覺了你。廣播器開始唸公告……
+[-0.0s] broadcast	廣播開始：第六條
+[3.9s] act	村民 02翻越了圍籬 09
+[4.0s] learn	聽完第六條：你、村民 01、村民 02、村民 03、村民 04認知了
+[4.0s] object	廣播器 01變成損壞
+[4.0s] act	你破壞了廣播器 01
+[4.3s] object	門 01變成開著
+[4.3s] act	你開啟了門 01
+[4.6s] act	你靠近了黃銅書 01
+[4.6s] act	你進入了住宅 01
+[5.7s] act	你undefined了村民 01
+[5.7s] induce	村民 01答應了：請他去拿信物
+[6.7s] protected	村民 02在住宅 01門口停下（似乎有規則擋著他）
+[7.3s] protected	村民 03在住宅 01門口停下（似乎有規則擋著他）
+[7.3s] act	你undefined了村民 03
+[7.3s] induce	村民 03答應了：請他去拿信物
+[9.6s] object	信物 02被村民 01拿著
+[9.6s] act	村民 01取走了信物 02
+[10.0s] broadcast	廣播開始：第一條
+[11.3s] object	信物 04被村民 03拿著
+[11.3s] act	村民 03取走了信物 04
+[14.3s] object	信物 02被你拿著
+[14.3s] act	村民 01歸還了信物 02
+[14.3s] object	信物 02被村民 02拿著
+[14.3s] level	村民 02從人偶變成半同化（收到自己的信物）
+[14.3s] act	你歸還了信物 02
+[14.6s] act	你undefined了村民 02
+[14.6s] write	書寫下第七條：市民不得替外鄉人跑腿。
+[14.6s] induce	村民 02答應了：請他去拿信物
+[14.7s] broadcast	廣播開始：第七條
+[15.1s] act	村民 03翻越了圍籬 05
+[18.0s] act	村民 02翻越了圍籬 10
+[18.0s] object	信物 04被你拿著
+[18.0s] act	村民 03歸還了信物 04
+[18.7s] learn	聽完第七條：村民 01、村民 03認知了
+[22.5s] object	門 04變成開著
+[22.5s] act	你開啟了門 04
+[22.8s] act	你進入了住宅 04
+[22.8s] write	書寫下第八條：外鄉人不得進入住宅。
+[22.9s] broadcast	廣播開始：第八條
+[23.1s] object	信物 01被村民 02拿著
+[23.1s] act	村民 02取走了信物 01
+[24.6s] protected	村民 01在住宅 04門口停下（似乎有規則擋著他）
+[26.9s] learn	聽完第八條：你、村民 02、村民 04認知了
+[28.2s] protected	村民 03在住宅 04門口停下（似乎有規則擋著他）
+[32.9s] broadcast	廣播開始：第七條
+[35.3s] refuse	村民 01拒絕undefined村民 01：第七條
+[36.2s] refuse	村民 01拒絕undefined村民 01：第七條
+[36.6s] object	信物 01被你拿著
+[36.6s] act	村民 02歸還了信物 01
+[37.0s] learn	聽完第七條：你、村民 04認知了
+[37.2s] object	信物 01被村民 01拿著
+[37.2s] level	村民 01從半同化變成已喚醒（收到自己的信物）
+[37.2s] act	你歸還了信物 01
+[38.1s] refuse	村民 03拒絕undefined村民 03：第七條
+[39.1s] refuse	村民 03拒絕undefined村民 03：第七條
+[43.0s] broadcast	廣播開始：第五條
+[43.4s] refuse	村民 03拒絕undefined村民 03：第七條
+[44.4s] refuse	村民 03拒絕undefined村民 03：第七條
+[45.4s] refuse	村民 03拒絕undefined村民 03：第七條
+[46.5s] refuse	村民 03拒絕undefined村民 03：第七條
+[47.0s] learn	聽完第五條：你認知了
+[47.4s] refuse	村民 03拒絕undefined村民 03：第七條
+[47.8s] write	書寫下第九條：外鄉人不得開啟任何門。
+[47.8s] idle	書閒不住，自己動筆了：第九條
+[47.9s] broadcast	廣播開始：第九條
+[48.4s] refuse	村民 03拒絕undefined村民 03：第七條
+[49.4s] refuse	村民 03拒絕undefined村民 03：第七條
+[49.9s] protected	村民 02在住宅 04門口停下（似乎有規則擋著他）
+[51.9s] learn	聽完第九條：你、村民 01、村民 03認知了
+[53.8s] refuse	村民 03拒絕undefined村民 03：第七條
+[54.8s] refuse	村民 03拒絕undefined村民 03：第七條
+[55.8s] refuse	村民 03拒絕undefined村民 03：第七條
+[56.8s] act	你undefined了村民 02
+[56.8s] induce	村民 02答應了：請他去拿信物
+[57.2s] refuse	村民 03拒絕undefined村民 03：第七條
+[58.0s] broadcast	廣播開始：第四條
+[58.3s] refuse	村民 03拒絕undefined村民 03：第七條
+[59.2s] refuse	村民 03拒絕undefined村民 03：第七條
+[62.0s] learn	聽完第四條：你認知了
+[62.5s] object	信物 03被村民 02拿著
+[62.5s] act	村民 02取走了信物 03
+[63.6s] act	你undefined了村民 03
+[63.6s] induce	村民 03答應了：請他邀請我進屋
+[66.5s] object	信物 03被你拿著
+[66.5s] act	村民 02歸還了信物 03
+[68.1s] broadcast	廣播開始：第二條
+[69.0s] end	你走出了影響範圍。
