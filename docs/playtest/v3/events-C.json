@@ -1,0 +1,169 @@
+[
+ {
+  "t": 0,
+  "type": "start",
+  "text": "黃銅書察覺了你。廣播器開始唸第一條：任何存在不得離開此地。"
+ },
+ {
+  "t": 0,
+  "type": "broadcast",
+  "text": "廣播開始：第一條",
+  "no": 1
+ },
+ {
+  "t": 4,
+  "type": "learn",
+  "text": "聽完第一條：你認知了",
+  "no": 1,
+  "learned": [
+   "outsider"
+  ]
+ },
+ {
+  "t": 8.03,
+  "type": "phase",
+  "text": "天黑了。廣播器靜音，村民回家，守夜的人偶點起燈。",
+  "phase": "night"
+ },
+ {
+  "t": 9.87,
+  "type": "object",
+  "text": "門 04變成開著",
+  "id": "door_04",
+  "state": "open",
+  "pos": [
+   50,
+   70
+  ]
+ },
+ {
+  "t": 9.87,
+  "type": "act",
+  "text": "村民 04開啟了門 04",
+  "actor": "villager_04",
+  "verb": "open",
+  "target": "door_04"
+ },
+ {
+  "t": 10.25,
+  "type": "object",
+  "text": "門 03變成開著",
+  "id": "door_03",
+  "state": "open",
+  "pos": [
+   70,
+   60
+  ]
+ },
+ {
+  "t": 10.25,
+  "type": "act",
+  "text": "村民 03開啟了門 03",
+  "actor": "villager_03",
+  "verb": "open",
+  "target": "door_03"
+ },
+ {
+  "t": 10.68,
+  "type": "sleep",
+  "text": "村民 04回家睡了",
+  "actor": "villager_04"
+ },
+ {
+  "t": 11.07,
+  "type": "sleep",
+  "text": "村民 03回家睡了",
+  "actor": "villager_03"
+ },
+ {
+  "t": 11.56,
+  "type": "object",
+  "text": "門 01變成開著",
+  "id": "door_01",
+  "state": "open",
+  "pos": [
+   50,
+   50
+  ]
+ },
+ {
+  "t": 11.56,
+  "type": "act",
+  "text": "村民 01開啟了門 01",
+  "actor": "villager_01",
+  "verb": "open",
+  "target": "door_01"
+ },
+ {
+  "t": 12.39,
+  "type": "sleep",
+  "text": "村民 01回家睡了",
+  "actor": "villager_01"
+ },
+ {
+  "t": 13.31,
+  "type": "object",
+  "text": "門 05變成開著",
+  "id": "door_05",
+  "state": "open",
+  "pos": [
+   34,
+   32
+  ]
+ },
+ {
+  "t": 13.31,
+  "type": "act",
+  "text": "村民 05開啟了門 05",
+  "actor": "villager_05",
+  "verb": "open",
+  "target": "door_05"
+ },
+ {
+  "t": 14.09,
+  "type": "sleep",
+  "text": "村民 05回家睡了",
+  "actor": "villager_05"
+ },
+ {
+  "t": 20.64,
+  "type": "act",
+  "text": "你行走了",
+  "actor": "outsider",
+  "verb": "walk"
+ },
+ {
+  "t": 22.03,
+  "type": "object",
+  "text": "提燈 01被你拿著",
+  "id": "lamp_01",
+  "state": "unlit",
+  "pos": null,
+  "heldBy": "outsider"
+ },
+ {
+  "t": 22.03,
+  "type": "act",
+  "text": "你取走了提燈 01",
+  "actor": "outsider",
+  "verb": "take",
+  "target": "lamp_01"
+ },
+ {
+  "t": 22.03,
+  "type": "object",
+  "text": "提燈 01變成亮著",
+  "id": "lamp_01",
+  "state": "lit",
+  "pos": null,
+  "heldBy": "outsider"
+ },
+ {
+  "t": 22.03,
+  "type": "act",
+  "text": "你點燈了提燈 01",
+  "actor": "outsider",
+  "verb": "light",
+  "target": "lamp_01"
+ }
+]

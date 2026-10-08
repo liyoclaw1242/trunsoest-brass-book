@@ -1,0 +1,112 @@
+[
+ {
+  "name": "開場 4 秒聽公告，之後認知「不得離開」",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "沒有違規就沒人追、沒被抓",
+  "ok": true,
+  "info": "[\"wander\",\"wander\",\"wander\",\"wander\",\"wander\",\"wander\"]"
+ },
+ {
+  "name": "走出邊界 → 傳送回中心、不是贏",
+  "ok": true,
+  "info": "[50,48]"
+ },
+ {
+  "name": "事件紀錄：被送回",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "村民看見你未經邀請進屋 → 追你（witness 事件）",
+  "ok": true,
+  "info": "村民 01看見你進入，違反第二條——追你！"
+ },
+ {
+  "name": "標籤顯示「追你！」",
+  "ok": true,
+  "info": "半同化・追你！,人偶,半同化,已喚醒,半同化,人偶"
+ },
+ {
+  "name": "被追上並抓住",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "天黑：phase 事件、廣播靜音",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "半同化／已喚醒回家睡覺",
+  "ok": true,
+  "info": "[\"villager_01:true\",\"villager_02:false\",\"villager_03:true\",\"villager_04:true\",\"villager_05:true\",\"villager_06:false\"]"
+ },
+ {
+  "name": "人偶守夜持燈",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "標籤：睡著／守夜",
+  "ok": true,
+  "info": "半同化・睡著,人偶・守夜,半同化・睡著,已喚醒・睡著,半同化・睡著,人偶・守夜"
+ },
+ {
+  "name": "夜裡在守夜人視線外違規 → 沒人追（屋主在屋裡睡著看得到→這裡屋主 03 在家）",
+  "ok": true,
+  "info": "hunting="
+ },
+ {
+  "name": "拿起提燈",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "點亮提燈 → lit",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "夜間點燈寫成條文要第 2 次；第 1 次只是記一筆",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "取走晾衣繩上的衣物",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "穿上 → wearing",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "第一次穿就被寫成「外鄉人不得穿著市民的衣物」",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "偽裝：5 格外的村民認不出你是外鄉人 → 不追",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "偽裝：2 格內認得出 → 追",
+  "ok": true,
+  "info": ""
+ },
+ {
+  "name": "重置後「不得離開」重寫、你還沒聽到 → 狀態列顯示現在走得出去",
+  "ok": true,
+  "info": "unheard"
+ },
+ {
+  "name": "窗口內走出去 → 贏",
+  "ok": true,
+  "info": "{\"state\":\"won\",\"reason\":\"escaped-unheard\",\"assim\":0,\"stats\":{\"time\":4.8,\"written\":7,\"resets\":1,\"awakened\":0,\"captures\":0,\"idleWrites\":0,\"teleports\":0}}"
+ }
+]

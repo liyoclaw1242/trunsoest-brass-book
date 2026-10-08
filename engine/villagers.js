@@ -59,7 +59,7 @@ export class Villagers {
     return true;
   }
   /** 正在追。 */
-  hunts(v) { return this.mayCapture(v) && this.world.t < v.chaseUntil; }
+  hunts(v) { return v.chaseUntil > 0 && this.mayCapture(v) && this.world.t < v.chaseUntil; }
   inducible(v) { return v.level !== 'puppet' && !v.sleeping && this.world.t >= v.cooldownUntil; }
   wouldRefuse(v, kind) {
     if (!this.isCitizenForRules(v) || kind === 'invite') return [];
@@ -139,9 +139,12 @@ export class Villagers {
   passable(v, cell, from) {
     if (!this.grid.inRange(cell)) return false;
     if (this.grid.blocked(cell)) {
-      const o = [...this.world.objects.values()].find(o => o.pos && eq(o.pos, cell) && (o.type === 'door' || o.type === 'fence'));
-      if (!o) return false;
-      const c = this.world.check(v.id, o.type === 'door' ? 'open' : 'climb', o.id, {});
+      // 擋路的若只是「關著的門」或「完好的圍籬」，而且村民開得了／翻得過，才算可通過；
+      // 若還有別的東西（燈柱、推車…）壓在同一格，就是真的過不去。
+      const blockers = [...this.world.objects.values()].filter(o => o.pos && eq(o.pos, cell) && this.grid.blocked(o.pos) && ['house', 'door', 'fence', 'cart', 'lectern', 'speaker', 'notice', 'boundary', 'lamppost'].includes(o.type) && !(o.type === 'door' && o.state !== 'closed') && !(o.type === 'fence' && o.state !== 'intact'));
+      const gate = blockers.find(o => o.type === 'door' || o.type === 'fence');
+      if (!gate || blockers.length > 1) return false;
+      const c = this.world.check(v.id, gate.type === 'door' ? 'open' : 'climb', gate.id, {});
       return c.possible && !c.violates.length;
     }
     const h = this.grid.houseAt(cell);

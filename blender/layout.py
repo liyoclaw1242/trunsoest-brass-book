@@ -61,7 +61,7 @@ OBJECTS = [
     dict(type='keepsake', id='keepsake_05', pos=(64, 70), owner='villager_05'),
     dict(type='keepsake', id='keepsake_06', pos=(41, 31), owner='villager_06'),
     # 燈柱（夜間照亮 r4）
-    *[dict(type='lamppost', id=f'lamppost_{i+1:02d}', pos=p, radius=4) for i, p in enumerate([(40, 47), (60, 47), (50, 42), (50, 59), (30, 47), (70, 47), (50, 30), (50, 70)])],
+    *[dict(type='lamppost', id=f'lamppost_{i+1:02d}', pos=p, radius=4) for i, p in enumerate([(40, 47), (60, 47), (50, 42), (50, 59), (30, 47), (70, 47), (50, 30), (44, 70)])],
     # 市民衣物（晾衣繩）
     dict(type='clothes', id='clothes_01', pos=(37, 59), owner='villager_02'),
     dict(type='clothes', id='clothes_02', pos=(63, 59), owner='villager_03'),

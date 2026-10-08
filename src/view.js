@@ -17,8 +17,9 @@ export class View {
     this.scene.background = new THREE.Color(0x2a3328);
     this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 500);
     this.viewHeight = 26;              // 畫面縱向看得到幾格
-    this.scene.add(new THREE.HemisphereLight(0xdfe8ff, 0x55604a, 2.6));
-    const sun = new THREE.DirectionalLight(0xfff2dc, 3.2); sun.position.set(20, 40, 25); this.scene.add(sun);
+    this.hemi = new THREE.HemisphereLight(0xdfe8ff, 0x55604a, 2.6); this.scene.add(this.hemi);
+    this.sun = new THREE.DirectionalLight(0xfff2dc, 3.2); this.sun.position.set(20, 40, 25); this.scene.add(this.sun);
+    this.daylight = 1;
     this.nodes = new Map();           // id -> 父節點
     this.states = new Map();          // id -> { state: Object3D }
     this.roofs = new Map();           // houseId -> [Object3D]
@@ -70,6 +71,22 @@ export class View {
     this.camera.lookAt(this.camTarget);
   }
   render() { this.renderer.render(this.scene, this.camera); }
+  /** 晝夜光照：target 1 白天、0 夜晚，慢慢過渡。 */
+  setDaylight(target, dt) {
+    this.daylight += (target - this.daylight) * Math.min(1, dt * 1.5);
+    const d = this.daylight;
+    this.hemi.intensity = 0.45 + 2.15 * d; this.sun.intensity = 0.25 + 2.95 * d;
+    this.hemi.color.setRGB(0.5 + 0.37 * d, 0.55 + 0.36 * d, 0.8 + 0.2 * d);
+    this.scene.background.setRGB(0.05 + 0.11 * d, 0.07 + 0.13 * d, 0.12 + 0.04 * d);
+  }
+  /** 村道：淡色平面，從 meta.roads 的矩形畫。 */
+  roads(rects) {
+    for (const [x0, y0, x1, y1] of rects) {
+      const g = new THREE.PlaneGeometry(x1 - x0 + 1, y1 - y0 + 1); g.rotateX(-Math.PI / 2);
+      const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: 0xcdbb95, roughness: 1 }));
+      m.position.set((x0 + x1) / 2, 0.015, -(y0 + y1) / 2); this.scene.add(m);
+    }
+  }
 
   // ---- 標記（範圍圈、保護外框等，M3 會用）----
   clearMarkers() { while (this.markers.children.length) { const c = this.markers.children.pop(); c.geometry?.dispose(); } }

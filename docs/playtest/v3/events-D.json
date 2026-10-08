@@ -1,0 +1,129 @@
+[
+ {
+  "t": 0,
+  "type": "start",
+  "text": "黃銅書察覺了你。廣播器開始唸第一條：任何存在不得離開此地。"
+ },
+ {
+  "t": 0,
+  "type": "broadcast",
+  "text": "廣播開始：第一條",
+  "no": 1
+ },
+ {
+  "t": 0.73,
+  "type": "object",
+  "text": "衣物 03被你拿著",
+  "id": "clothes_03",
+  "state": "intact",
+  "pos": null,
+  "heldBy": "outsider"
+ },
+ {
+  "t": 0.73,
+  "type": "act",
+  "text": "你取走了衣物 03",
+  "actor": "outsider",
+  "verb": "take",
+  "target": "clothes_03"
+ },
+ {
+  "t": 0.73,
+  "type": "object",
+  "text": "衣物 03變成穿著",
+  "id": "clothes_03",
+  "state": "worn",
+  "pos": null,
+  "heldBy": "outsider"
+ },
+ {
+  "t": 0.73,
+  "type": "act",
+  "text": "你穿上了衣物 03",
+  "actor": "outsider",
+  "verb": "wear",
+  "target": "clothes_03"
+ },
+ {
+  "t": 0.73,
+  "type": "write",
+  "text": "書寫下第六條：外鄉人不得穿著市民的衣物。",
+  "no": 6
+ },
+ {
+  "t": 1.03,
+  "type": "write",
+  "text": "書寫下第七條：外鄉人不得開啟任何門。",
+  "no": 7
+ },
+ {
+  "t": 1.03,
+  "type": "object",
+  "text": "門 05變成開著",
+  "id": "door_05",
+  "state": "open",
+  "pos": [
+   34,
+   32
+  ]
+ },
+ {
+  "t": 1.03,
+  "type": "act",
+  "text": "你開啟了門 05",
+  "actor": "outsider",
+  "verb": "open",
+  "target": "door_05"
+ },
+ {
+  "t": 1.55,
+  "type": "object",
+  "text": "門 05變成開著",
+  "id": "door_05",
+  "state": "open",
+  "pos": [
+   34,
+   32
+  ]
+ },
+ {
+  "t": 1.55,
+  "type": "act",
+  "text": "你開啟了門 05",
+  "actor": "outsider",
+  "verb": "open",
+  "target": "door_05"
+ },
+ {
+  "t": 1.55,
+  "type": "witness",
+  "text": "村民 05看見你開啟，違反第七條——追你！",
+  "actor": "villager_05",
+  "verb": "open",
+  "rules": [
+   7
+  ]
+ },
+ {
+  "t": 2.22,
+  "type": "act",
+  "text": "村民 05抓捕了外鄉人",
+  "actor": "villager_05",
+  "verb": "capture",
+  "target": "outsider"
+ },
+ {
+  "t": 2.22,
+  "type": "assim",
+  "text": "同化度 0→1（被抓）",
+  "from": 0,
+  "to": 1,
+  "why": "captured"
+ },
+ {
+  "t": 2.22,
+  "type": "captured",
+  "text": "你被村民 05抓住了，送回村子中心",
+  "actor": "villager_05"
+ }
+]

@@ -1,0 +1,122 @@
+[
+ {
+  "t": 0,
+  "type": "start",
+  "text": "黃銅書察覺了你。廣播器開始唸第一條：任何存在不得離開此地。"
+ },
+ {
+  "t": 0,
+  "type": "broadcast",
+  "text": "廣播開始：第一條",
+  "no": 1
+ },
+ {
+  "t": 4.03,
+  "type": "learn",
+  "text": "聽完第一條：你認知了",
+  "no": 1,
+  "learned": [
+   "outsider"
+  ]
+ },
+ {
+  "t": 6.2,
+  "type": "violation",
+  "text": "你違反了第一條（離開）",
+  "actor": "outsider",
+  "verb": "leave",
+  "rules": [
+   1
+  ]
+ },
+ {
+  "t": 6.2,
+  "type": "act",
+  "text": "你離開了",
+  "actor": "outsider",
+  "verb": "leave"
+ },
+ {
+  "t": 6.2,
+  "type": "teleport",
+  "text": "你走出了此地的邊界，黃銅書把你送回了中心。",
+  "to": [
+   50,
+   48
+  ]
+ },
+ {
+  "t": 6.75,
+  "type": "act",
+  "text": "你行走了",
+  "actor": "outsider",
+  "verb": "walk"
+ },
+ {
+  "t": 7,
+  "type": "object",
+  "text": "門 01變成開著",
+  "id": "door_01",
+  "state": "open",
+  "pos": [
+   50,
+   50
+  ]
+ },
+ {
+  "t": 7,
+  "type": "act",
+  "text": "你開啟了門 01",
+  "actor": "outsider",
+  "verb": "open",
+  "target": "door_01"
+ },
+ {
+  "t": 7.33,
+  "type": "act",
+  "text": "你進入了住宅 01",
+  "actor": "outsider",
+  "verb": "enter",
+  "target": "house_01"
+ },
+ {
+  "t": 7.33,
+  "type": "witness",
+  "text": "村民 01看見你進入，違反第二條——追你！",
+  "actor": "villager_01",
+  "verb": "enter",
+  "rules": [
+   2
+  ]
+ },
+ {
+  "t": 7.33,
+  "type": "act",
+  "text": "你靠近了黃銅書 01",
+  "actor": "outsider",
+  "verb": "approach",
+  "target": "book_01"
+ },
+ {
+  "t": 9.72,
+  "type": "act",
+  "text": "村民 01抓捕了外鄉人",
+  "actor": "villager_01",
+  "verb": "capture",
+  "target": "outsider"
+ },
+ {
+  "t": 9.72,
+  "type": "assim",
+  "text": "同化度 0→1（被抓）",
+  "from": 0,
+  "to": 1,
+  "why": "captured"
+ },
+ {
+  "t": 9.72,
+  "type": "captured",
+  "text": "你被村民 01抓住了，送回村子中心",
+  "actor": "villager_01"
+ }
+]

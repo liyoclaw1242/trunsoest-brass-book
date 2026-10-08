@@ -25,6 +25,12 @@ for (const o of scene) {
     if (h && (h.pos[0] !== o.pos[0] || h.pos[1] - 2 !== o.pos[1])) errors.push(`${o.id}: 不在 ${o.parent} 的門洞 (${h.pos[0]}, ${h.pos[1] - 2})`);
   }
 }
+// 重疊檢查：會擋路的物件不該兩個疊在同一格（門與住宅例外——門本來就在住宅門洞）
+const BLOCKERS = new Set(['lectern', 'speaker', 'notice', 'boundary', 'lamppost', 'cart', 'fence']);
+const atCell = new Map();
+for (const o of scene) { if (!o.pos || !BLOCKERS.has(o.type)) continue; const k = o.pos.join(','); (atCell.get(k) || atCell.set(k, []).get(k)).push(o.id); }
+for (const [k, ids] of atCell) if (ids.length > 1) errors.push(`格子 (${k}) 有多個擋路物件重疊：${ids.join('、')}`);
+for (const o of scene) { if (o.type !== 'door' || !o.pos) continue; const k = o.pos.join(','); if (atCell.has(k)) errors.push(`門 ${o.id} 和擋路物件 ${atCell.get(k).join('、')} 同格`); }
 const count = t => scene.filter(o => o.type === t).length;
 const expect = { book: [1, 1], lectern: [1, 1], speaker: [4, 10], notice: [2, 4], house: [4, 8], fence: [6, 30], cart: [2, 4], boundary: [8, 20], villager: [3, 8], outsider: [1, 1] };
 for (const [t, [lo, hi]] of Object.entries(expect)) { const n = count(t); if (n < lo || n > hi) errors.push(`${t} 數量 ${n}，規格是 ${lo}–${hi}`); }

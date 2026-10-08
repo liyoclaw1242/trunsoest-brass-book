@@ -31,6 +31,7 @@ docs/       設計、規格、計畫、changelog、open-questions、playtest 紀
 - `node tools/playtest.js [--route keepsake|deaf] [--out dir]`：整局自動試玩，輸出事件紀錄、規則書紀錄、截圖。
 - `node tools/playtest-m2.js`…`m5.js`：各里程碑的驗收腳本。
 - `node tools/check-sprint.js [N]`：「什麼都不做就贏」檢查（開局直奔、被抓後趁免疫直奔各 N 次）。
+- `node tools/playtest-v3.js`：原型三驗收（晝夜、目擊追逐、不得離開＝傳送、偽裝、提燈、重置窗口）。網址參數另有 `&day=`、`&night=`（秒）、`&noidle`。原型三的設計決定見 `docs/design-v3.md`、計畫 `docs/plan-v3.md`、規則候選 `docs/rules-brainstorm.md`。
 - 怎麼跑、網址參數、輸出格式見 `docs/playtest/HOW_TO_RUN.md`。
 
 ## 工作規則
