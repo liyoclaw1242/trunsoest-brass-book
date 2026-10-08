@@ -1,0 +1,6 @@
+第1條	此地不為外界所知。	認知：outsider,villager_01,villager_02,villager_03,villager_04
+第2條	不得傷害他人。	認知：outsider,villager_01,villager_02,villager_03,villager_04
+第3條	未經邀請不得進入他人住宅。	認知：outsider,villager_01,villager_02,villager_03,villager_04
+第4條	受市民邀請者，得進入該市民的住宅。	認知：outsider,villager_01,villager_02,villager_03,villager_04
+第5條	請所有市民一起抓捕外鄉人，可採用一切手段。	認知：outsider,villager_01,villager_02,villager_03,villager_04
+第6條	外鄉人不得開啟任何門。	認知：outsider,villager_01,villager_02,villager_03,villager_04	漏洞：只禁止「開啟」，沒說不能破壞門；也沒禁止市民開門（開著的門走進去就好）。

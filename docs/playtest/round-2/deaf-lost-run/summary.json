@@ -1,0 +1,130 @@
+{
+ "route": "deaf",
+ "state": "lost",
+ "reason": "assimilated",
+ "stats": {
+  "time": 36.6,
+  "written": 2,
+  "resets": 0,
+  "awakened": 1,
+  "captures": 3,
+  "idleWrites": 0
+ },
+ "assim": 3,
+ "villagers": [
+  {
+   "id": "villager_01",
+   "pos": [
+    28,
+    28
+   ],
+   "level": "half",
+   "mode": "task",
+   "hunting": false,
+   "task": "fetch",
+   "quiet": 10.3,
+   "cooldown": 0
+  },
+  {
+   "id": "villager_02",
+   "pos": [
+    28,
+    29
+   ],
+   "level": "half",
+   "mode": "wander",
+   "hunting": false,
+   "task": null,
+   "quiet": 10.3,
+   "cooldown": 0
+  },
+  {
+   "id": "villager_03",
+   "pos": [
+    30,
+    28
+   ],
+   "level": "half",
+   "mode": "wander",
+   "hunting": false,
+   "task": null,
+   "quiet": 23.6,
+   "cooldown": 17.7
+  },
+  {
+   "id": "villager_04",
+   "pos": [
+    29,
+    41
+   ],
+   "level": "awake",
+   "mode": "wander",
+   "hunting": false,
+   "task": null,
+   "quiet": 0,
+   "cooldown": 0
+  }
+ ],
+ "marks": [
+  {
+   "t": 0.5,
+   "name": "start",
+   "file": "docs/playtest/round-2/deaf/01-start.png"
+  },
+  {
+   "t": 5.7,
+   "name": "hide-in-house",
+   "file": "docs/playtest/round-2/deaf/02-hide-in-house.png"
+  },
+  {
+   "t": 6.5,
+   "name": "induce",
+   "file": "docs/playtest/round-2/deaf/03-induce.png"
+  },
+  {
+   "t": 14,
+   "name": "broke-speaker_06",
+   "file": "docs/playtest/round-2/deaf/04-broke-speaker_06.png"
+  },
+  {
+   "t": 15.3,
+   "name": "induce",
+   "file": "docs/playtest/round-2/deaf/05-induce.png"
+  },
+  {
+   "t": 16.5,
+   "name": "give",
+   "file": "docs/playtest/round-2/deaf/06-give.png"
+  },
+  {
+   "t": 20.5,
+   "name": "broke-speaker_02",
+   "file": "docs/playtest/round-2/deaf/07-broke-speaker_02.png"
+  },
+  {
+   "t": 27.3,
+   "name": "broke-speaker_03",
+   "file": "docs/playtest/round-2/deaf/08-broke-speaker_03.png"
+  },
+  {
+   "t": 31.6,
+   "name": "back-in-house",
+   "file": "docs/playtest/round-2/deaf/09-back-in-house.png"
+  },
+  {
+   "t": 36.6,
+   "name": "induce",
+   "file": "docs/playtest/round-2/deaf/10-induce.png"
+  },
+  {
+   "t": 36.8,
+   "name": "after-awakening",
+   "file": "docs/playtest/round-2/deaf/11-after-awakening.png"
+  },
+  {
+   "t": 37.6,
+   "name": "end",
+   "file": "docs/playtest/round-2/deaf/12-end.png"
+  }
+ ]
+}

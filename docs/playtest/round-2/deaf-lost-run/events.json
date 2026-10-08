@@ -1,0 +1,509 @@
+[
+ {
+  "t": 0,
+  "type": "write",
+  "text": "書寫下第五條：請所有市民一起抓捕外鄉人，可採用一切手段。",
+  "no": 5
+ },
+ {
+  "t": 0,
+  "type": "start",
+  "text": "黃銅書察覺了你。廣播器開始唸公告……"
+ },
+ {
+  "t": 0,
+  "type": "broadcast",
+  "text": "廣播開始：第五條",
+  "no": 5
+ },
+ {
+  "t": 4.03,
+  "type": "learn",
+  "text": "聽完第五條：你、村民 01、村民 02、村民 03、村民 04認知了",
+  "no": 5,
+  "learned": [
+   "outsider",
+   "villager_01",
+   "villager_02",
+   "villager_03",
+   "villager_04"
+  ]
+ },
+ {
+  "t": 4.2,
+  "type": "object",
+  "text": "廣播器 01變成損壞",
+  "id": "speaker_01",
+  "state": "broken",
+  "pos": [
+   30,
+   27
+  ]
+ },
+ {
+  "t": 4.2,
+  "type": "act",
+  "text": "你破壞了廣播器 01",
+  "actor": "outsider",
+  "verb": "break",
+  "target": "speaker_01"
+ },
+ {
+  "t": 4.49,
+  "type": "object",
+  "text": "門 01變成開著",
+  "id": "door_01",
+  "state": "open",
+  "pos": [
+   30,
+   30
+  ]
+ },
+ {
+  "t": 4.49,
+  "type": "act",
+  "text": "你開啟了門 01",
+  "actor": "outsider",
+  "verb": "open",
+  "target": "door_01"
+ },
+ {
+  "t": 4.81,
+  "type": "act",
+  "text": "你靠近了黃銅書 01",
+  "actor": "outsider",
+  "verb": "approach",
+  "target": "book_01"
+ },
+ {
+  "t": 4.81,
+  "type": "act",
+  "text": "你進入了住宅 01",
+  "actor": "outsider",
+  "verb": "enter",
+  "target": "house_01"
+ },
+ {
+  "t": 5.45,
+  "type": "protected",
+  "text": "村民 03在住宅 01門口停下（似乎有規則擋著他）",
+  "actor": "villager_03",
+  "house": "house_01",
+  "rules": [
+   3
+  ]
+ },
+ {
+  "t": 5.98,
+  "type": "protected",
+  "text": "村民 02在住宅 01門口停下（似乎有規則擋著他）",
+  "actor": "villager_02",
+  "house": "house_01",
+  "rules": [
+   3
+  ]
+ },
+ {
+  "t": 6.21,
+  "type": "induce",
+  "text": "村民 01答應了：請他去拿信物",
+  "actor": "villager_01",
+  "kind": "fetch"
+ },
+ {
+  "t": 10.06,
+  "type": "broadcast",
+  "text": "廣播開始：第四條",
+  "no": 4
+ },
+ {
+  "t": 10.2,
+  "type": "object",
+  "text": "信物 02被村民 01拿著",
+  "id": "keepsake_02",
+  "state": "intact",
+  "pos": null,
+  "heldBy": "villager_01"
+ },
+ {
+  "t": 10.2,
+  "type": "act",
+  "text": "村民 01取走了信物 02",
+  "actor": "villager_01",
+  "verb": "take",
+  "target": "keepsake_02"
+ },
+ {
+  "t": 13.73,
+  "type": "object",
+  "text": "廣播器 06變成損壞",
+  "id": "speaker_06",
+  "state": "broken",
+  "pos": [
+   30,
+   17
+  ]
+ },
+ {
+  "t": 13.73,
+  "type": "act",
+  "text": "你破壞了廣播器 06",
+  "actor": "outsider",
+  "verb": "break",
+  "target": "speaker_06"
+ },
+ {
+  "t": 13.73,
+  "type": "write",
+  "text": "書寫下第六條：廣播器不得被破壞。",
+  "no": 6
+ },
+ {
+  "t": 13.9,
+  "type": "act",
+  "text": "村民 03翻越了圍籬 04",
+  "actor": "villager_03",
+  "verb": "climb",
+  "target": "fence_04"
+ },
+ {
+  "t": 14.12,
+  "type": "broadcast",
+  "text": "廣播開始：第六條",
+  "no": 6
+ },
+ {
+  "t": 14.39,
+  "type": "act",
+  "text": "村民 01翻越了圍籬 04",
+  "actor": "villager_01",
+  "verb": "climb",
+  "target": "fence_04"
+ },
+ {
+  "t": 14.65,
+  "type": "act",
+  "text": "村民 02翻越了圍籬 04",
+  "actor": "villager_02",
+  "verb": "climb",
+  "target": "fence_04"
+ },
+ {
+  "t": 15.12,
+  "type": "induce",
+  "text": "村民 03答應了：請他去拿信物",
+  "actor": "villager_03",
+  "kind": "fetch"
+ },
+ {
+  "t": 16.25,
+  "type": "object",
+  "text": "信物 02被你拿著",
+  "id": "keepsake_02",
+  "state": "intact",
+  "pos": null,
+  "heldBy": "outsider"
+ },
+ {
+  "t": 16.25,
+  "type": "act",
+  "text": "村民 01歸還了信物 02",
+  "actor": "villager_01",
+  "verb": "give",
+  "target": "keepsake_02"
+ },
+ {
+  "t": 16.29,
+  "type": "object",
+  "text": "信物 02被村民 02拿著",
+  "id": "keepsake_02",
+  "state": "intact",
+  "pos": null,
+  "heldBy": "villager_02"
+ },
+ {
+  "t": 16.29,
+  "type": "level",
+  "text": "村民 02從人偶變成半同化（收到自己的信物）",
+  "actor": "villager_02",
+  "from": "puppet",
+  "to": "half",
+  "why": "keepsake"
+ },
+ {
+  "t": 16.29,
+  "type": "act",
+  "text": "你歸還了信物 02",
+  "actor": "outsider",
+  "verb": "give",
+  "target": "keepsake_02"
+ },
+ {
+  "t": 16.33,
+  "type": "act",
+  "text": "村民 02抓捕了外鄉人",
+  "actor": "villager_02",
+  "verb": "capture",
+  "target": "outsider"
+ },
+ {
+  "t": 16.33,
+  "type": "assim",
+  "text": "同化度 0→1（被抓）",
+  "from": 0,
+  "to": 1,
+  "why": "captured"
+ },
+ {
+  "t": 16.33,
+  "type": "captured",
+  "text": "你被村民 02抓住了，送回村子中心",
+  "actor": "villager_02"
+ },
+ {
+  "t": 18.16,
+  "type": "learn",
+  "text": "聽完第六條：村民 04認知了",
+  "no": 6,
+  "learned": [
+   "villager_04"
+  ]
+ },
+ {
+  "t": 19.05,
+  "type": "object",
+  "text": "信物 04被村民 03拿著",
+  "id": "keepsake_04",
+  "state": "intact",
+  "pos": null,
+  "heldBy": "villager_03"
+ },
+ {
+  "t": 19.05,
+  "type": "act",
+  "text": "村民 03取走了信物 04",
+  "actor": "villager_03",
+  "verb": "take",
+  "target": "keepsake_04"
+ },
+ {
+  "t": 20.24,
+  "type": "object",
+  "text": "廣播器 02變成損壞",
+  "id": "speaker_02",
+  "state": "broken",
+  "pos": [
+   17,
+   30
+  ]
+ },
+ {
+  "t": 20.24,
+  "type": "act",
+  "text": "你破壞了廣播器 02",
+  "actor": "outsider",
+  "verb": "break",
+  "target": "speaker_02"
+ },
+ {
+  "t": 23.55,
+  "type": "act",
+  "text": "村民 02翻越了圍籬 01",
+  "actor": "villager_02",
+  "verb": "climb",
+  "target": "fence_01"
+ },
+ {
+  "t": 23.99,
+  "type": "act",
+  "text": "村民 02翻越了圍籬 02",
+  "actor": "villager_02",
+  "verb": "climb",
+  "target": "fence_02"
+ },
+ {
+  "t": 24.17,
+  "type": "broadcast",
+  "text": "廣播開始：第四條",
+  "no": 4
+ },
+ {
+  "t": 24.45,
+  "type": "act",
+  "text": "村民 02翻越了圍籬 03",
+  "actor": "villager_02",
+  "verb": "climb",
+  "target": "fence_03"
+ },
+ {
+  "t": 24.89,
+  "type": "act",
+  "text": "村民 02翻越了圍籬 04",
+  "actor": "villager_02",
+  "verb": "climb",
+  "target": "fence_04"
+ },
+ {
+  "t": 25.33,
+  "type": "act",
+  "text": "村民 02翻越了圍籬 05",
+  "actor": "villager_02",
+  "verb": "climb",
+  "target": "fence_05"
+ },
+ {
+  "t": 25.78,
+  "type": "act",
+  "text": "村民 02翻越了圍籬 06",
+  "actor": "villager_02",
+  "verb": "climb",
+  "target": "fence_06"
+ },
+ {
+  "t": 27.06,
+  "type": "object",
+  "text": "廣播器 03變成損壞",
+  "id": "speaker_03",
+  "state": "broken",
+  "pos": [
+   40,
+   30
+  ]
+ },
+ {
+  "t": 27.06,
+  "type": "act",
+  "text": "你破壞了廣播器 03",
+  "actor": "outsider",
+  "verb": "break",
+  "target": "speaker_03"
+ },
+ {
+  "t": 30.75,
+  "type": "act",
+  "text": "你靠近了黃銅書 01",
+  "actor": "outsider",
+  "verb": "approach",
+  "target": "book_01"
+ },
+ {
+  "t": 30.75,
+  "type": "act",
+  "text": "你進入了住宅 01",
+  "actor": "outsider",
+  "verb": "enter",
+  "target": "house_01"
+ },
+ {
+  "t": 30.75,
+  "type": "write",
+  "text": "書寫下第七條：外鄉人不得進入住宅。",
+  "no": 7
+ },
+ {
+  "t": 30.8,
+  "type": "broadcast",
+  "text": "廣播開始：第七條",
+  "no": 7
+ },
+ {
+  "t": 32.54,
+  "type": "act",
+  "text": "村民 03翻越了圍籬 05",
+  "actor": "villager_03",
+  "verb": "climb",
+  "target": "fence_05"
+ },
+ {
+  "t": 33.11,
+  "type": "act",
+  "text": "村民 01抓捕了外鄉人",
+  "actor": "villager_01",
+  "verb": "capture",
+  "target": "outsider"
+ },
+ {
+  "t": 33.11,
+  "type": "assim",
+  "text": "同化度 1→2（被抓）",
+  "from": 1,
+  "to": 2,
+  "why": "captured"
+ },
+ {
+  "t": 33.11,
+  "type": "captured",
+  "text": "你被村民 01抓住了，送回村子中心",
+  "actor": "villager_01"
+ },
+ {
+  "t": 34.83,
+  "type": "learn",
+  "text": "聽完第七條：村民 04認知了",
+  "no": 7,
+  "learned": [
+   "villager_04"
+  ]
+ },
+ {
+  "t": 35.07,
+  "type": "object",
+  "text": "信物 04被你拿著",
+  "id": "keepsake_04",
+  "state": "intact",
+  "pos": null,
+  "heldBy": "outsider"
+ },
+ {
+  "t": 35.07,
+  "type": "act",
+  "text": "村民 03歸還了信物 04",
+  "actor": "villager_03",
+  "verb": "give",
+  "target": "keepsake_04"
+ },
+ {
+  "t": 36.35,
+  "type": "induce",
+  "text": "村民 01答應了：請他去拿信物",
+  "actor": "villager_01",
+  "kind": "fetch"
+ },
+ {
+  "t": 36.6,
+  "type": "act",
+  "text": "村民 03抓捕了外鄉人",
+  "actor": "villager_03",
+  "verb": "capture",
+  "target": "outsider"
+ },
+ {
+  "t": 36.6,
+  "type": "assim",
+  "text": "同化度 2→3（被抓）",
+  "from": 2,
+  "to": 3,
+  "why": "captured"
+ },
+ {
+  "t": 36.6,
+  "type": "end",
+  "text": "你被同化了。",
+  "state": "lost",
+  "reason": "assimilated",
+  "stats": {
+   "time": 36.6,
+   "written": 2,
+   "resets": 0,
+   "awakened": 1,
+   "captures": 3,
+   "idleWrites": 0
+  }
+ },
+ {
+  "t": 36.6,
+  "type": "captured",
+  "text": "你被村民 03抓住了，送回村子中心",
+  "actor": "villager_03"
+ }
+]

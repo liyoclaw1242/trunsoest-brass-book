@@ -1,0 +1,15 @@
+{
+ "deaf": {
+  "state": "lost",
+  "reason": "assimilated",
+  "assim": 3,
+  "stats": {
+   "time": 36.3,
+   "written": 2,
+   "resets": 0,
+   "awakened": 1,
+   "captures": 3,
+   "idleWrites": 0
+  }
+ }
+}
