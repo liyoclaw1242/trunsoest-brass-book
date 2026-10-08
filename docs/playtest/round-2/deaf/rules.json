@@ -10,6 +10,7 @@
   "verb": null,
   "who": "any",
   "knownBy": [
+   "outsider",
    "villager_01",
    "villager_02",
    "villager_03",
@@ -88,6 +89,21 @@
  },
  {
   "no": 6,
+  "key": "house-outsider",
+  "text": "外鄉人不得進入住宅。",
+  "hole": "和「受邀者得進入」衝突，裁決寫下前不追究。",
+  "void": false,
+  "dead": false,
+  "mode": "forbid",
+  "verb": "enter",
+  "who": "outsider",
+  "knownBy": [
+   "outsider",
+   "villager_04"
+  ]
+ },
+ {
+  "no": 7,
   "key": "speaker-break",
   "text": "廣播器不得被破壞。",
   "hole": "沒聽到的人不受約束；沒說不能搬走。",
@@ -97,19 +113,8 @@
   "verb": "break",
   "who": "any",
   "knownBy": [
-   "villager_04"
+   "villager_02",
+   "villager_03"
   ]
- },
- {
-  "no": 7,
-  "key": "house-outsider",
-  "text": "外鄉人不得進入住宅。",
-  "hole": "和「受邀者得進入」衝突，裁決寫下前不追究。",
-  "void": false,
-  "dead": false,
-  "mode": "forbid",
-  "verb": "enter",
-  "who": "outsider",
-  "knownBy": []
  }
 ]

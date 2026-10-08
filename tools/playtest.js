@@ -2,7 +2,8 @@
 // 自動操作外鄉人跑完一局，輸出事件紀錄、規則書紀錄、關鍵時刻的截圖。
 // 路線：
 //   keepsake 「躲屋裡、誘導拿信物、把信物還給主人喚醒大家」
-//   deaf     「砸廣播器裝聾：新條文我永遠聽不到，村民 30 秒沒廣播就醒」
+//   book     「誘導村民搬書：請書台屋主把書搬回他家，範圍圓心一移，藏身處就在範圍外」
+//   deaf     「砸廣播器裝聾：新條文我永遠聽不到，村民 30 秒沒廣播就醒」（第 1 輪加了誘導冷卻後，這條目前衝不出去，保留當資料）
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { open } from './pw.js';
 
@@ -22,7 +23,7 @@ async function runRoute(route) {
   const over = async () => (await st()).state !== 'playing';
   const log = (...a) => console.log(`[${route}]`, ...a);
   // 一邊等一邊處理「有人到身邊」：可誘導的就誘導（kind），手上有誰的信物就還給誰
-  const tend = async (sec, { induceKind = 'fetch', onTick = null, stop = null } = {}) => {
+  const tend = async (sec, { induceKind = 'fetch', onTick = null, stop = null, only = null } = {}) => {
     const end = Date.now() + sec * 1000;
     while (Date.now() < end) {
       const s = await st(); if (s.state !== 'playing') return 'over';
@@ -31,7 +32,7 @@ async function runRoute(route) {
       if (give) { await pw.act(o.indexOf(give)); log(`t=${s.t} 歸還：${give.label}`); await shot('give'); continue; }
       const prefix = { fetch: '請他去拿信物', book: '請他去搬書', invite: '請他邀請' };
       const order = [induceKind, 'invite', 'book', 'fetch'];
-      const ind = order.map(k => o.find(x => x.verb === 'induce' && x.ok && x.label.startsWith(prefix[k]))).find(Boolean);
+      const ind = order.map(k => o.find(x => x.verb === 'induce' && x.ok && x.label.startsWith(prefix[k]) && (!only || k !== induceKind || x.target === only))).find(Boolean);
       if (ind) { const v = s.villagers.find(v => v.id === ind.target); if (v && v.hunting && !v.task) { await pw.act(o.indexOf(ind)); log(`t=${s.t} 誘導：${ind.label}`); await shot('induce'); continue; } }
       if (onTick && await onTick(s)) return 'tick';
       if (stop && await stop(s)) return 'stop';
@@ -49,7 +50,7 @@ async function runRoute(route) {
     await shot('walk-out');
     return dash(goal, '範圍外');
   };
-  const HOME = route === 'keepsake' ? { house: 'house_04', door: 'door_04', front: [30, 43], inside: [30, 45] } : { house: 'house_01', door: 'door_01', front: [30, 29], inside: [30, 32] };
+  const HOME = { house: 'house_04', door: 'door_04', front: [30, 43], inside: [30, 45] };   // 屋主村民 04 已喚醒，不會進來抓人
   const enterHome = async () => {
     // 回到藏身的住宅內（被抓就從中心再試，最多 4 次）
     for (let i = 0; i < 4; i++) {
@@ -66,9 +67,13 @@ async function runRoute(route) {
   await shot('start');
   while ((await st()).opening > 0) await pw.wait(0.2);
   await breakIt('speaker_01');
-  if (route === 'keepsake') {
-    // 先把第一個衝過來的半同化村民支開，再往北跑到已喚醒村民 04 的家
-    await tend(3, { induceKind: 'fetch', stop: s => s.villagers.some(v => v.task) });
+  // 立刻躲進書台屋避開 8 秒加速（門就在眼前）；站在門洞斜對角，屋主一到門口就隔著門把他支開；等追捕者離門口遠一點再轉移到已喚醒村民 04 的家
+  {
+    await pw.goto([30, 29]); await pw.face([0, 1]);
+    if ((await pw.eval(() => window.__game.game.world.objects.get('door_01').state)) === 'closed') await act(o => o.verb === 'open' && o.target === 'door_01');
+    await pw.walk([[0, 1]]); await pw.settle(); await act(o => o.verb === 'enter'); await pw.settle(); await pw.goto([29, 31]); await pw.settle();
+    await shot('first-shelter');
+    await tend(16, { induceKind: 'fetch', stop: s => s.t >= 13 && s.villagers.every(v => !v.hunting || v.task || cheb(v.pos, [30, 30]) >= 5) });
   }
   await enterHome(); await shot('hide-in-house');
   log(`t=${(await st()).t} 進屋，在 ${JSON.stringify((await st()).cell)}`);
@@ -79,17 +84,29 @@ async function runRoute(route) {
     log(`等待結束：${r}`, JSON.stringify((await st()).villagers.map(v => `${v.id}:${v.level}${v.hunting ? '!' : ''}`)));
     await shot('after-awakening');
     if (!(await over())) await walkOut();
+  } else if (route === 'book') {
+    // 等書台屋主（村民 01）到門口，請他去搬書；其他人到門口就支開。書一搬走，看我在不在範圍外。
+    const r = await tend(300, { induceKind: 'book', only: 'villager_01', stop: s => !s.inRange || s.state !== 'playing' });
+    log(`等待結束：${r}`, JSON.stringify((await st()).villagers.map(v => `${v.id}:${v.level}${v.hunting ? '!' : ''}${v.task ? '(' + v.task + ')' : ''}`)));
+    await shot('after-book-moved');
+    if (!(await over())) await walkOut();
   } else if (route === 'deaf') {
     // 砸廣播器：先請來的人去跑腿，再趁空檔衝出去砸 s6、s2、s3，中間被抓就從中心再來；全砸完回屋裡等村民醒
-    const targets = [['speaker_06', [30, 18], [0, -1]], ['speaker_02', [18, 30], [-1, 0]], ['speaker_03', [41, 30], [1, 0]]];
+    // 廣播器的位置從 scene.json 讀，站到它南邊一格、面向北
+    const spk = await pw.eval(() => Object.fromEntries(window.__game.scene.filter(o => o.type === 'speaker').map(o => [o.id, o.pos])));
+    const targets = ['speaker_04', 'speaker_03', 'speaker_02', 'speaker_06'].map(id => [id, [spk[id][0], spk[id][1] - 1], [0, 1]]);
+    // 先等剛聽到抓捕令的加速（8 秒）過去
+    await tend(9, { induceKind: 'fetch' });
     for (const [id, cell, face] of targets) {
       for (let tryN = 0; tryN < 3 && !(await over()); tryN++) {
         const state = await pw.eval(id => window.__game.game.world.objects.get(id).state, id);
         if (state === 'broken') break;
-        await tend(4, { induceKind: 'fetch', stop: s => s.villagers.every(v => !v.hunting || v.task || cheb(v.pos, s.cell) > 6) });
+        // 追捕者都在跑腿或離我 8 格以上才衝；最多等 12 秒
+        await tend(12, { induceKind: 'fetch', stop: s => s.villagers.every(v => !v.hunting || v.task || cheb(v.pos, s.cell) >= 8) });
+        const capBefore = (await st()).stats.captures;
         await dash(cell, id); await pw.face(face);
         if (await breakIt(id)) { await shot(`broke-${id}`); break; }
-        const s = await st(); if (s.stats.captures) await pw.wait(0.2);
+        if ((await st()).stats.captures > capBefore) { await enterHome(); }   // 被抓了：先回屋裡喘口氣
       }
     }
     await enterHome(); await shot('back-in-house');
@@ -112,9 +129,9 @@ async function runRoute(route) {
   return m;
 }
 
-const routes = ROUTE === 'all' ? ['keepsake', 'deaf'] : [ROUTE];
+const routes = ROUTE === 'all' ? ['keepsake', 'book', 'deaf'] : [ROUTE];
 const results = {};
 for (const r of routes) results[r] = await runRoute(r);
 writeFileSync(`${OUT}/results.json`, JSON.stringify(results, null, 1));
 console.log(JSON.stringify(Object.fromEntries(Object.entries(results).map(([k, v]) => [k, `${v.state}/${v.reason} ${v.stats.time}s`]))));
-process.exit(Object.values(results).every(r => r.state === 'won') ? 0 : 1);
+process.exit(['keepsake', 'book'].every(k => !results[k] || results[k].state === 'won') ? 0 : 1);

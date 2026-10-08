@@ -3,45 +3,19 @@
  "state": "won",
  "reason": "escaped",
  "stats": {
-  "time": 92.1,
+  "time": 64.5,
   "written": 1,
   "resets": 0,
-  "awakened": 2,
+  "awakened": 3,
   "captures": 1,
-  "idleWrites": 1
+  "idleWrites": 0
  },
  "assim": 1,
  "villagers": [
   {
    "id": "villager_01",
    "pos": [
-    32,
-    33
-   ],
-   "level": "half",
-   "mode": "task",
-   "hunting": true,
-   "task": "invite",
-   "quiet": 0,
-   "cooldown": 0
-  },
-  {
-   "id": "villager_02",
-   "pos": [
-    27,
-    37
-   ],
-   "level": "half",
-   "mode": "task",
-   "hunting": true,
-   "task": "fetch",
-   "quiet": 4.1,
-   "cooldown": 0
-  },
-  {
-   "id": "villager_03",
-   "pos": [
-    40,
+    33,
     34
    ],
    "level": "awake",
@@ -49,12 +23,38 @@
    "hunting": false,
    "task": null,
    "quiet": 0,
+   "cooldown": 0.7
+  },
+  {
+   "id": "villager_02",
+   "pos": [
+    37,
+    31
+   ],
+   "level": "half",
+   "mode": "task",
+   "hunting": true,
+   "task": "fetch",
+   "quiet": 0,
    "cooldown": 0
+  },
+  {
+   "id": "villager_03",
+   "pos": [
+    36,
+    43
+   ],
+   "level": "awake",
+   "mode": "wander",
+   "hunting": false,
+   "task": null,
+   "quiet": 0,
+   "cooldown": 14.1
   },
   {
    "id": "villager_04",
    "pos": [
-    32,
+    28,
     41
    ],
    "level": "awake",
@@ -72,64 +72,74 @@
    "file": "docs/playtest/round-2/keepsake/01-start.png"
   },
   {
-   "t": 5.8,
+   "t": 5.5,
+   "name": "first-shelter",
+   "file": "docs/playtest/round-2/keepsake/02-first-shelter.png"
+  },
+  {
+   "t": 6.9,
    "name": "induce",
-   "file": "docs/playtest/round-2/keepsake/02-induce.png"
+   "file": "docs/playtest/round-2/keepsake/03-induce.png"
   },
   {
-   "t": 13.3,
-   "name": "hide-in-house",
-   "file": "docs/playtest/round-2/keepsake/03-hide-in-house.png"
-  },
-  {
-   "t": 13.6,
+   "t": 7.5,
    "name": "induce",
    "file": "docs/playtest/round-2/keepsake/04-induce.png"
   },
   {
-   "t": 24.8,
+   "t": 17.6,
    "name": "give",
    "file": "docs/playtest/round-2/keepsake/05-give.png"
   },
   {
-   "t": 39.8,
+   "t": 23.7,
+   "name": "hide-in-house",
+   "file": "docs/playtest/round-2/keepsake/06-hide-in-house.png"
+  },
+  {
+   "t": 25.3,
    "name": "induce",
-   "file": "docs/playtest/round-2/keepsake/06-induce.png"
+   "file": "docs/playtest/round-2/keepsake/07-induce.png"
   },
   {
-   "t": 65.7,
-   "name": "give",
-   "file": "docs/playtest/round-2/keepsake/07-give.png"
+   "t": 32.2,
+   "name": "induce",
+   "file": "docs/playtest/round-2/keepsake/08-induce.png"
   },
   {
-   "t": 68.3,
-   "name": "give",
-   "file": "docs/playtest/round-2/keepsake/08-give.png"
-  },
-  {
-   "t": 68.7,
+   "t": 36.9,
    "name": "induce",
    "file": "docs/playtest/round-2/keepsake/09-induce.png"
   },
   {
-   "t": 87.5,
+   "t": 57.3,
    "name": "induce",
    "file": "docs/playtest/round-2/keepsake/10-induce.png"
   },
   {
-   "t": 87.9,
+   "t": 59.5,
+   "name": "give",
+   "file": "docs/playtest/round-2/keepsake/11-give.png"
+  },
+  {
+   "t": 59.8,
+   "name": "give",
+   "file": "docs/playtest/round-2/keepsake/12-give.png"
+  },
+  {
+   "t": 60.2,
    "name": "after-awakening",
-   "file": "docs/playtest/round-2/keepsake/11-after-awakening.png"
+   "file": "docs/playtest/round-2/keepsake/13-after-awakening.png"
   },
   {
-   "t": 88.2,
+   "t": 60.6,
    "name": "walk-out",
-   "file": "docs/playtest/round-2/keepsake/12-walk-out.png"
+   "file": "docs/playtest/round-2/keepsake/14-walk-out.png"
   },
   {
-   "t": 92.9,
+   "t": 65.3,
    "name": "end",
-   "file": "docs/playtest/round-2/keepsake/13-end.png"
+   "file": "docs/playtest/round-2/keepsake/15-end.png"
   }
  ]
 }

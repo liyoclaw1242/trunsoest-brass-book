@@ -28,7 +28,6 @@
   "verb": null,
   "who": "any",
   "knownBy": [
-   "outsider",
    "villager_01",
    "villager_02",
    "villager_03",
@@ -91,19 +90,18 @@
  },
  {
   "no": 6,
-  "key": "door-open",
-  "text": "外鄉人不得開啟任何門。",
-  "hole": "只禁止「開啟」，沒說不能破壞門；也沒禁止市民開門（開著的門走進去就好）。",
+  "key": "house-outsider",
+  "text": "外鄉人不得進入住宅。",
+  "hole": "和「受邀者得進入」衝突，裁決寫下前不追究。",
   "void": false,
   "dead": false,
   "mode": "forbid",
-  "verb": "open",
+  "verb": "enter",
   "who": "outsider",
   "knownBy": [
    "outsider",
    "villager_01",
    "villager_02",
-   "villager_03",
    "villager_04"
   ]
  }

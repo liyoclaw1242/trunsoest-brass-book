@@ -1,7 +1,7 @@
-第1條	此地不為外界所知。	認知：villager_01,villager_02,villager_03,villager_04
+第1條	此地不為外界所知。	認知：outsider,villager_01,villager_02,villager_03,villager_04
 第2條	不得傷害他人。	認知：villager_01,villager_02,villager_03,villager_04
 第3條	未經邀請不得進入他人住宅。	認知：villager_01,villager_02,villager_03,villager_04
 第4條	受市民邀請者，得進入該市民的住宅。	認知：outsider,villager_01,villager_02,villager_03,villager_04
 第5條	請所有市民一起抓捕外鄉人，可採用一切手段。	認知：outsider,villager_01,villager_02,villager_03,villager_04
-第6條	廣播器不得被破壞。	認知：villager_04	漏洞：沒聽到的人不受約束；沒說不能搬走。
-第7條	外鄉人不得進入住宅。	認知：無	漏洞：和「受邀者得進入」衝突，裁決寫下前不追究。
+第6條	外鄉人不得進入住宅。	認知：outsider,villager_04	漏洞：和「受邀者得進入」衝突，裁決寫下前不追究。
+第7條	廣播器不得被破壞。	認知：villager_02,villager_03	漏洞：沒聽到的人不受約束；沒說不能搬走。
