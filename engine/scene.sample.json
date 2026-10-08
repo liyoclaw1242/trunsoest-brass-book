@@ -1,0 +1,15 @@
+[
+  { "id": "book_01",     "type": "book",     "pos": [2, 2],   "state": "closed",  "verbs": ["read", "move"] },
+  { "id": "lectern_01",  "type": "lectern",  "pos": [2, 2],   "verbs": [] },
+  { "id": "speaker_01",  "type": "speaker",  "pos": [5, 5],   "radius": 6, "tags": ["breakable", "broadcast"], "verbs": ["break", "repair"] },
+  { "id": "speaker_02",  "type": "speaker",  "pos": [25, 5],  "radius": 6, "tags": ["breakable", "broadcast"], "verbs": ["break", "repair"] },
+  { "id": "speaker_03",  "type": "speaker",  "pos": [15, 20], "radius": 6, "tags": ["breakable", "broadcast"], "verbs": ["break", "repair"] },
+  { "id": "notice_01",   "type": "notice",   "pos": [15, 10], "state": "written", "verbs": ["read", "deface"] },
+  { "id": "house_01",    "type": "house",    "pos": [10, 12], "owner": "villager_01", "verbs": ["enter"] },
+  { "id": "door_01",     "type": "door",     "pos": [10, 10], "state": "closed",  "parent": "house_01", "verbs": ["open", "break"] },
+  { "id": "fence_01",    "type": "fence",    "pos": [15, 5],  "tags": ["breakable"], "verbs": ["break", "climb"] },
+  { "id": "fence_02",    "type": "fence",    "pos": [16, 5],  "tags": ["breakable"], "verbs": ["break", "climb"] },
+  { "id": "cart_01",     "type": "cart",     "pos": [14, 6],  "tags": ["breakable"], "verbs": ["move", "break"] },
+  { "id": "keepsake_01", "type": "keepsake", "pos": [28, 12], "owner": "villager_01", "verbs": ["take", "give"] },
+  { "id": "boundary_01", "type": "boundary", "pos": [30, 15], "verbs": [] }
+]
