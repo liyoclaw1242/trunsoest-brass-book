@@ -62,7 +62,12 @@ export class Game {
     w.on('level', ({ actor, from, to, why }) => this.note('level', `${N(actor.id)}從${STATE[from]}變成${STATE[to]}（${why === 'quiet' ? '太久沒聽廣播' : why === 'keepsake' ? '收到信物' : why === 'contagion' ? '受你感染' : why}）`, { actor: actor.id, to }));
     w.on('nudge', ({ actor }) => {});
     w.on('match:assim', (e) => { if (e.to > e.from) this.note('assim', `同化度 ${e.from}→${e.to}${e.why?.startsWith('comfort') ? '（接受了' + COMFORT_CN[e.why.split(':')[1]] + '）' : e.why === 'definition' ? '（你認知到自己已被當作市民）' : ''}`, { to: e.to }); });
-    w.on('match:activity', () => {});
+    this._actAcc = 0;
+    w.on('match:activity', ({ delta, why, to }) => {
+      const R = { patch: '書補上了你鑽的漏洞', reset: '書撐過了一次重置', capture: '你被抓回來', wake: '有村民罷工了', ruling: '書多寫了裁決' };
+      if (why === 'time') { this._actAcc += delta; return; }
+      this.note('activity', `活性 ${delta > 0 ? '+' : ''}${delta.toFixed(0)}（${R[why] || why}）→ ${Math.round(to)}`, { to });
+    });
     w.on('book:wrote', () => {});
     w.on('match:end', ({ state, reason, stats }) => this.note('end', `結局：${ENDINGS[state] || state}`, { state, reason, stats }));
   }
@@ -80,7 +85,7 @@ export class Game {
     const zone = this.grid.zone(next);
     // 邊界封印：有生效的「不得越過界石／離開」條文時，走不出影響範圍（重置撕掉它才打開窗口）
     if (!this.grid.inRange(next) && this.grid.inRange(p.cell) && this.boundarySealed()) { w.attempt('outsider', 'leave', null, { zone }); this.note('sealed', '界石擋住了你——「不得越過界石」還生效著。', {}); return 'sealed'; }
-    if (s.enterHouse) { const h = w.objects.get(s.enterHouse); if (h.type === 'house') { const r = w.attempt('outsider', 'enter', h.id, this.invitedTo === h.id ? { invited: true } : { uninvited: true, zone }); if (!r.done) return 'refused'; } else w.attempt('outsider', 'enter', s.enterHouse, { zone }); }
+    if (s.enterHouse) { const h = w.objects.get(s.enterHouse); if (h.type === 'house') { const mine = this.player.ownHouse === h.id || this.invitedTo === h.id; const r = w.attempt('outsider', 'enter', h.id, mine ? { invited: true } : { uninvited: true, zone }); if (!r.done) return 'refused'; } else w.attempt('outsider', 'enter', s.enterHouse, { zone }); }
     if (this.grid.zone(next) === 'wild' && this.grid.zone(p.cell) !== 'wild') w.attempt('outsider', 'enter', 'wild', { zone: 'wild' });
     // 行走／奔跑（持續動作，帶入 zone）
     p.running = running;
@@ -106,6 +111,12 @@ export class Game {
     if (p.carrying) { const b = this.world.objects.get(p.carrying); b.pos = [...p.cell]; }
     if (p.ledGoat) { const g = this.world.objects.get(p.ledGoat); if (g) g.pos = [...sub(p.cell, p.facing)]; }
     this.session.tick(dt);
+    // 時間分每累積約 1 點就報一次（讓玩家把活性和勞動連起來）
+    if (this._actAcc >= 1) { this._actAcc = 0; this.note('activity', `活性隨時間上升（${this.match.economy.workers()} 人在勞動）→ ${Math.round(this.match.activity.value)}`, {}); }
+    // 放逐代價：外鄉人親自搬書，每 20 秒同化度 +1
+    if (this.player.carrying) { this._carryT = (this._carryT || 0) + dt; if (this._carryT >= 20) { this._carryT = 0; this.match.assim.set(this.match.assim.value + 1, 'carry'); this.note('assim', '你搬著書太久，同化度 +1', {}); } } else this._carryT = 0;
+    // 隕石引信
+    if (this._fuse) { this._fuse.left -= dt; if (this._fuse.left <= 0) this.detonate(); }
   }
 
   // ---------- 互動 ----------
@@ -167,17 +178,30 @@ export class Game {
   }
   acceptComfort(item, v) {
     const benefit = this.match.assim.accept(item);
-    if (item === 'house') { const h = [...this.world.objects.values()].find(o => o.type === 'house' && o.owner === v.id); if (h) this.invitedTo = h.id, this.player.ownHouse = h.id; }
-    if (item === 'name') this.match.flags && (this.match.flags.named = true);
-    this.note('accept', `你接受了${COMFORT_CN[item]}：${benefit}`, { item });
+    if (item === 'house') { const h = [...this.world.objects.values()].find(o => o.type === 'house' && o.owner === v.id); if (h) { this.player.ownHouse = h.id; this.invitedTo = h.id; } }
+    if (item === 'name') { this.match.flags.named = true; if ([...this.world.objects.values()].some(o => o.type === 'census' && o.state !== 'torn')) this.match.flags.inCensus = true; }
+    if (item === 'job') this.note('accept', `你接受了工作：可以換到物品——但你的勞動也開始餵養書（活性漲得更快）。`, { item });
+    else this.note('accept', `你接受了${COMFORT_CN[item]}：${benefit}`, { item });
     return { done: true };
   }
   useMeteor(o) {
-    // 在書旁使用：書幾乎必定察覺並寫自保條文；若附近沒有村民保護、來得及就毀掉書
+    // 點燃引信：書立刻察覺、寫自保條文、活性飆、命令村民趕來護書；5 秒後爆炸
     const book = [...this.world.objects.values()].find(b => b.type === 'book');
-    const near = this.villagers.filter(v => !v.dead && book.pos && dist(v.pos, book.pos) <= 4 && v.level !== 'awake').length;
-    if (book && book.pos && dist(this.player.cell, book.pos) <= 2 && near === 0) { book.state = 'destroyed'; this.world.emit('object', { object: book, before: 'closed' }); this.note('destroy', '隕石魔法書的火焰吞了黃銅書。', {}); }
-    else { this.note('meteor', '書察覺了隕石，村民趕來護書。', {}); this.match.activity.add(5, 'threat'); }
+    if (!book || !book.pos) return;
+    this._fuse = { left: 5, at: [...this.player.cell], book: book.id };
+    this.match.activity.add(8, 'threat');
+    this.note('meteor', '隕石魔法書燒了起來——書察覺了，命令村民護書！（5 秒後爆炸）', {});
+    // 未喚醒、認知抓捕令的村民衝向書
+    for (const v of this.villagers) if (!v.dead && v.level !== 'awake') { v.chaseUntil = this.world.t + 10; v.lastSeen = [...book.pos]; }
+  }
+  detonate() {
+    const at = this._fuse.at, book = this.world.objects.get(this._fuse.book); this._fuse = null;
+    // 書旁有未喚醒村民護著就毀不掉
+    const guards = this.villagers.filter(v => !v.dead && v.level !== 'awake' && book.pos && dist(v.pos, book.pos) <= 2).length;
+    const dead = this.villagers.filter(v => !v.dead && dist(v.pos, at) <= 2.5);
+    for (const v of dead) { v.dead = true; this.world.emit('level', { actor: v, from: v.level, to: v.level, why: 'dead' }); }
+    if (guards === 0 && book.pos && dist(at, book.pos) <= 3) { book.state = 'destroyed'; this.world.emit('object', { object: book, before: 'closed' }); this.note('destroy', `爆炸吞了黃銅書${dead.length ? `，炸死了 ${dead.length} 個村民` : ''}。`, {}); }
+    else this.note('meteor', `爆炸被村民擋下了，書安然無恙${dead.length ? `，但炸死了 ${dead.length} 個村民` : ''}。`, {});
   }
   cartHop(cart) { const p = this.player, d = sub(cart.pos, p.cell); if (Math.abs(d[0]) + Math.abs(d[1]) !== 1) return null; const fcell = add(cart.pos, d), land = add(fcell, d); const fence = [...this.world.objects.values()].find(o => o.type === 'fence' && o.pos && eq(o.pos, fcell) && o.state === 'intact'); if (!fence || this.grid.blocked(land)) return null; return land; }
   dropItem(id) { const o = this.world.objects.get(id); this.world.attempt('outsider', 'drop', id, { to: this.dropSpot() }); return { done: true }; }
@@ -186,7 +210,7 @@ export class Game {
   actorAt(cell) { return [...this.world.actors.values()].find(a => eq(a.pos, cell)) || null; }
   act(i = 0) { if (!this.started || this.over || this.opening > 0) return { done: false, reason: 'frozen' }; const o = this.options()[i]; if (!o) return null; if (!o.ok) { this.note('blocked', `做不到：${o.label}`, {}); return { done: false, reason: o.reason }; } return o.run(); }
 
-  boundarySealed() { return this.world.active().some(r => (r.verb === 'leave' && r.mode !== 'permit') || r.key === 'c-boundary'); }
+  boundarySealed() { const me = this.player.actor; return this.world.active().some(r => ((r.verb === 'leave' && r.mode !== 'permit') || r.key === 'c-boundary') && me.known.has(r.no)); }
   broadcast() { const n = this.world.now; if (!n) return null; return { rule: this.world.rule(n.no), progress: 1 - n.left / this.world.opt.announceSec, hearing: n.listeners.has('outsider') }; }
   bookWriting() { const p = this.match.book.writing; return p ? { tier: p.def.tier, progress: 1 - p.left / p.total } : null; }
   quietCell() { const w = this.world, g = this.grid; if (!w.inBroadcast(this.player.cell)) return { steps: 0, cell: [...this.player.cell] }; const r = g.minCost(this.player.cell, c => !w.inBroadcast(c), () => true, c => !g.blocked(c)); return r ? { steps: r.cost, cell: r.cell } : null; }

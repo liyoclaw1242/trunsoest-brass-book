@@ -67,7 +67,14 @@ export class Villagers {
     return true;
   }
   hunts(v) { return v.chaseUntil > 0 && this.mayChase(v) && this.world.t < v.chaseUntil; }
-  sees(v) { return !v.dead && !v.sleeping && dist(v.pos, this.outsider.pos) <= this.opt.sight && this.grid.houseAt(v.pos) === this.grid.houseAt(this.outsider.pos); }
+  sees(v) {
+    if (v.dead || v.sleeping) return false;
+    const me = this.outsider;
+    if (this.grid.houseAt(v.pos) !== this.grid.houseAt(me.pos)) return false;
+    const disguised = me.comforts.has('clothes') || me.wearing;   // 偽裝：要到相鄰格才認得出你是外鄉人
+    const range = disguised ? Math.min(this.opt.sight, 1.5) : this.opt.sight;
+    return dist(v.pos, me.pos) <= range;
+  }
 
   /** 外鄉人違規：啟動目擊者的追捕（有名字時才需目擊）、記錄給傳染用。 */
   onViolation(verb, target, ctx, violates) {

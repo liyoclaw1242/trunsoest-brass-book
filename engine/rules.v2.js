@@ -16,7 +16,7 @@ export const POOL = [
   r({ key: 'a-road-outsider', text: '外鄉人不得行走於大路。', tier: 'crude', category: 'action', who: 'outsider', verb: 'walk', target: { zone: 'road' }, hole: '草地、田埂、屋後都不是大路；奔跑不是行走。', trigger: '外鄉人在大路上移動' }),
   r({ key: 'a-boundary-near', text: '外鄉人不得靠近界石十步以內。', tier: 'crude', category: 'action', who: 'outsider', verb: 'approach', target: { type: 'boundary' }, hole: '界石可以搬走；沒有界石的那一段邊界沒人管。', trigger: '外鄉人靠近界石', leaks: '書在意邊界' }),
   r({ key: 'a-fence-climb', text: '圍籬不得翻越。', tier: 'crude', category: 'action', verb: 'climb', target: { type: 'fence' }, hole: '破壞圍籬；推車墊腳。', trigger: '外鄉人翻越圍籬' }),
-  r({ key: 'a-goat-loose', text: '牲口不得擅自走動。', tier: 'crude', category: 'action', verb: 'move', target: { type: 'goat' }, hole: '山羊聽不懂規則；用繩子牽著不算擅自；書管不到牲口只好這樣寫。', trigger: '山羊亂走' }),
+  r({ key: 'a-goat-loose', text: '牲口不得被擅自牽引。', tier: 'crude', category: 'action', verb: 'lead', target: { type: 'goat' }, hole: '山羊聽不懂規則，沒牽著時牠自己亂走；繫住不算牽引；書管不到牲口只好繞去管人。', trigger: '外鄉人牽山羊' }),
   r({ key: 'a-run-village', text: '村內不得奔跑。', tier: 'plain', category: 'action', verb: 'run', hole: '推車代步；村民也一起被限速，追你的人追不快。', trigger: '外鄉人奔跑', leaks: '書願意拖累村民' }),
   r({ key: 'a-boundary-cross', text: '外鄉人不得越過界石離村。', tier: 'plain', category: 'action', who: 'outsider', verb: 'leave', hole: '不聽到它就不受約束；重置撕掉它的空檔。', trigger: '外鄉人走近邊界', leaks: '書在意邊界' }),
   r({ key: 'a-fence-both', text: '圍籬不得翻越或破壞。', tier: 'plain', category: 'action', verb: 'climb', target: { type: 'fence' }, cond: null, hole: '推車墊腳不算翻越也不算破壞。', trigger: '外鄉人破壞圍籬' }),
@@ -92,7 +92,7 @@ export const CONSTITUTION = [
   { key: 'c-no-harm', text: '不得傷害他人。', verb: 'harm', target: null, hole: '「他人」包不包括山羊、人偶沒定義。' },
   { key: 'c-invite-only', text: '未經邀請不得進入他人住宅。', verb: 'enter', target: { type: 'house' }, cond: 'uninvited', hole: '受邀就可以；非住宅建築不算。' },
   { key: 'c-guest-ok', text: '受市民邀請者，得進入該市民的住宅。', verb: 'enter', target: { type: 'house' }, cond: 'invited', mode: 'permit' },
-  { key: 'c-boundary', text: '任何存在不得越過界石。', verb: 'leave', target: null, hole: '界石被搬走後「界」在哪沒定義；沒聽到的人不受約束。' },
+  { key: 'c-boundary', text: '任何存在不得越過界石。', tier: 'plain', verb: 'leave', target: null, hole: '沒聽到這條的人不受約束（搶在聽到前衝出去）；界石被搬走後「界」在哪沒定義；等重置撕掉它的空檔。' },
 ];
 
 export const CAPTURE = [
@@ -123,11 +123,13 @@ export function stagesUnlocked(stage) {
  * 書針對某一類行為動筆：從該類、已解鎖階段、尚未生效的候選裡，依活性的三級權重抽一條。
  * @returns 條文定義物件，或 null（該類已無可寫）。
  */
-export function draw(category, activity, stage, rng, isLive, isMatchable = null) {
+export function draw(category, activity, stage, rng, isLive, isMatchable = null, defBias = 0) {
   const unlocked = new Set(stagesUnlocked(stage));
   let pool = POOL.filter(d => d.category === category && unlocked.has(d.stage) && !isLive(d.key));
   // 定義類只在外鄉人目前符合那條定義時才抽得到（否則「大家當你市民」的局面不是你的行為造成的）
   if (isMatchable) pool = pool.filter(d => d.kind !== 'definition' || isMatchable(d.defn));
+  // 後期偏置：有可用的定義類時，有機率直接只抽定義（讓「大家當你市民」的局面真的會出現）
+  if (defBias > 0 && stage === 'late') { const defs = pool.filter(d => d.kind === 'definition'); if (defs.length && rng.chance(defBias)) pool = defs; }
   if (!pool.length) return null;
   const weights = tierWeights(activity);
   // 先依權重選等級，該等級沒有就往鄰近等級退

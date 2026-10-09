@@ -28,6 +28,7 @@ export class Match {
     this.flags = { worked: false, greeted: false, inCensus: false, days: 0 };
     const w = this.world, A = this.activity;
     w.on('write', () => { if (this.started) this.stats.written++; });
+    w.on('book:wrote', ({ why }) => { if (why === 'discover') this.activity.patch(); });
     w.on('reset', () => { this.stats.resets = w.resets; if (this.started) A.survivedReset(); });
     w.on('faded', ({ faded }) => this.stats.faded += faded.length);
     w.on('level', ({ actor, from, to }) => { const L = ['puppet', 'half', 'awake']; if (L.indexOf(to) > L.indexOf(from)) { if (to === 'awake') A.woke(); this.stats.awakened = this.awakenedCount(); } });
@@ -75,7 +76,7 @@ export class Match {
     this.world.opt.max = cap;
     if (this.world.active().length > cap) this.world.fade(cap);
     // 活性（時間 × 勞動比例）
-    this.activity.tick(dt, this.economy.laborRatio());
+    this.activity.tick(dt, this.economy.laborRatio(this.assim.has('job')));
     this.book.tick(dt);
     this.assim.tick(dt, this.world.inBroadcast(this.s.outsider.pos));
     // 活性到頂

@@ -14,9 +14,9 @@ export class Economy {
     const n = this.villagers.filter(v => v.level !== 'awake' && v.mode !== 'chase' && !v.sleeping && v.working !== false).length;
     return n + (outsiderWorking ? 1 : 0);
   }
-  laborRatio() {
-    const total = this.villagers.length || 1;
-    return this.workers() / total;
+  laborRatio(outsiderWorking = false) {
+    const total = (this.villagers.length || 1) + (outsiderWorking ? 1 : 0);
+    return this.workers(outsiderWorking) / total;
   }
   ruleCap(outsiderWorking = false) { return this.opt.base + this.opt.perWorker * this.workers(outsiderWorking); }
 }

@@ -292,3 +292,23 @@
 - 原本的 20 種子全村模擬因村民尋路在 100×100 太慢（兩次逾時），改用純模組快轉量測；全村模擬留待優化回合的 critic 視需要。
 - 移除 game.js 殘留的 `no-leave` 參照（改 `boundarySealed`）。
 - **驗收**：`node tools/playtest-r5.js` 7/7、`node tools/balance.js` 輸出合理、early-rush 封印與窗口逃跑 engine／browser 實測。`npm test` 38 項。材料在 `docs/playtest/r6/`。
+
+## 改版 v2 — 優化回合 第 1 輪（2026-01，Opus 4.8）
+
+這一輪開始前先對整個條文池跑 `audit-rules`（子代理），再用 `playtest-critic`（子代理，model fable；此時 session 還不認得該代理，故用 general-purpose＋原樣指令）看 `docs/playtest/round-1/` 的材料。兩份意見合併處理：
+
+**已改（這一輪）**
+1. **高｜封印不看公示（打破「公示才生效」）**：`boundarySealed()` 原本只看條文生效與否，無視外鄉人有沒有聽過。改成「外鄉人認知到一條生效的 leave 條文」才封；開場由書向踏入者公告「不得越過界石」（`book.arrive` 先 `announce(c-boundary)`），他在開場 4 秒內聽完 → 誠實地被封。`c-boundary` 的 hole 改成真的出路（搶在聽到前衝、等重置空檔）。
+2. **高｜前期逃得掉／窗口不隨後期變短**：平常的走／跑不再逼書動筆（`book.observe` 忽略 walk/run），逼寫節奏不再像節拍器；重封書寫時間與等級脫鉤（固定 4 秒基底×活性係數），越後期越短。
+3. **高｜舒適只有名字兌現**：衣服 → `villagers.sees()` 認出距離縮到相鄰（實測 3 格前看得到、接受後看不到）；房子 → 接受後那棟成為你的住宅（進得去、不需邀請）；工作 → 算一份勞動餵養書（`economy.laborRatio(job)`，活性漲更快＝代價）、提示可換物品。按鈕不再先寫「+1」，代價事後在量表上出現。
+4. **中｜結局代價（封印二、四）**：隕石改成點引信、5 秒後爆炸——書察覺、活性飆、命令未喚醒村民衝向書護它；爆炸時 2.5 格內村民 `dead`，書旁有村民護著就毀不掉。放逐：外鄉人親自搬書每 20 秒同化度 +1。結局畫面的「死亡」下場現在真的會出現。
+5. **中｜活性跳動沒解釋**：`match:activity` 接到事件紀錄，附原因（補漏洞 +3／撐過重置 +5／村民罷工 −4／被抓 +2／隨時間），`patch()` 在書因發現漏洞而寫時呼叫。
+6. **中／低｜定義與戶籍接線**：`flags.worked`（用工作站）、`flags.inCensus`（接受名字且有戶籍冊）接上，`d-worked`／`d-census` 不再是死條；戶籍冊進 `book.categoryOf`；後期抽條文有定義偏置（`draw` 的 `defBias`，後期有機率只抽符合的定義類），讓「大家當你市民」真的會出現；書在活性跨中／後期門檻時主動寫一條（不再是玩家不惹就死書）。
+7. **低｜臭蟲**：重封用的 `c-boundary` 補 `tier:'plain'`（原本印 undefined）；`a-goat-loose` 動詞改 `lead`（原本 move/goat 永不命中）；條文鏈 `a-fence-both`／`v-talk-plain` 與粗糙版同動詞——標註為「措辭升級」而非補丁鏈。
+
+**寫進 open-questions（觸及已定案或需較大機制）**
+- 義務類 `require` 的「不照做是違規」沒有通用強制器（引擎 `evaluate` 只算 forbid/permit）；中期義務目前只有「照做＝接受舒適」一半。
+- 社交動詞（talk/greet/listen/invite）本版不做對話，對應條文是陳列品。
+- 「同一招第五次必中」讓逼寫接近確定性，是否要更隨機留待真人樣本。
+
+**改後驗證**：`npm test` 38 項；`node tools/playtest-r5.js` 7/7、`r3` 10/10、`r4` 4/4；封印需公示、衣服偽裝、放逐／損毀代價 browser／engine 實測。

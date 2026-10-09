@@ -1,0 +1,51 @@
+[
+ {
+  "t": 0,
+  "type": "write",
+  "text": "書寫下第六條：請所有市民一起抓捕外鄉人，可採用一切手段。",
+  "no": 6
+ },
+ {
+  "t": 0,
+  "type": "start",
+  "text": "黃銅書察覺了你。廣播器唸起第一條公告。"
+ },
+ {
+  "t": 0,
+  "type": "broadcast",
+  "text": "廣播：第六條",
+  "no": 6
+ },
+ {
+  "t": 4.03,
+  "type": "learn",
+  "text": "聽完第六條：你、村民 01、村民 02、村民 03、村民 04、村民 05認知了",
+  "no": 6,
+  "learned": [
+   "outsider",
+   "villager_01",
+   "villager_02",
+   "villager_03",
+   "villager_04",
+   "villager_05"
+  ]
+ },
+ {
+  "t": 8.01,
+  "type": "assim",
+  "text": "同化度 0→1（接受了名字）",
+  "to": 1
+ },
+ {
+  "t": 8.01,
+  "type": "accept",
+  "text": "你接受了名字：村民不主動追你，除非看到你違規",
+  "item": "name"
+ },
+ {
+  "t": 10.08,
+  "type": "broadcast",
+  "text": "廣播：第六條",
+  "no": 6
+ }
+]

@@ -1,0 +1,115 @@
+{
+ "t": 12.2,
+ "state": "playing",
+ "reason": null,
+ "seed": "round1",
+ "sealed": true,
+ "activity": 76,
+ "stage": "late",
+ "peakActivity": 76,
+ "assim": 1,
+ "assimMax": 5,
+ "comforts": [
+  "name"
+ ],
+ "laborRatio": 1,
+ "workers": 6,
+ "ruleCap": 10,
+ "phase": "day",
+ "cell": [
+  50,
+  48
+ ],
+ "house": null,
+ "zone": "plaza",
+ "inBroadcast": true,
+ "inRange": true,
+ "held": [],
+ "wearing": null,
+ "lit": false,
+ "carrying": null,
+ "rules": 6,
+ "resets": 0,
+ "opening": 0,
+ "writing": null,
+ "villagers": [
+  {
+   "id": "villager_01",
+   "pos": [
+    51,
+    48
+   ],
+   "level": "half",
+   "mode": "work",
+   "hunting": false,
+   "dead": false,
+   "working": true,
+   "carrying": true
+  },
+  {
+   "id": "villager_02",
+   "pos": [
+    65,
+    48
+   ],
+   "level": "puppet",
+   "mode": "work",
+   "hunting": false,
+   "dead": false,
+   "working": true,
+   "carrying": true
+  },
+  {
+   "id": "villager_03",
+   "pos": [
+    35,
+    60
+   ],
+   "level": "half",
+   "mode": "work",
+   "hunting": false,
+   "dead": false,
+   "working": true,
+   "carrying": true
+  },
+  {
+   "id": "villager_04",
+   "pos": [
+    35,
+    56
+   ],
+   "level": "half",
+   "mode": "work",
+   "hunting": false,
+   "dead": false,
+   "working": true,
+   "carrying": false
+  },
+  {
+   "id": "villager_05",
+   "pos": [
+    65,
+    60
+   ],
+   "level": "half",
+   "mode": "work",
+   "hunting": false,
+   "dead": false,
+   "working": true,
+   "carrying": false
+  },
+  {
+   "id": "villager_06",
+   "pos": [
+    35,
+    41
+   ],
+   "level": "puppet",
+   "mode": "work",
+   "hunting": false,
+   "dead": false,
+   "working": true,
+   "carrying": false
+  }
+ ]
+}

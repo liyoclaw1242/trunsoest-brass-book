@@ -11,7 +11,7 @@ export function categoryOf(verb, obj) {
   const t = obj?.type;
   if (THREAT_TARGETS.has(t)) return { category: 'selfprotect', threat: true };
   if (t === 'speaker' || t === 'notice' || t === 'earplug') return { category: 'asset', threat: false };
-  if (t === 'keepsake' || t === 'bell' || t === 'villager') return { category: 'villager', threat: false };
+  if (t === 'keepsake' || t === 'bell' || t === 'villager' || t === 'census') return { category: 'villager', threat: false };
   if (verb === 'talk' || verb === 'give' || verb === 'induce') return { category: 'villager', threat: false };
   if (t === 'house' || t === 'well' || t === 'library' || t === 'cart' && verb === 'use') return { category: 'hide', threat: false };
   if (['run', 'walk', 'climb', 'approach', 'leave', 'enter'].includes(verb)) return (t === 'house' || t === 'well') ? { category: 'hide', threat: false } : { category: 'action', threat: false };
@@ -31,6 +31,7 @@ export class Book {
     this.matchDefn = opt.matchDefn || null;
     this.opt = { discoverBase: 0.2, discoverPerActivity: 0.006, certainAt: 5, threatMin: 0.9, speedByActivity: true, ...opt };
     this.uses = {};          // category -> 次數
+    this._lastStage = getStage();
     this.pending = null;     // { def, left }
     this.resets = 0;
     this.listeners = [];
@@ -40,8 +41,8 @@ export class Book {
   on(fn) { this.listeners.push(fn); return this; }
   emit(type, data) { for (const fn of this.listeners) fn({ type, ...data }); this.world.emit('book:' + type, data); }
 
-  /** 開場：頒布抓捕令。 */
-  arrive() { return this.writeCapture(); }
+  /** 開場：先向踏入者公告「不得越過界石」（他聽完才受封印約束——公示才生效），再頒布抓捕令。 */
+  arrive() { const cb = this.world.live('c-boundary'); if (cb) this.world.announce(cb.no); return this.writeCapture(); }
   writeCapture() {
     const v = CAPTURE[Math.min(this.world.resets, CAPTURE.length - 1)];
     return this.world.write({ key: 'capture', verb: 'capture', mode: 'require', target: { type: 'outsider' }, ...v });
@@ -53,13 +54,14 @@ export class Book {
     if (gone.some(r => r.key === 'c-boundary' || (r.verb === 'leave')) && !this.boundaryLive()) {
       const drawn = draw('action', this.getActivity(), this.getStage(), this.rng, k => !!this.world.live(k), this.matchDefn);
       const def = (drawn && drawn.verb === 'leave') ? drawn : { ...CONSTITUTION.find(c => c.key === 'c-boundary') };
-      this.startWrite(def, 'reseal');
+      this.startWrite(def, 'reseal', 4);   // 重封固定 4 秒基底，乘活性係數 → 越後期越短
     }
   }
   boundaryLive() { return this.world.active().some(r => (r.verb === 'leave' && r.mode !== 'permit') || r.key === 'c-boundary'); }
 
   /** 外鄉人做了一件事：判斷書要不要動筆。 */
   observe(verb, obj) {
+    if (verb === 'walk' || verb === 'run') return;   // 單純移動不算鑽漏洞，不逼書動筆（approach/break/enter… 才算）
     const c = categoryOf(verb, obj);
     if (!c) return;
     const key = c.category;
@@ -70,24 +72,32 @@ export class Book {
                      : this.opt.discoverBase + a * this.opt.discoverPerActivity;
     if (this.uses[key] >= this.opt.certainAt) p = 1;
     if (!this.rng.chance(Math.min(1, p))) return;
-    const def = draw(key, a, this.getStage(), this.rng, k => !!this.world.live(k), this.matchDefn);
+    const def = draw(key, a, this.getStage(), this.rng, k => !!this.world.live(k), this.matchDefn, 0.5);
     if (!def) return;
     this.uses[key] = 0;
     this.startWrite(def, 'discover');
   }
-  startWrite(def, why) {
-    let sec = WRITE_SEC[def.tier] ?? 4;
+  startWrite(def, why, baseSec = null) {
+    let sec = baseSec != null ? baseSec : (WRITE_SEC[def.tier] ?? 4);
     if (this.opt.speedByActivity) sec *= 1 - this.getActivity() / 250;   // 後期最多快約 40%
-    this.pending = { def, left: sec, total: sec };
+    this.pending = { def, left: sec, total: sec }; this.pendingWhy = why;
     this.emit('writing', { rule: def, sec });
   }
   tick(dt) {
+    // 階段門檻：活性跨過中／後期時，書主動寫一條（就算你沒惹它——它越來越活）
+    const st = this.getStage();
+    if (this._lastStage && this._lastStage !== st && !this.pending) {
+      const cat = Object.entries(this.uses).sort((a, b) => b[1] - a[1])[0]?.[0] || 'villager';
+      const def = draw(cat, this.getActivity(), st, this.rng, k => !!this.world.live(k), this.matchDefn, 0.6);
+      if (def) this.startWrite(def, 'discover');
+    }
+    this._lastStage = st;
     if (!this.pending) return;
     this.pending.left -= dt;
     if (this.pending.left <= 0) {
       const def = this.pending.def; this.pending = null;
       const rule = this.world.write(def);   // 排入廣播；寫滿會觸發重置
-      if (rule) this.emit('wrote', { rule });
+      if (rule) this.emit('wrote', { rule, why: this.pendingWhy });
     }
   }
   /** 活性到 100：寫下最後一條。 */

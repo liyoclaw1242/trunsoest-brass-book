@@ -1,0 +1,117 @@
+[
+ {
+  "no": 1,
+  "key": "c-hide",
+  "text": "此地不為外界所知。",
+  "hole": "",
+  "void": false,
+  "dead": false,
+  "mode": "forbid",
+  "verb": null,
+  "who": "any",
+  "kind": "lore",
+  "knownBy": [
+   "villager_01",
+   "villager_02",
+   "villager_03",
+   "villager_04",
+   "villager_05",
+   "villager_06"
+  ]
+ },
+ {
+  "no": 2,
+  "key": "c-no-harm",
+  "text": "不得傷害他人。",
+  "hole": "「他人」包不包括山羊、人偶沒定義。",
+  "void": false,
+  "dead": false,
+  "mode": "forbid",
+  "verb": "harm",
+  "who": "any",
+  "knownBy": [
+   "villager_01",
+   "villager_02",
+   "villager_03",
+   "villager_04",
+   "villager_05",
+   "villager_06"
+  ]
+ },
+ {
+  "no": 3,
+  "key": "c-invite-only",
+  "text": "未經邀請不得進入他人住宅。",
+  "hole": "受邀就可以；非住宅建築不算。",
+  "void": false,
+  "dead": false,
+  "mode": "forbid",
+  "verb": "enter",
+  "who": "any",
+  "knownBy": [
+   "villager_01",
+   "villager_02",
+   "villager_03",
+   "villager_04",
+   "villager_05",
+   "villager_06"
+  ]
+ },
+ {
+  "no": 4,
+  "key": "c-guest-ok",
+  "text": "受市民邀請者，得進入該市民的住宅。",
+  "hole": "",
+  "void": false,
+  "dead": false,
+  "mode": "permit",
+  "verb": "enter",
+  "who": "any",
+  "knownBy": [
+   "villager_01",
+   "villager_02",
+   "villager_03",
+   "villager_04",
+   "villager_05",
+   "villager_06"
+  ]
+ },
+ {
+  "no": 5,
+  "key": "c-boundary",
+  "text": "任何存在不得越過界石。",
+  "hole": "界石被搬走後「界」在哪沒定義；沒聽到的人不受約束。",
+  "void": false,
+  "dead": false,
+  "mode": "forbid",
+  "verb": "leave",
+  "who": "any",
+  "knownBy": [
+   "villager_01",
+   "villager_02",
+   "villager_03",
+   "villager_04",
+   "villager_05",
+   "villager_06"
+  ]
+ },
+ {
+  "no": 6,
+  "key": "capture",
+  "text": "請所有市民一起抓捕外鄉人，可採用一切手段。",
+  "hole": "",
+  "void": false,
+  "dead": false,
+  "mode": "require",
+  "verb": "capture",
+  "who": "citizen",
+  "knownBy": [
+   "outsider",
+   "villager_01",
+   "villager_02",
+   "villager_03",
+   "villager_04",
+   "villager_05"
+  ]
+ }
+]
