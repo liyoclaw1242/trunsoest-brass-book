@@ -64,6 +64,21 @@ def rock(id, pos, rng=random):
     o.scale = (o.scale[0] * 1.2, o.scale[1], o.scale[2] * 0.6)
     return p
 
+def scarecrow(id, pos, rng=random):
+    p = _decor(id, pos)
+    rb.box(p, f'{id}_post', (0.12, 0.12, 2.0), (0, 0, 1.0), rb.TRUNK)
+    rb.box(p, f'{id}_arms', (1.5, 0.1, 0.1), (0, 0, 1.5), rb.TRUNK)
+    rb.box(p, f'{id}_body', (0.5, 0.3, 0.6), (0, 0, 1.35), rb.THATCH)
+    rb.sphere(p, f'{id}_head', 0.26, (0, 0, 1.85), (0.86, 0.72, 0.5))
+    rb.cyl(p, f'{id}_hatbrim', 0.4, 0.05, (0, 0, 2.02), rb.DARKWOOD)
+    rb.cyl(p, f'{id}_hattop', 0.22, 0.22, (0, 0, 2.14), rb.DARKWOOD)
+    rb.box(p, f'{id}_eyeL', (0.06, 0.06, 0.06), (-0.1, -0.22, 1.9), rb.INK)
+    rb.box(p, f'{id}_eyeR', (0.06, 0.06, 0.06), (0.1, -0.22, 1.9), rb.INK)
+    # 稻草從袖口露出
+    for j, dx in enumerate((-0.72, 0.72)):
+        rb.cone(p, f'{id}_straw{j}', 0.1, 0.3, (dx, 0, 1.5), rb.THATCH, rot=(0, 1.5708 if dx > 0 else -1.5708, 0))
+    return p
+
 def ground_patch(id, pos, w, d, color, z=0.012):
     p = _decor(id, pos, z)
     rb.box(p, f'{id}_slab', (w, d, 0.02), (0, 0, 0), color)
@@ -168,6 +183,14 @@ def scatter(layout, seed=7):
             placed.append((x, y))
             objs.append(maker(f'{prefix}_{n:02d}', (x, y), rng))
             n += 1
+    # 稻草人：立在每塊田旁
+    si = 0
+    for o in layout.OBJECTS:
+        if o.get('type') == 'field':
+            fx, fy = o['pos']
+            objs.append(scarecrow(f'decor_scarecrow_{si}', (fx + 2, fy + 1), rng))
+            si += 1
+
     place(bush, 'decor_bush', 26, 6, R - 1)
     place(flowers, 'decor_flower', 48, 4, R - 1)
     place(grasstuft, 'decor_tuft', 90, 3, R + 2, avoid_road=False)
