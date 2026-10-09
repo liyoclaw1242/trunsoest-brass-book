@@ -27,8 +27,16 @@ check('設計者視角：種子＋權重＋等級', dz.includes('種子') && dz.
 await pw.shot(DIR, '03-designer');
 await pw.eval(() => window.__game.designer(false));
 // 舒適：走到商人旁接受（舒適由市集的商人提供）
-// 把一個商人放到外鄉人旁邊，確保接受得到舒適
-await pw.eval(() => { const g = window.__game.game; const me = g.player.cell; const h = g.villagers.find(x => x.role === 'merchant') || g.villagers.find(x => x.level === 'half'); h.pos = [me[0] + 1, me[1]]; h.fpos = [...h.pos]; h.path = []; h.move = null; });
+// 商人會走回自己的店鋪，所以把商人釘在它的店鋪工作位、再把外鄉人放到它旁邊，確保接受得到舒適
+await pw.eval(() => {
+  const g = window.__game.game; const h = g.villagers.find(x => x.role === 'merchant') || g.villagers.find(x => x.level === 'half');
+  const shop = [...g.world.objects.values()].find(o => o.type === 'shop');
+  const spot = shop ? (g.grid.neighbors(shop.pos).find(c => !g.grid.blocked(c)) || shop.pos) : [h.pos[0], h.pos[1]];
+  h.pos = [...spot]; h.fpos = [...spot]; h.path = []; h.move = null; h.goal = null;   // 釘在店鋪工作位，不會再走開
+  const adj = g.grid.neighbors(spot).find(c => !g.grid.blocked(c) && !g.grid.houseAt(c)) || [spot[0] + 1, spot[1]];
+  g.player.cell = [...adj]; g.player.pos = [...adj]; g.player.actor.pos = [...adj];
+  g.opening = 0;   // 開場公告凍結已結束（本測試驗的是舒適機制，不是開場）
+});
 await pw.face([1, 0]);
 { const o = await pw.options(); const i = o.findIndex(x => x.verb === 'accept'); check('有「接受舒適」選項', i >= 0, o.map(x => x.label).slice(0, 4).join('|')); if (i >= 0) { await pw.act(i); await pw.wait(0.3); } }
 const s2 = await pw.status();
