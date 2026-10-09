@@ -13,7 +13,7 @@ export function categoryOf(verb, obj) {
   if (t === 'speaker' || t === 'notice' || t === 'earplug') return { category: 'asset', threat: false };
   if (t === 'keepsake' || t === 'bell' || t === 'villager' || t === 'census') return { category: 'villager', threat: false };
   if (verb === 'talk' || verb === 'give' || verb === 'induce') return { category: 'villager', threat: false };
-  if (t === 'house' || t === 'well' || t === 'library' || t === 'cart' && verb === 'use') return { category: 'hide', threat: false };
+  if (t === 'house' || t === 'well' || t === 'library') return { category: 'hide', threat: false };
   if (['run', 'walk', 'climb', 'approach', 'leave', 'enter'].includes(verb)) return (t === 'house' || t === 'well') ? { category: 'hide', threat: false } : { category: 'action', threat: false };
   if (verb === 'move' && t === 'goat') return { category: 'action', threat: false };
   return null;

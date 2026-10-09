@@ -65,7 +65,7 @@ export class Grid {
         }
         case 'door': if (o.pos[0] === x && o.pos[1] === y && o.state === 'closed') return true; break;
         case 'fence': if (o.pos[0] === x && o.pos[1] === y && o.state === 'intact') return true; break;
-        case 'cart': case 'lectern': case 'speaker': case 'notice': case 'boundary': case 'lamppost':
+        case 'lectern': case 'speaker': case 'notice': case 'boundary': case 'lamppost':
         case 'workstation': case 'well': case 'census': case 'carved-stone':
           if (o.pos[0] === x && o.pos[1] === y) return true; break;
       }

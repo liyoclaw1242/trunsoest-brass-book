@@ -7,7 +7,7 @@ import { COMFORT_CN, COMFORT_BENEFIT } from '../engine/assimilation.js';
 import { ENDINGS } from '../engine/match.js';
 
 export const LABEL = { induce: '誘導', enter: '進入', use: '使用', open: '開啟', take: '取走', give: '給', break: '破壞', repair: '修復', move: '搬動', climb: '翻越', read: '閱讀', deface: '塗毀', approach: '靠近', run: '奔跑', capture: '抓捕', leave: '離開', walk: '行走', wear: '穿上', light: '點火', stay: '停留', drop: '放下', talk: '交談', greet: '問安', listen: '聆聽', reside: '居住', accept: '領受', harm: '傷害', invite: '邀請', tie: '繫上', lead: '牽引' };
-export const TYPE = { book: '黃銅書', lectern: '書台', speaker: '廣播器', notice: '公告牌', house: '住宅', door: '門', fence: '圍籬', cart: '推車', keepsake: '信物', boundary: '界石', villager: '村民', outsider: '外鄉人', lamppost: '燈柱', clothes: '衣物', lamp: '提燈', library: '圖書館', workstation: '工作站', goat: '山羊', rope: '繩子', meteor: '隕石魔法書', census: '戶籍冊', bell: '山羊鈴鐺', 'carved-stone': '刻字石', well: '水井' };
+export const TYPE = { book: '黃銅書', lectern: '書台', speaker: '廣播器', notice: '公告牌', house: '住宅', door: '門', fence: '圍籬', keepsake: '信物', boundary: '界石', villager: '村民', outsider: '外鄉人', lamppost: '燈柱', clothes: '衣物', lamp: '提燈', library: '圖書館', workstation: '工作站', goat: '山羊', rope: '繩子', census: '戶籍冊', bell: '山羊鈴鐺', 'carved-stone': '刻字石', well: '水井' };
 export const STATE = { intact: '完好', broken: '損壞', closed: '關著', open: '開著', written: '有字', defaced: '被塗毀', puppet: '人偶', half: '半同化', awake: '已喚醒', torn: '撕破', frayed: '磨斷', unlit: '未點', lit: '亮著', worn: '穿著', destroyed: '毀壞' };
 export const name = o => o ? `${TYPE[o.type] || o.type}${o.id.includes('_') && /\d/.test(o.id) ? ' ' + o.id.split('_').pop() : ''}` : '';
 
@@ -122,7 +122,6 @@ export class Game {
     if (this._lastStage && this._lastStage !== st) { if (st === 'mid') this.pushHint('stage-mid', '書進入「中期」：開始要求你照它的方式生活（義務類條文）。照做會讓你更像市民。'); if (st === 'late') this.pushHint('stage-late', '書進入「後期」：開始改寫「誰算市民」。小心別聽到剛好套在你身上的那一條定義。'); }
     this._lastStage = st;
     if (this.started && this.opening <= 0 && !this.shownHints.has('first-villager')) { const near = this.villagers.find(v => !v.dead && cheb(v.pos, this.player.cell) <= 1 && v.level !== 'puppet'); if (near) this.pushHint('first-villager', '靠近村民按 E：可以接受他的好處（更舒適，但更接近被同化），喚醒的村民則會站到你這邊。'); }
-    if (this.started && this.opening <= 0 && !this.shownHints.has('first-cart')) { const c = [...this.world.objects.values()].find(o => o.type === 'cart' && o.pos && cheb(o.pos, this.player.cell) <= 1); if (c) this.pushHint('first-cart', '推車可以推動（擋路／移位）。把它推到圍籬旁，就能踩著它翻過圍籬——不必翻越或破壞，繞過書的圍籬條文。'); }
     this.session.tick(dt);
     // 時間分每累積約 1 點就報一次（讓玩家把活性和勞動連起來）
     if (this._actAcc >= 1) { this._actAcc = 0; this.note('activity', `活性隨時間上升（${this.match.economy.workers()} 人在勞動）→ ${Math.round(this.match.activity.value)}`, {}); }
@@ -159,8 +158,6 @@ export class Game {
         if (['give', 'approach', 'capture', 'drop', 'wear', 'light', 'enter', 'leave', 'accept'].includes(verb)) continue;
         if (verb === 'take' && o.heldBy) continue;
         if (o.type === 'book' && verb === 'move') { if (!p.carrying) out.push(this.opt('move', o, { to: [...p.cell] }, '搬起黃銅書')); continue; }
-        if (o.type === 'cart' && verb === 'move') { const d = sub(o.pos, p.cell); if (Math.abs(d[0]) + Math.abs(d[1]) !== 1) continue; const to = add(o.pos, d); if (g.blocked(to) || this.actorAt(to)) continue; out.push(this.opt('move', o, { to }, `推動${name(o)}`)); continue; }
-        if (o.type === 'cart' && verb === 'use') { const hop = this.cartHop(o); if (!hop) continue; out.push(this.opt('use', o, {}, '踩推車翻過圍籬', () => this.place(hop))); continue; }
         if (o.type === 'fence' && verb === 'climb') { const d = sub(o.pos, p.cell); if (Math.abs(d[0]) + Math.abs(d[1]) !== 1) continue; const land = add(o.pos, d); if (g.blocked(land)) continue; out.push(this.opt('climb', o, {}, `翻越${name(o)}`, () => this.place(land))); continue; }
         if (o.type === 'goat' && verb === 'tie') { if (!p.actor.held.some(id => w.objects.get(id).type === 'rope')) continue; out.push(this.opt('tie', o, {}, '用繩子繫住山羊', () => { o.tied = true; })); continue; }
         if (o.type === 'goat' && verb === 'lead') { if (!o.tied) continue; out.push(this.opt('lead', o, {}, '牽著山羊走', () => { p.ledGoat = o.id; })); continue; }
@@ -193,7 +190,6 @@ export class Game {
     this.note('accept', `你接受了${COMFORT_CN[item]}（同化度 +1）：${benefit}`, { item });
     return { done: true };
   }
-  cartHop(cart) { const p = this.player, d = sub(cart.pos, p.cell); if (Math.abs(d[0]) + Math.abs(d[1]) !== 1) return null; const fcell = add(cart.pos, d), land = add(fcell, d); const fence = [...this.world.objects.values()].find(o => o.type === 'fence' && o.pos && eq(o.pos, fcell) && o.state === 'intact'); if (!fence || this.grid.blocked(land)) return null; return land; }
   dropItem(id) { const o = this.world.objects.get(id); this.world.attempt('outsider', 'drop', id, { to: this.dropSpot() }); return { done: true }; }
   dropSpot() { const p = this.player; return [add(p.cell, p.facing), ...this.grid.neighbors(p.cell)].find(c => !this.grid.blocked(c)) || p.cell; }
   dropBook() { const p = this.player, b = this.world.objects.get(p.carrying); b.pos = [...this.dropSpot()]; p.carrying = null; this.world.emit('object', { object: b, before: b.state }); return { done: true }; }

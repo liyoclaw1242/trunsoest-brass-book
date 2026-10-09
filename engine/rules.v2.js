@@ -12,14 +12,14 @@ const r = (o) => ({ who: 'any', mode: 'forbid', cond: null, target: null, stage:
 
 export const POOL = [
   // ========== 行動 action（限制）==========
-  r({ key: 'a-plaza-run', text: '廣場上不得奔跑。', tier: 'crude', category: 'action', verb: 'run', target: { zone: 'plaza' }, hole: '廣場以外照跑；坐推車移動不算奔跑。', trigger: '外鄉人奔跑' }),
+  r({ key: 'a-plaza-run', text: '廣場上不得奔跑。', tier: 'crude', category: 'action', verb: 'run', target: { zone: 'plaza' }, hole: '廣場以外照跑；走路不算奔跑。', trigger: '外鄉人奔跑' }),
   r({ key: 'a-road-outsider', text: '外鄉人不得行走於大路。', tier: 'crude', category: 'action', who: 'outsider', verb: 'walk', target: { zone: 'road' }, hole: '草地、田埂、屋後都不是大路；奔跑不是行走。', trigger: '外鄉人在大路上移動' }),
   r({ key: 'a-boundary-near', text: '外鄉人不得靠近界石十步以內。', tier: 'crude', category: 'action', who: 'outsider', verb: 'approach', target: { type: 'boundary' }, hole: '界石可以搬走；沒有界石的那一段邊界沒人管。', trigger: '外鄉人靠近界石', leaks: '書在意邊界' }),
-  r({ key: 'a-fence-climb', text: '圍籬不得翻越。', tier: 'crude', category: 'action', verb: 'climb', target: { type: 'fence' }, hole: '破壞圍籬；推車墊腳。', trigger: '外鄉人翻越圍籬' }),
+  r({ key: 'a-fence-climb', text: '圍籬不得翻越。', tier: 'crude', category: 'action', verb: 'climb', target: { type: 'fence' }, hole: '沒說不能破壞；沒聽到的人不受約束。', trigger: '外鄉人翻越圍籬' }),
   r({ key: 'a-goat-loose', text: '牲口不得被擅自牽引。', tier: 'crude', category: 'action', verb: 'lead', target: { type: 'goat' }, hole: '山羊聽不懂規則，沒牽著時牠自己亂走；繫住不算牽引；書管不到牲口只好繞去管人。', trigger: '外鄉人牽山羊' }),
-  r({ key: 'a-run-village', text: '村內不得奔跑。', tier: 'plain', category: 'action', verb: 'run', hole: '推車代步；村民也一起被限速，追你的人追不快。', trigger: '外鄉人奔跑', leaks: '書願意拖累村民' }),
+  r({ key: 'a-run-village', text: '村內不得奔跑。', tier: 'plain', category: 'action', verb: 'run', hole: '村民也一起被限速，追你的人追不快；走路不算奔跑。', trigger: '外鄉人奔跑', leaks: '書願意拖累村民' }),
   r({ key: 'a-boundary-cross', text: '外鄉人不得越過界石離村。', tier: 'plain', category: 'action', who: 'outsider', verb: 'leave', hole: '不聽到它就不受約束；重置撕掉它的空檔。', trigger: '外鄉人走近邊界', leaks: '書在意邊界' }),
-  r({ key: 'a-fence-both', text: '圍籬不得被破壞。', tier: 'plain', category: 'action', verb: 'break', target: { type: 'fence' }, hole: '翻越是另一條管的；推車墊腳不算破壞。', trigger: '外鄉人破壞圍籬' }),
+  r({ key: 'a-fence-both', text: '圍籬不得被破壞。', tier: 'plain', category: 'action', verb: 'break', target: { type: 'fence' }, hole: '翻越是另一條管的；沒聽到的人不受約束。', trigger: '外鄉人破壞圍籬' }),
   r({ key: 'a-wild-enter', text: '外鄉人不得進入荒野。', tier: 'plain', category: 'action', who: 'outsider', verb: 'enter', target: { zone: 'wild' }, hole: '天黑前就站在荒野裡的人沒有「進入」；界石被搬後荒野的邊沒了定義。', trigger: '外鄉人走向村外' }),
   r({ key: 'a-speed-any', text: '任何存在不得奔跑，無論緣由。', tier: 'strict', category: 'action', verb: 'run', hole: '村民同樣追不快，書自己吃虧；山羊聽不懂；不聽到它；等重置。', trigger: '外鄉人反覆奔跑', leaks: '書願意拖累全村' }),
   r({ key: 'a-leave-any', text: '外鄉人不得離開本村，無論經由何處、以何種方式。', tier: 'strict', category: 'action', who: 'outsider', verb: 'leave', hole: '不聽到它；等它被撕掉的空檔；影響範圍會跟著書走，把書帶出去等於村也出去了。', trigger: '外鄉人試圖離開', leaks: '書在意邊界' }),
@@ -27,7 +27,6 @@ export const POOL = [
 
   // ========== 藏身 hide（限制）==========
   r({ key: 'h-house-outsider', text: '外鄉人不得進入住宅。', tier: 'crude', category: 'hide', who: 'outsider', verb: 'enter', target: { type: 'house' }, cond: 'uninvited', hole: '和「受邀者得進入」衝突，裁決前不追究；屬於自己的房子算不算。', trigger: '外鄉人進入住宅' }),
-  r({ key: 'h-cart-hide', text: '外鄉人不得藏身於推車。', tier: 'crude', category: 'hide', who: 'outsider', verb: 'use', target: { type: 'cart' }, hole: '水井、草堆、圖書館都能藏；推著走不算藏身。', trigger: '外鄉人躲進推車' }),
   r({ key: 'h-well-hide', text: '外鄉人不得藏身於井中。', tier: 'crude', category: 'hide', who: 'outsider', verb: 'use', target: { type: 'well' }, hole: '別處能藏；站在井裡取水不算藏。', trigger: '外鄉人躲進水井' }),
   r({ key: 'h-building-any', text: '外鄉人不得進入任何建築。', tier: 'plain', category: 'hide', who: 'outsider', verb: 'enter', target: { tag: 'building' }, hole: '屬於自己的那間房子算不算建築沒有定義；水井、草堆不是建築。', trigger: '外鄉人進入圖書館或工作站' }),
   r({ key: 'h-well-enter', text: '任何存在不得進入水井。', tier: 'plain', category: 'hide', verb: 'use', target: { type: 'well' }, hole: '村民沒法打水，書得補「市民取水不在此限」，你可以說自己在取水。', trigger: '外鄉人躲進水井', leaks: '書願意拖累村民' }),

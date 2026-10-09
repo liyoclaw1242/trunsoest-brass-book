@@ -8,7 +8,7 @@ const file = process.argv[2] || 'public/scene.json';
 const scene = JSON.parse(readFileSync(file, 'utf8'));
 const errors = [], warn = [];
 const ids = new Set();
-const TYPES = ['book', 'lectern', 'speaker', 'notice', 'house', 'door', 'fence', 'cart', 'keepsake', 'boundary', 'villager', 'outsider', 'lamppost', 'clothes', 'lamp', 'wild', 'library', 'workstation', 'goat', 'rope', 'census', 'bell', 'carved-stone', 'well'];
+const TYPES = ['book', 'lectern', 'speaker', 'notice', 'house', 'door', 'fence', 'keepsake', 'boundary', 'villager', 'outsider', 'lamppost', 'clothes', 'lamp', 'wild', 'library', 'workstation', 'goat', 'rope', 'census', 'bell', 'carved-stone', 'well'];
 const ZONE = new Set(['wild']);
 for (const o of scene) {
   for (const k of ['id', 'type', 'state', 'verbs']) if (!(k in o)) errors.push(`${o.id || '?'}: 缺 ${k}`);
@@ -26,13 +26,13 @@ for (const o of scene) {
   }
 }
 // 重疊檢查：會擋路的物件不該兩個疊在同一格（門與住宅例外——門本來就在住宅門洞）
-const BLOCKERS = new Set(['lectern', 'speaker', 'notice', 'boundary', 'lamppost', 'cart', 'fence']);
+const BLOCKERS = new Set(['lectern', 'speaker', 'notice', 'boundary', 'lamppost', 'fence']);
 const atCell = new Map();
 for (const o of scene) { if (!o.pos || !BLOCKERS.has(o.type)) continue; const k = o.pos.join(','); (atCell.get(k) || atCell.set(k, []).get(k)).push(o.id); }
 for (const [k, ids] of atCell) if (ids.length > 1) errors.push(`格子 (${k}) 有多個擋路物件重疊：${ids.join('、')}`);
 for (const o of scene) { if (o.type !== 'door' || !o.pos) continue; const k = o.pos.join(','); if (atCell.has(k)) errors.push(`門 ${o.id} 和擋路物件 ${atCell.get(k).join('、')} 同格`); }
 const count = t => scene.filter(o => o.type === t).length;
-const expect = { book: [1, 1], lectern: [1, 1], speaker: [4, 10], notice: [2, 4], house: [4, 8], fence: [6, 30], cart: [2, 4], boundary: [8, 20], villager: [3, 8], outsider: [1, 1] };
+const expect = { book: [1, 1], lectern: [1, 1], speaker: [4, 10], notice: [2, 4], house: [4, 8], fence: [6, 30], boundary: [8, 20], villager: [3, 8], outsider: [1, 1] };
 for (const [t, [lo, hi]] of Object.entries(expect)) { const n = count(t); if (n < lo || n > hi) errors.push(`${t} 數量 ${n}，規格是 ${lo}–${hi}`); }
 if (count('door') !== count('house')) errors.push('門的數量要等於住宅數量');
 if (count('keepsake') + count('bell') !== count('villager')) errors.push('信物（含山羊鈴鐺）數量要等於村民數量');

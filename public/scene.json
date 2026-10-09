@@ -891,60 +891,6 @@
 "dir": "y"
 },
 {
-"id": "cart_01",
-"type": "cart",
-"pos": [
-54,
-27
-],
-"state": "intact",
-"tags": [
-"breakable",
-"step"
-],
-"verbs": [
-"move",
-"break",
-"use"
-]
-},
-{
-"id": "cart_02",
-"type": "cart",
-"pos": [
-45,
-76
-],
-"state": "intact",
-"tags": [
-"breakable",
-"step"
-],
-"verbs": [
-"move",
-"break",
-"use"
-]
-},
-{
-"id": "cart_03",
-"type": "cart",
-"pos": [
-24,
-52
-],
-"state": "intact",
-"tags": [
-"breakable",
-"step"
-],
-"verbs": [
-"move",
-"break",
-"use"
-]
-},
-{
 "id": "keepsake_01",
 "type": "keepsake",
 "pos": [

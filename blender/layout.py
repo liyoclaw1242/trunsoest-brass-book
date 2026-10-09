@@ -48,9 +48,6 @@ OBJECTS = [
     *[dict(type='fence', id=f'fence_{i+1:02d}', pos=(46 + i, 26), dir='x') for i in range(6)],
     *[dict(type='fence', id=f'fence_{i+7:02d}', pos=(47 + i, 78), dir='x') for i in range(6)],
     *[dict(type='fence', id=f'fence_{i+13:02d}', pos=(22, 45 + i), dir='y') for i in range(5)],
-    dict(type='cart', id='cart_01', pos=(54, 27)),
-    dict(type='cart', id='cart_02', pos=(45, 76)),
-    dict(type='cart', id='cart_03', pos=(24, 52)),
     # 信物（都在廣播範圍內）
     *[dict(type='keepsake', id=f'keepsake_0{i+1}', pos=p, owner=f'villager_0{i+1}') for i, p in enumerate([(26, 48), (72, 48), (29, 58), (69, 58), (44, 66)])],
     # 燈柱
