@@ -63,7 +63,7 @@
 "enter",
 "reside"
 ],
-"owner": "villager_01"
+"owner": "villager_05"
 },
 {
 "id": "house_02",
@@ -82,7 +82,7 @@
 "enter",
 "reside"
 ],
-"owner": "villager_02"
+"owner": "villager_06"
 },
 {
 "id": "house_03",
@@ -101,7 +101,7 @@
 "enter",
 "reside"
 ],
-"owner": "villager_03"
+"owner": "villager_01"
 },
 {
 "id": "house_04",
@@ -139,7 +139,7 @@
 "enter",
 "reside"
 ],
-"owner": "villager_05"
+"owner": "villager_02"
 },
 {
 "id": "house_06",
@@ -158,7 +158,7 @@
 "enter",
 "reside"
 ],
-"owner": "villager_06"
+"owner": "villager_03"
 },
 {
 "id": "door_01",
@@ -263,11 +263,188 @@
 "parent": "house_06"
 },
 {
+"id": "field_01",
+"type": "field",
+"pos": [
+34,
+73
+],
+"state": "intact",
+"tags": [
+"field",
+"ground"
+],
+"verbs": [
+"use"
+]
+},
+{
+"id": "field_02",
+"type": "field",
+"pos": [
+46,
+73
+],
+"state": "intact",
+"tags": [
+"field",
+"ground"
+],
+"verbs": [
+"use"
+]
+},
+{
+"id": "field_03",
+"type": "field",
+"pos": [
+58,
+73
+],
+"state": "intact",
+"tags": [
+"field",
+"ground"
+],
+"verbs": [
+"use"
+]
+},
+{
+"id": "granary_01",
+"type": "granary",
+"pos": [
+49,
+68
+],
+"state": "intact",
+"tags": [
+"granary",
+"store",
+"building"
+],
+"verbs": [
+"use"
+]
+},
+{
+"id": "shop_01",
+"type": "shop",
+"pos": [
+42,
+52
+],
+"state": "intact",
+"tags": [
+"shop",
+"market",
+"building"
+],
+"verbs": [
+"use"
+]
+},
+{
+"id": "shop_02",
+"type": "shop",
+"pos": [
+56,
+52
+],
+"state": "intact",
+"tags": [
+"shop",
+"market",
+"building"
+],
+"verbs": [
+"use"
+]
+},
+{
+"id": "post_01",
+"type": "post",
+"pos": [
+50,
+40
+],
+"state": "intact",
+"tags": [
+"post",
+"guard"
+],
+"verbs": [
+"use"
+]
+},
+{
+"id": "post_02",
+"type": "post",
+"pos": [
+64,
+52
+],
+"state": "intact",
+"tags": [
+"post",
+"guard"
+],
+"verbs": [
+"use"
+]
+},
+{
+"id": "post_03",
+"type": "post",
+"pos": [
+49,
+64
+],
+"state": "intact",
+"tags": [
+"post",
+"guard"
+],
+"verbs": [
+"use"
+]
+},
+{
+"id": "post_04",
+"type": "post",
+"pos": [
+34,
+52
+],
+"state": "intact",
+"tags": [
+"post",
+"guard"
+],
+"verbs": [
+"use"
+]
+},
+{
+"id": "cart_01",
+"type": "cart",
+"pos": [
+51,
+70
+],
+"state": "intact",
+"tags": [
+"cart",
+"vehicle"
+],
+"verbs": []
+},
+{
 "id": "ws_01",
 "type": "workstation",
 "pos": [
-34,
-48
+45,
+50
 ],
 "state": "intact",
 "tags": [
@@ -276,59 +453,8 @@
 "verbs": [
 "use"
 ],
-"owner": "villager_01",
+"owner": "villager_08",
 "kind": "paper"
-},
-{
-"id": "ws_02",
-"type": "workstation",
-"pos": [
-64,
-48
-],
-"state": "intact",
-"tags": [
-"station"
-],
-"verbs": [
-"use"
-],
-"owner": "villager_02",
-"kind": "ink"
-},
-{
-"id": "ws_03",
-"type": "workstation",
-"pos": [
-34,
-60
-],
-"state": "intact",
-"tags": [
-"station"
-],
-"verbs": [
-"use"
-],
-"owner": "villager_03",
-"kind": "paper"
-},
-{
-"id": "ws_04",
-"type": "workstation",
-"pos": [
-64,
-60
-],
-"state": "intact",
-"tags": [
-"station"
-],
-"verbs": [
-"use"
-],
-"owner": "villager_05",
-"kind": "ink"
 },
 {
 "id": "speaker_01",
@@ -527,7 +653,7 @@
 "type": "notice",
 "pos": [
 49,
-40
+42
 ],
 "state": "written",
 "tags": [
@@ -707,8 +833,8 @@
 "id": "fence_07",
 "type": "fence",
 "pos": [
-47,
-78
+43,
+82
 ],
 "state": "intact",
 "tags": [
@@ -724,8 +850,8 @@
 "id": "fence_08",
 "type": "fence",
 "pos": [
-48,
-78
+44,
+82
 ],
 "state": "intact",
 "tags": [
@@ -741,8 +867,8 @@
 "id": "fence_09",
 "type": "fence",
 "pos": [
-49,
-78
+45,
+82
 ],
 "state": "intact",
 "tags": [
@@ -758,8 +884,8 @@
 "id": "fence_10",
 "type": "fence",
 "pos": [
-50,
-78
+46,
+82
 ],
 "state": "intact",
 "tags": [
@@ -775,8 +901,8 @@
 "id": "fence_11",
 "type": "fence",
 "pos": [
-51,
-78
+47,
+82
 ],
 "state": "intact",
 "tags": [
@@ -792,8 +918,8 @@
 "id": "fence_12",
 "type": "fence",
 "pos": [
-52,
-78
+48,
+82
 ],
 "state": "intact",
 "tags": [
@@ -1014,7 +1140,7 @@
 "type": "lamppost",
 "pos": [
 49,
-70
+76
 ],
 "state": "intact",
 "tags": [
@@ -1030,46 +1156,8 @@
 "id": "clothes_01",
 "type": "clothes",
 "pos": [
-37,
-45
-],
-"state": "intact",
-"tags": [
-"portable",
-"disguise"
-],
-"verbs": [
-"take",
-"wear",
-"drop"
-],
-"owner": "villager_01"
-},
-{
-"id": "clothes_02",
-"type": "clothes",
-"pos": [
-61,
-45
-],
-"state": "intact",
-"tags": [
-"portable",
-"disguise"
-],
-"verbs": [
-"take",
-"wear",
-"drop"
-],
-"owner": "villager_02"
-},
-{
-"id": "clothes_03",
-"type": "clothes",
-"pos": [
-49,
-66
+40,
+51
 ],
 "state": "intact",
 "tags": [
@@ -1082,6 +1170,25 @@
 "drop"
 ],
 "owner": "villager_05"
+},
+{
+"id": "clothes_02",
+"type": "clothes",
+"pos": [
+58,
+51
+],
+"state": "intact",
+"tags": [
+"portable",
+"disguise"
+],
+"verbs": [
+"take",
+"wear",
+"drop"
+],
+"owner": "villager_06"
 },
 {
 "id": "lamp_01",
@@ -1388,7 +1495,7 @@
 "type": "villager",
 "pos": [
 34,
-46
+72
 ],
 "state": "half",
 "tags": [
@@ -1397,38 +1504,42 @@
 "verbs": [
 "induce"
 ],
+"role": "farmer",
+"field": "field_01",
 "color": [
-0.9,
 0.35,
-0.3
+0.7,
+0.4
 ]
 },
 {
 "id": "villager_02",
 "type": "villager",
 "pos": [
-64,
-46
+46,
+72
 ],
-"state": "puppet",
+"state": "half",
 "tags": [
 "actor"
 ],
 "verbs": [
 "induce"
 ],
+"role": "farmer",
+"field": "field_02",
 "color": [
 0.3,
-0.55,
-0.9
+0.62,
+0.34
 ]
 },
 {
 "id": "villager_03",
 "type": "villager",
 "pos": [
-34,
-58
+58,
+72
 ],
 "state": "half",
 "tags": [
@@ -1437,18 +1548,20 @@
 "verbs": [
 "induce"
 ],
+"role": "farmer",
+"field": "field_03",
 "color": [
-0.95,
-0.75,
-0.2
+0.46,
+0.68,
+0.3
 ]
 },
 {
 "id": "villager_04",
 "type": "villager",
 "pos": [
-64,
-58
+51,
+69
 ],
 "state": "half",
 "tags": [
@@ -1457,10 +1570,12 @@
 "verbs": [
 "induce"
 ],
+"role": "logistics",
+"cart": "cart_01",
 "color": [
-0.35,
-0.75,
-0.4
+0.6,
+0.42,
+0.25
 ]
 },
 {
@@ -1468,7 +1583,7 @@
 "type": "villager",
 "pos": [
 42,
-66
+53
 ],
 "state": "half",
 "tags": [
@@ -1477,18 +1592,63 @@
 "verbs": [
 "induce"
 ],
+"role": "merchant",
+"shop": "shop_01",
 "color": [
-0.7,
-0.4,
-0.8
+0.92,
+0.72,
+0.2
 ]
 },
 {
 "id": "villager_06",
 "type": "villager",
 "pos": [
-49,
-24
+56,
+53
+],
+"state": "half",
+"tags": [
+"actor"
+],
+"verbs": [
+"induce"
+],
+"role": "merchant",
+"shop": "shop_02",
+"color": [
+0.86,
+0.6,
+0.24
+]
+},
+{
+"id": "villager_07",
+"type": "villager",
+"pos": [
+50,
+41
+],
+"state": "half",
+"tags": [
+"actor"
+],
+"verbs": [
+"induce"
+],
+"role": "sheriff",
+"color": [
+0.3,
+0.45,
+0.78
+]
+},
+{
+"id": "villager_08",
+"type": "villager",
+"pos": [
+45,
+51
 ],
 "state": "puppet",
 "tags": [
@@ -1497,10 +1657,32 @@
 "verbs": [
 "induce"
 ],
+"role": "scribe",
 "color": [
-0.6,
 0.55,
-0.5
+0.4,
+0.72
+]
+},
+{
+"id": "villager_09",
+"type": "villager",
+"pos": [
+50,
+68
+],
+"state": "half",
+"tags": [
+"actor"
+],
+"verbs": [
+"induce"
+],
+"role": "keeper",
+"color": [
+0.72,
+0.6,
+0.42
 ]
 },
 {

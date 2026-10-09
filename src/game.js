@@ -7,7 +7,8 @@ import { COMFORT_CN, COMFORT_BENEFIT } from '../engine/assimilation.js';
 import { ENDINGS } from '../engine/match.js';
 
 export const LABEL = { induce: '誘導', enter: '進入', use: '使用', open: '開啟', take: '取走', give: '給', break: '破壞', repair: '修復', move: '搬動', climb: '翻越', read: '閱讀', deface: '塗毀', approach: '靠近', run: '奔跑', capture: '抓捕', leave: '離開', walk: '行走', wear: '穿上', light: '點火', stay: '停留', drop: '放下', talk: '交談', greet: '問安', listen: '聆聽', reside: '居住', accept: '領受', harm: '傷害', invite: '邀請', tie: '繫上', lead: '牽引' };
-export const TYPE = { book: '黃銅書', lectern: '書台', speaker: '廣播器', notice: '公告牌', house: '住宅', door: '門', fence: '圍籬', boundary: '界石', villager: '村民', outsider: '外鄉人', lamppost: '燈柱', clothes: '衣物', lamp: '提燈', library: '圖書館', workstation: '工作站', goat: '山羊', rope: '繩子', census: '戶籍冊', 'carved-stone': '刻字石', well: '水井' };
+export const TYPE = { book: '黃銅書', lectern: '書台', speaker: '廣播器', notice: '公告牌', house: '住宅', door: '門', fence: '圍籬', boundary: '界石', villager: '村民', outsider: '外鄉人', lamppost: '燈柱', clothes: '衣物', lamp: '提燈', library: '圖書館', workstation: '抄寫台', goat: '山羊', rope: '繩子', census: '戶籍冊', 'carved-stone': '刻字石', well: '水井', field: '田', granary: '穀倉', shop: '店鋪', post: '哨口', cart: '物流車' };
+export const ROLE_CN = { farmer: '農夫', logistics: '物流業者', merchant: '商人', sheriff: '治安官', scribe: '書記', keeper: '穀倉管理員' };
 export const STATE = { intact: '完好', broken: '損壞', closed: '關著', open: '開著', written: '有字', defaced: '被塗毀', puppet: '人偶', half: '半同化', awake: '已喚醒', torn: '撕破', frayed: '磨斷', unlit: '未點', lit: '亮著', worn: '穿著', destroyed: '毀壞' };
 export const name = o => o ? `${TYPE[o.type] || o.type}${o.id.includes('_') && /\d/.test(o.id) ? ' ' + o.id.split('_').pop() : ''}` : '';
 
@@ -121,7 +122,7 @@ export class Game {
     const st = this.match.activity.stage;
     if (this._lastStage && this._lastStage !== st) { if (st === 'mid') this.pushHint('stage-mid', '書進入「中期」：開始要求你照它的方式生活（義務類條文）。照做會讓你更像市民。'); if (st === 'late') this.pushHint('stage-late', '書進入「後期」：開始改寫「誰算市民」。小心別聽到剛好套在你身上的那一條定義。'); }
     this._lastStage = st;
-    if (this.started && this.opening <= 0 && !this.shownHints.has('first-villager')) { const near = this.villagers.find(v => !v.dead && cheb(v.pos, this.player.cell) <= 1 && v.level !== 'puppet'); if (near) this.pushHint('first-villager', '靠近村民按 E：可以接受他的好處（更舒適，但也更接近被同化、更可能符合後期的『市民』定義）。'); }
+    if (this.started && this.opening <= 0 && !this.shownHints.has('first-merchant')) { const near = this.villagers.find(v => !v.dead && cheb(v.pos, this.player.cell) <= 1 && this.vil.comfortOffers(v).length); if (near) this.pushHint('first-merchant', '市集的商人會給你好處（名字、衣物、房子、工作）。按 E 領受更舒適，但也更接近被同化、更可能符合後期的『市民』定義。'); }
     this.session.tick(dt);
     // 時間分每累積約 1 點就報一次（讓玩家把活性和勞動連起來）
     if (this._actAcc >= 1) { this._actAcc = 0; this.note('activity', `活性隨時間上升（${this.match.economy.workers()} 人在勞動）→ ${Math.round(this.match.activity.value)}`, {}); }
@@ -209,9 +210,7 @@ export class Game {
     if (!this.boundarySealed()) return '界石的封印失效了——趁現在走出影響範圍（白色虛線圈）！';
     if (!this.player.seenBook) return '先去村子中央的圖書館，找到那本黃銅書（跟著畫面上的金色標記）。走進去就看得到。';
     if (m.assim.value >= m.assim.opt.max - 1) return `同化度 ${m.assim.value}/${m.assim.opt.max}，快到頂了！躲到聽不到廣播的地方讓它退下來。`;
-    const awake = this.villagers.filter(v => v.level === 'awake' && !v.dead).length;
-    if (awake === 0) return '目標：喚醒村民來削弱書。砸廣播器讓附近村民聽不到 30 秒，或把信物還給本人。';
-    return `已喚醒 ${awake} 人。繼續喚醒（書會越來越弱），或趁書重寫規則的空檔逃出邊界。`;
+    return '趁書重寫規則的空檔走出影響範圍逃走，或把黃銅書搬到荒野深處放逐它。小心巡邏的治安官。';
   }
   /** 畫面標記：重要地標（書、山羊、隕石），讓玩家找得到。 */
   landmarks() {
@@ -220,6 +219,8 @@ export class Game {
     if (book && book.pos) out.push({ id: 'book', cell: book.heldBy ? this.player.cell : book.pos, text: '黃銅書（圖書館）', cls: 'book' });
     const goat = [...w.objects.values()].find(o => o.type === 'goat');
     if (goat && goat.pos) out.push({ id: 'goat', cell: goat.fpos || goat.pos, text: '山羊', cls: 'goat' });
+    // 市集：還沒拿滿舒適時，指一間店鋪，讓玩家找得到商人
+    if (this.match.assim.comforts.size < 4) { const shop = [...w.objects.values()].filter(o => o.type === 'shop' && o.pos).sort((a, b) => dist(a.pos, this.player.cell) - dist(b.pos, this.player.cell))[0]; if (shop) out.push({ id: 'market', cell: shop.pos, text: '市集店鋪', cls: 'market' }); }
     return out;
   }
   broadcast() { const n = this.world.now; if (!n) return null; return { rule: this.world.rule(n.no), progress: 1 - n.left / this.world.opt.announceSec, hearing: n.listeners.has('outsider') }; }
@@ -236,6 +237,6 @@ export class Game {
       phase: w.phase(), cell: [...p.cell], house: p.house, zone: this.grid.zone(p.cell), inBroadcast: w.inBroadcast(p.cell), inRange: this.grid.inRange(p.cell),
       held: [...p.actor.held], wearing: p.actor.wearing || null, lit: !!p.actor.lit, carrying: p.carrying, rules: w.active().length, resets: w.resets, opening: Math.ceil(this.opening * 10) / 10,
       writing: this.bookWriting(), objective: this.objective(), hint: this.currentHint(),
-      villagers: this.villagers.map(v => ({ id: v.id, pos: [...v.pos], level: v.level, mode: v.mode, hunting: this.vil.hunts(v), dead: !!v.dead, working: v.mode === 'work', carrying: !!v.carryingGoods })) };
+      villagers: this.villagers.map(v => ({ id: v.id, pos: [...v.pos], level: v.level, mode: v.mode, role: v.role || null, hunting: this.vil.hunts(v), dead: !!v.dead, working: v.mode === 'work', carrying: !!v.carryingGoods })) };
   }
 }

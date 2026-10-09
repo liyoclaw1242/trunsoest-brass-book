@@ -12,7 +12,8 @@ export function createSession(scene, meta, opt = {}) {
   const grid = new Grid(world.objects, { roads: meta.roads || [], plaza: meta.plaza || null, wildDeep: meta.wildDeep || null, radius: meta.radius });
   const outsider = world.addActor({ id: 'outsider', kind: 'outsider', pos: [...meta.start] });
   for (const o of scene.filter(o => o.type === 'villager')) {
-    world.addActor({ id: o.id, kind: 'citizen', pos: [...o.pos], level: o.state, home: [...o.pos], color: o.color, carrier: !!o.carrier });
+    world.addActor({ id: o.id, kind: 'citizen', pos: [...o.pos], level: o.state, home: [...o.pos], color: o.color, carrier: !!o.carrier,
+      role: o.role || null, field: o.field || null, shop: o.shop || null, cart: o.cart || null });
   }
   // 憲法：市民皆認知，外鄉人沒被告知過
   const citizens = [...world.actors.values()].filter(a => a.kind === 'citizen').map(a => a.id);

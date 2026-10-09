@@ -26,9 +26,9 @@ const dz = await text(pw, '#designer');
 check('設計者視角：種子＋權重＋等級', dz.includes('種子') && dz.includes('權重') && /\d+\/\d+\/\d+/.test(dz), dz.slice(0, 44));
 await pw.shot(DIR, '03-designer');
 await pw.eval(() => window.__game.designer(false));
-// 舒適：走到村民旁接受（找最近的 half 村民）
-// 把一個 half 村民放到外鄉人旁邊，確保接受得到舒適
-await pw.eval(() => { const g = window.__game.game; const me = g.player.cell; const h = g.villagers.find(x => x.level === 'half'); h.pos = [me[0] + 1, me[1]]; h.fpos = [...h.pos]; h.path = []; h.move = null; });
+// 舒適：走到商人旁接受（舒適由市集的商人提供）
+// 把一個商人放到外鄉人旁邊，確保接受得到舒適
+await pw.eval(() => { const g = window.__game.game; const me = g.player.cell; const h = g.villagers.find(x => x.role === 'merchant') || g.villagers.find(x => x.level === 'half'); h.pos = [me[0] + 1, me[1]]; h.fpos = [...h.pos]; h.path = []; h.move = null; });
 await pw.face([1, 0]);
 { const o = await pw.options(); const i = o.findIndex(x => x.verb === 'accept'); check('有「接受舒適」選項', i >= 0, o.map(x => x.label).slice(0, 4).join('|')); if (i >= 0) { await pw.act(i); await pw.wait(0.3); } }
 const s2 = await pw.status();

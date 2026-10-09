@@ -19,7 +19,8 @@ for m in (rb, layout):
 
 MAKERS = {t: importlib.import_module(f'make_{t}') for t in
           ['book', 'lectern', 'speaker', 'notice', 'house', 'door', 'fence', 'boundary', 'villager', 'outsider', 'lamppost', 'clothes', 'lamp',
-           'library', 'workstation', 'goat', 'rope', 'census', 'carved_stone', 'well']}
+           'library', 'workstation', 'goat', 'rope', 'census', 'carved_stone', 'well',
+           'field', 'granary', 'shop', 'post', 'cart']}
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 scene = bpy.context.scene
@@ -51,7 +52,7 @@ for o in layout.OBJECTS:
     rec['state'] = o.get('state', default_state)
     rec['tags'] = [s for s in p['rb_tags'].split(',') if s]
     rec['verbs'] = [s for s in p['rb_verbs'].split(',') if s]
-    for k in ('radius', 'owner', 'parent', 'dir', 'kind', 'carrier'):
+    for k in ('radius', 'owner', 'parent', 'dir', 'kind', 'carrier', 'role', 'field', 'shop', 'cart'):
         if k in o and o[k] is not None:
             rec[k] = o[k]
     if t == 'villager':
