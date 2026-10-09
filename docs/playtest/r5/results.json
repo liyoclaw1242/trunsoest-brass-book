@@ -26,7 +26,7 @@
  },
  {
   "n": "無人聆聽：達成並顯示結局畫面",
-  "ok": false,
-  "info": "state=playing ov="
+  "ok": true,
+  "info": "state=unheard ov=無人聆聽（封印三） 廣播器沉默、公告無字、醒著的人不再傳話。"
  }
 ]
