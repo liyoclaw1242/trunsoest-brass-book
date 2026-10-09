@@ -17,7 +17,7 @@ def mat(color):
         stone = key in {tuple(round(c, 3) for c in c2) for c2 in ((0.55, 0.55, 0.52), (0.35, 0.35, 0.34))}
         if bsdf:
             bsdf.inputs['Base Color'].default_value = (*key, 1.0)
-            bsdf.inputs['Roughness'].default_value = 0.35 if metal else 0.95 if stone else 0.75
+            bsdf.inputs['Roughness'].default_value = 0.4 if metal else 0.95 if stone else 0.9
             if 'Metallic' in bsdf.inputs: bsdf.inputs['Metallic'].default_value = 0.8 if metal else 0.0
         m.diffuse_color = (*key, 1.0)
         _mats[key] = m
@@ -152,3 +152,43 @@ METAL = (0.45, 0.47, 0.5)
 PAPER = (0.93, 0.9, 0.8)
 INK = (0.15, 0.12, 0.1)
 RED = (0.8, 0.15, 0.1)
+
+# —— 星露谷風格暖色調與材質（art pass 新增）——
+GRASS   = (0.41, 0.60, 0.29)
+GRASS2  = (0.47, 0.66, 0.33)
+GRASS3  = (0.36, 0.54, 0.26)
+LEAF    = (0.30, 0.54, 0.26)
+LEAF2   = (0.38, 0.62, 0.30)
+LEAF3   = (0.52, 0.64, 0.26)
+TRUNK   = (0.46, 0.32, 0.20)
+DIRT    = (0.64, 0.47, 0.30)
+SOILC   = (0.42, 0.29, 0.19)
+COBBLE  = (0.64, 0.62, 0.58)
+COBBLE2 = (0.56, 0.54, 0.50)
+CREAM   = (0.94, 0.87, 0.73)
+PLASTER = (0.89, 0.80, 0.65)
+TIMBER  = (0.50, 0.34, 0.22)   # 露明木架
+ROOF_RED   = (0.72, 0.29, 0.23)
+ROOF_BLUE  = (0.31, 0.46, 0.60)
+ROOF_GREEN = (0.34, 0.50, 0.34)
+ROOF_TEAL  = (0.25, 0.52, 0.52)
+ROOF_PLUM  = (0.46, 0.30, 0.46)
+THATCH  = (0.80, 0.63, 0.34)
+WINDOW  = (0.68, 0.85, 0.92)
+FLOWERS = [(0.90, 0.33, 0.40), (0.96, 0.76, 0.24), (0.86, 0.45, 0.76),
+           (0.56, 0.45, 0.86), (0.96, 0.55, 0.30), (0.97, 0.93, 0.46)]
+ROOFS   = [ROOF_RED, ROOF_BLUE, ROOF_GREEN, ROOF_TEAL, ROOF_PLUM]
+
+def _pyr():
+    """四面金字塔（低多邊形屋頂／樹冠用）。"""
+    key = 'rb_pyr'
+    if key not in bpy.data.meshes:
+        bm = bpy.data.meshes.new(key)
+        v = [(-.5, -.5, -.5), (.5, -.5, -.5), (.5, .5, -.5), (-.5, .5, -.5), (0, 0, .5)]
+        f = [(0, 1, 4), (1, 2, 4), (2, 3, 4), (3, 0, 4), (3, 2, 1, 0)]
+        bm.from_pydata(v, [], f); bm.update()
+    return bpy.data.meshes[key]
+
+def pyramid(parent, name, size, center, color, rot=(0, 0, 0)):
+    """金字塔／四坡屋頂。size=(w, d, h)。"""
+    return _mesh_obj(name, _pyr(), parent, center, rot, size, color)

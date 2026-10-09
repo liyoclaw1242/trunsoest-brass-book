@@ -13,8 +13,8 @@ def arg(name, default):
 OUT = os.path.join(ROOT, arg('--out', 'public'))
 RENDER = os.path.join(ROOT, arg('--render', 'docs/playtest/m1')) if '--no-render' not in args else None
 
-import rb, layout
-for m in (rb, layout):
+import rb, layout, scenery
+for m in (rb, layout, scenery):
     importlib.reload(m)
 
 MAKERS = {t: importlib.import_module(f'make_{t}') for t in
@@ -29,7 +29,7 @@ scene.unit_settings.scale_length = 1.0
 
 # 地面（匯出，畫面端保留）
 size = getattr(layout, 'MAP', max(layout.CENTER) + layout.RADIUS + 12)
-ground = rb.box(None, 'ground', (size * 1.0, size * 1.0, 0.02), (size / 2 - 0.5, size / 2 - 0.5, -0.01), (0.45, 0.62, 0.38))
+ground = rb.box(None, 'ground', (size * 1.0, size * 1.0, 0.02), (size / 2 - 0.5, size / 2 - 0.5, -0.01), rb.GRASS)
 
 records = []
 parents = []
@@ -61,6 +61,9 @@ for o in layout.OBJECTS:
     p['rb_state'] = rec['state']
 
 # 只顯示初始狀態（匯出時所有狀態都要保留，所以不隱藏；畫面端依 scene.json 切換）
+
+# 星露谷風裝飾（非互動、不進 scene.json）
+scenery.scatter(layout, seed=7)
 
 os.makedirs(OUT, exist_ok=True)
 with open(os.path.join(OUT, 'scene.json'), 'w', encoding='utf-8') as f:

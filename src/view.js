@@ -16,8 +16,8 @@ export class View {
     this.renderer.shadowMap.enabled = true; this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping; this.renderer.toneMappingExposure = 1.05;
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x8fa9b8);
-    this.scene.fog = new THREE.Fog(0x8fa9b8, 55, 120);
+    this.scene.background = new THREE.Color(0xb6c6c2);
+    this.scene.fog = new THREE.Fog(0xb6c6c2, 58, 128);
     this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 500);
     this.viewHeight = 26;              // 畫面縱向看得到幾格
     this.hemi = new THREE.HemisphereLight(0xcfe0ff, 0x6b6250, 1.4); this.scene.add(this.hemi);
@@ -47,9 +47,9 @@ export class View {
   async load(url) {
     const gltf = await new GLTFLoader().loadAsync(url);
     const root = gltf.scene; this.scene.add(root);
-    root.traverse(o => { if (o.isMesh) { const ground = o.name === 'ground'; o.castShadow = !ground; o.receiveShadow = true; if (o.material) { o.material.roughness = o.material.roughness ?? 1; } } });
+    root.traverse(o => { if (o.isMesh) { const flat = o.name === 'ground' || o.name.includes('_slab'); o.castShadow = !flat; o.receiveShadow = true; if (o.material) { o.material.roughness = o.material.roughness ?? 1; } } });
     for (const node of root.children) {
-      if (node.name === 'ground') continue;
+      if (node.name === 'ground' || node.name.startsWith('decor')) continue;   // 裝飾（樹／花／草／鋪石）只渲染、不追蹤狀態
       const id = node.name;
       this.nodes.set(id, node);
       const st = {};
@@ -85,17 +85,17 @@ export class View {
   setDaylight(target, dt) {
     this.daylight += (target - this.daylight) * Math.min(1, dt * 1.5);
     const d = this.daylight;
-    this.hemi.intensity = 0.35 + 1.15 * d; this.sun.intensity = 0.2 + 2.5 * d; this.fill.intensity = 0.15 + 0.4 * d;
-    this.hemi.color.setRGB(0.42 + 0.39 * d, 0.5 + 0.38 * d, 0.7 + 0.3 * d);
-    const bg = this.scene.background; bg.setRGB(0.07 + 0.49 * d, 0.09 + 0.57 * d, 0.14 + 0.58 * d);
+    this.hemi.intensity = 0.4 + 1.1 * d; this.sun.intensity = 0.25 + 2.6 * d; this.fill.intensity = 0.15 + 0.45 * d;
+    this.hemi.color.setRGB(0.55 + 0.33 * d, 0.57 + 0.34 * d, 0.60 + 0.25 * d);   // 偏暖的天光
+    const bg = this.scene.background; bg.setRGB(0.12 + 0.56 * d, 0.16 + 0.60 * d, 0.20 + 0.56 * d);   // 柔和暖藍天
     if (this.scene.fog) this.scene.fog.color.copy(bg);
-    this.renderer.toneMappingExposure = 0.85 + 0.25 * d;
+    this.renderer.toneMappingExposure = 0.9 + 0.28 * d;
   }
   /** 村道：淡色平面，從 meta.roads 的矩形畫。 */
   roads(rects) {
     for (const [x0, y0, x1, y1] of rects) {
       const g = new THREE.PlaneGeometry(x1 - x0 + 1, y1 - y0 + 1); g.rotateX(-Math.PI / 2);
-      const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: 0xcdbb95, roughness: 1 }));
+      const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: 0xbf9d64, roughness: 1 }));
       m.position.set((x0 + x1) / 2, 0.015, -(y0 + y1) / 2); this.scene.add(m);
     }
   }
