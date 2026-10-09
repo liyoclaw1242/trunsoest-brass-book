@@ -8,7 +8,7 @@ const file = process.argv[2] || 'public/scene.json';
 const scene = JSON.parse(readFileSync(file, 'utf8'));
 const errors = [], warn = [];
 const ids = new Set();
-const TYPES = ['book', 'lectern', 'speaker', 'notice', 'house', 'door', 'fence', 'cart', 'keepsake', 'boundary', 'villager', 'outsider', 'lamppost', 'clothes', 'lamp', 'wild', 'library', 'workstation', 'goat', 'rope', 'meteor', 'census', 'bell', 'carved-stone', 'well'];
+const TYPES = ['book', 'lectern', 'speaker', 'notice', 'house', 'door', 'fence', 'cart', 'keepsake', 'boundary', 'villager', 'outsider', 'lamppost', 'clothes', 'lamp', 'wild', 'library', 'workstation', 'goat', 'rope', 'census', 'bell', 'carved-stone', 'well'];
 const ZONE = new Set(['wild']);
 for (const o of scene) {
   for (const k of ['id', 'type', 'state', 'verbs']) if (!(k in o)) errors.push(`${o.id || '?'}: 缺 ${k}`);

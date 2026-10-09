@@ -6,7 +6,7 @@ import { readFileSync, existsSync } from 'node:fs';
 
 // v2 的物件類型目錄（R2 的 scene 會實際產生這些；抽象目標如 name/fire 無實體但條文指得到）
 const TYPES = new Set(['book', 'lectern', 'speaker', 'notice', 'house', 'door', 'fence', 'cart', 'keepsake', 'boundary', 'villager', 'outsider',
-  'lamppost', 'clothes', 'lamp', 'library', 'workstation', 'goat', 'rope', 'meteor', 'census', 'bell', 'carved-stone', 'well', 'fire', 'earplug', 'name']);
+  'lamppost', 'clothes', 'lamp', 'library', 'workstation', 'goat', 'rope', 'census', 'bell', 'carved-stone', 'well', 'earplug', 'name']);
 const ZONES = new Set(['plaza', 'road', 'wild']);
 const TAGS = new Set(['building', 'roofed']);
 
@@ -42,7 +42,7 @@ for (const [defn, label] of [['has-name', '名字'], ['wears', '衣服'], ['has-
 }
 
 // 覆蓋冒煙：每條有具體 target.type 的條文，場景裡要有那個物件（抽象目標 name/fire/earplug 除外）
-const ABSTRACT = new Set(['name', 'fire', 'earplug']);
+const ABSTRACT = new Set(['name', 'earplug']);
 const scenePath = 'public/scene.json';
 if (existsSync(scenePath)) {
   const scene = JSON.parse(readFileSync(scenePath, 'utf8'));

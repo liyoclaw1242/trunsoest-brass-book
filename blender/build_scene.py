@@ -19,7 +19,7 @@ for m in (rb, layout):
 
 MAKERS = {t: importlib.import_module(f'make_{t}') for t in
           ['book', 'lectern', 'speaker', 'notice', 'house', 'door', 'fence', 'cart', 'keepsake', 'boundary', 'villager', 'outsider', 'lamppost', 'clothes', 'lamp',
-           'library', 'workstation', 'goat', 'rope', 'meteor', 'census', 'bell', 'carved_stone', 'well']}
+           'library', 'workstation', 'goat', 'rope', 'census', 'bell', 'carved_stone', 'well']}
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 scene = bpy.context.scene

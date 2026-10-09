@@ -1283,24 +1283,6 @@
 ]
 },
 {
-"id": "meteor_01",
-"type": "meteor",
-"pos": [
-70,
-70
-],
-"state": "intact",
-"tags": [
-"portable",
-"dangerous"
-],
-"verbs": [
-"take",
-"use",
-"break"
-]
-},
-{
 "id": "boundary_01",
 "type": "boundary",
 "pos": [

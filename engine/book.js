@@ -4,7 +4,7 @@
 import { draw, CAPTURE, CONSTITUTION, FINAL } from './rules.v2.js';
 
 const WRITE_SEC = { crude: 2, plain: 4, strict: 10 };
-const THREAT_TARGETS = new Set(['book', 'library', 'meteor', 'fire']);
+const THREAT_TARGETS = new Set(['book', 'library']);
 
 /** 行為 → 條文類別。回傳 {category, threat} 或 null。 */
 export function categoryOf(verb, obj) {

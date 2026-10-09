@@ -29,8 +29,6 @@ await drive('escape', 'e-escape', async pw => { await pw.eval(() => window.__gam
 await drive('empty', 'e-empty', async pw => { await pw.eval(() => { for (const v of window.__game.game.villagers) v.level = 'awake'; window.__game.place([16, 52]); }); }, '04-empty');
 // 5 放逐（封印二）
 await drive('exile', 'e-exile', async pw => { await pw.eval(() => { const g = window.__game.game; const b = [...g.world.objects.values()].find(o => o.type === 'book'); b.pos = [92, 92]; for (const v of g.villagers) v.pos = [49, 52]; }); }, '05-exile');
-// 6 損毀（封印四）
-await drive('destroyed', 'e-destroyed', async pw => { await pw.eval(() => { const b = [...window.__game.game.world.objects.values()].find(o => o.type === 'book'); b.state = 'destroyed'; window.__game.game.world.emit('object', { object: b, before: 'closed' }); }); }, '06-destroyed');
 // 7 無人聆聽（封印三）
 await drive('unheard', 'e-unheard', async pw => { await pw.eval(() => { const g = window.__game.game; g.match.opt.unheardSec = 1.5; g.match.lastCognition = g.match.t; for (const o of g.world.objects.values()) { if (o.type === 'speaker') o.state = 'broken'; if (o.type === 'notice') o.state = 'defaced'; } g.villagers.slice(0, 3).forEach(v => v.level = 'awake'); }); await pw.wait(2.2); }, '07-unheard');
 

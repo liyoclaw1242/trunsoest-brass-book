@@ -77,12 +77,6 @@ const run = (s, sec) => { for (let i = 0; i < sec * 20; i++) s.tick(0.05); };
   assert.equal(s.match.state, 'exile', JSON.stringify(s.match.reason));
   ok('放逐（封印二）：書被帶到荒野深處、身邊沒有村民');
 }
-// 6. 損毀（封印四）
-{
-  const s = fresh(); s.world.objects.get('book_01').state = 'destroyed'; run(s, 0.1);
-  assert.equal(s.match.state, 'destroyed');
-  ok('損毀（封印四）：書被毀');
-}
 // 7. 無人聆聽（封印三）
 {
   const s = fresh({ match: { unheardSec: 2 } });

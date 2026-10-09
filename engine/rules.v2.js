@@ -49,11 +49,8 @@ export const POOL = [
   r({ key: 'p-library-break', text: '圖書館為重要資產，不得損毀。', tier: 'crude', category: 'selfprotect', verb: 'break', target: { type: 'library' }, hole: '這句話洩露了書在圖書館裡；「損毀」沒定義。', trigger: '外鄉人破壞圖書館', leaks: '書在圖書館裡' }),
   r({ key: 'p-book-move', text: '黃銅書不得被搬動。', tier: 'crude', category: 'selfprotect', verb: 'move', target: { type: 'book' }, hole: '書台沒被提到；山羊可以馱它；沒說不能觸碰。', trigger: '有人搬動書' }),
   r({ key: 'p-book-touch', text: '黃銅書不得被任何存在觸碰、搬動或損毀。', tier: 'strict', category: 'selfprotect', verb: 'move', target: { type: 'book' }, hole: '山羊不是「存在」意義下聽得懂的對象，牠聽不懂；天災不是存在。', trigger: '外鄉人反覆動書' }),
-  r({ key: 'p-fire-out', text: '市民應撲滅村內一切火源。', tier: 'strict', category: 'selfprotect', who: 'citizen', verb: 'repair', target: { type: 'fire' }, mode: 'require', hole: '靠村民的勞動保護它，村民不在或已喚醒時無效。', trigger: '外鄉人生火或帶隕石魔法書靠近', leaks: '書怕火' }),
   r({ key: 'p-library-plain', text: '外鄉人不得進入圖書館。', tier: 'plain', category: 'selfprotect', who: 'outsider', verb: 'enter', target: { type: 'library' }, hole: '這句同樣洩露了書的位置；請村民替你進去搬東西。', trigger: '外鄉人接近圖書館', leaks: '書在圖書館裡' }),
   r({ key: 'p-book-read', text: '黃銅書不得被閱讀。', tier: 'plain', category: 'selfprotect', verb: 'read', target: { type: 'book' }, hole: '讀公告牌、聽廣播一樣知道條文。', trigger: '外鄉人讀書' }),
-  r({ key: 'p-meteor-take', text: '外鄉人不得持有危險之物。', tier: 'crude', category: 'selfprotect', who: 'outsider', verb: 'take', target: { type: 'meteor' }, hole: '「危險之物」沒定義；放在推車上不算持有；請村民拿。', trigger: '外鄉人拿起隕石魔法書', leaks: '書怕隕石魔法書' }),
-  r({ key: 'p-fire-light', text: '任何存在不得於村內舉火。', tier: 'plain', category: 'selfprotect', verb: 'light', target: { type: 'fire' }, hole: '村外舉火不算村內；提燈的火算不算。', trigger: '外鄉人生火', leaks: '書怕火' }),
 
   // ========== 村民 villager（限制）==========
   r({ key: 'v-talk', text: '市民不得與外鄉人交談。', tier: 'crude', category: 'villager', who: 'citizen', verb: 'talk', target: { type: 'outsider' }, hole: '遞東西不算交談；已喚醒者算不算市民。', trigger: '外鄉人與村民互動' }),

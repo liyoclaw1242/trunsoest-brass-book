@@ -122,13 +122,12 @@ export class Game {
     if (this._lastStage && this._lastStage !== st) { if (st === 'mid') this.pushHint('stage-mid', '書進入「中期」：開始要求你照它的方式生活（義務類條文）。照做會讓你更像市民。'); if (st === 'late') this.pushHint('stage-late', '書進入「後期」：開始改寫「誰算市民」。小心別聽到剛好套在你身上的那一條定義。'); }
     this._lastStage = st;
     if (this.started && this.opening <= 0 && !this.shownHints.has('first-villager')) { const near = this.villagers.find(v => !v.dead && cheb(v.pos, this.player.cell) <= 1 && v.level !== 'puppet'); if (near) this.pushHint('first-villager', '靠近村民按 E：可以接受他的好處（更舒適，但更接近被同化），喚醒的村民則會站到你這邊。'); }
+    if (this.started && this.opening <= 0 && !this.shownHints.has('first-cart')) { const c = [...this.world.objects.values()].find(o => o.type === 'cart' && o.pos && cheb(o.pos, this.player.cell) <= 1); if (c) this.pushHint('first-cart', '推車可以推動（擋路／移位）。把它推到圍籬旁，就能踩著它翻過圍籬——不必翻越或破壞，繞過書的圍籬條文。'); }
     this.session.tick(dt);
     // 時間分每累積約 1 點就報一次（讓玩家把活性和勞動連起來）
     if (this._actAcc >= 1) { this._actAcc = 0; this.note('activity', `活性隨時間上升（${this.match.economy.workers()} 人在勞動）→ ${Math.round(this.match.activity.value)}`, {}); }
     // 放逐代價：外鄉人親自搬書，每 20 秒同化度 +1
     if (this.player.carrying) { this._carryT = (this._carryT || 0) + dt; if (this._carryT >= 20) { this._carryT = 0; this.match.assim.set(this.match.assim.value + 1, 'carry'); this.note('assim', '你搬著書太久，同化度 +1', {}); } } else this._carryT = 0;
-    // 隕石引信
-    if (this._fuse) { this._fuse.left -= dt; if (this._fuse.left <= 0) this.detonate(); }
   }
 
   // ---------- 互動 ----------
@@ -150,7 +149,6 @@ export class Game {
       if (o.type === 'clothes') { if (p.actor.wearing !== o.id) out.push(this.opt('wear', o, {}, `穿上${name(o)}`)); out.push({ verb: 'drop', target: id, label: '放下衣物', ok: true, violates: [], run: () => this.dropItem(id) }); }
       if (o.type === 'lamp') { out.push(this.opt('light', o, {}, o.state === 'lit' ? '熄滅提燈' : '點亮提燈')); out.push({ verb: 'drop', target: id, label: '放下提燈', ok: true, violates: [], run: () => this.dropItem(id) }); }
       if (o.type === 'keepsake' || o.type === 'bell') { const owner = this.villagers.find(v => cheb(v.pos, p.cell) <= 1 && v.id === o.owner); if (owner) out.push(this.opt('give', o, { to: owner.id }, `把${name(o)}還給${name(w.objects.get(owner.id))}`)); const anyv = this.villagers.find(v => cheb(v.pos, p.cell) <= 1); if (anyv && anyv.id !== o.owner) out.push(this.opt('give', o, { to: anyv.id }, `把${name(o)}給${name(w.objects.get(anyv.id))}`)); out.push({ verb: 'drop', target: id, label: `放下${name(o)}`, ok: true, violates: [], run: () => this.dropItem(id) }); }
-      if (o.type === 'meteor') { out.push(this.opt('use', o, {}, '點燃隕石魔法書（引信 5 秒後爆炸，可毀書；書會察覺）')); out.push({ verb: 'drop', target: id, label: '放下隕石魔法書', ok: true, violates: [], run: () => this.dropItem(id) }); }
       if (o.type === 'rope') out.push({ verb: 'drop', target: id, label: '放下繩子', ok: true, violates: [], run: () => this.dropItem(id) });
     }
     if (p.carrying) out.push({ verb: 'drop', target: p.carrying, label: '放下黃銅書', ok: true, violates: [], run: () => this.dropBook() });
@@ -182,7 +180,6 @@ export class Game {
       const r = this.world.attempt('outsider', verb, o.id, { zone: this.grid.zone(this.player.cell), ...ctx });
       if (r.done && verb === 'move' && o.type === 'book') this.player.carrying = o.id;
       if (r.done && verb === 'take') this.player.actor.held.includes(o.id);
-      if (r.done && verb === 'use' && o.type === 'meteor') this.useMeteor(o);
       if (r.done && after) after();
       return r;
     } };
@@ -195,25 +192,6 @@ export class Game {
     if (item === 'job') this.match.flags.worked = true;
     this.note('accept', `你接受了${COMFORT_CN[item]}（同化度 +1）：${benefit}`, { item });
     return { done: true };
-  }
-  useMeteor(o) {
-    // 點燃引信：書立刻察覺、寫自保條文、活性飆、命令村民趕來護書；5 秒後爆炸
-    const book = [...this.world.objects.values()].find(b => b.type === 'book');
-    if (!book || !book.pos) return;
-    this._fuse = { left: 5, at: [...this.player.cell], book: book.id };
-    this.match.activity.add(8, 'threat');
-    this.note('meteor', '隕石魔法書燒了起來——書察覺了，命令村民護書！（5 秒後爆炸）', {});
-    // 未喚醒、認知抓捕令的村民衝向書
-    for (const v of this.villagers) if (!v.dead && v.level !== 'awake') { v.chaseUntil = this.world.t + 10; v.lastSeen = [...book.pos]; }
-  }
-  detonate() {
-    const at = this._fuse.at, book = this.world.objects.get(this._fuse.book); this._fuse = null;
-    // 書旁有未喚醒村民護著就毀不掉
-    const guards = this.villagers.filter(v => !v.dead && v.level !== 'awake' && book.pos && dist(v.pos, book.pos) <= 2).length;
-    const dead = this.villagers.filter(v => !v.dead && dist(v.pos, at) <= 2.5);
-    for (const v of dead) { v.dead = true; this.world.emit('level', { actor: v, from: v.level, to: v.level, why: 'dead' }); }
-    if (guards === 0 && book.pos && dist(at, book.pos) <= 3) { book.state = 'destroyed'; this.world.emit('object', { object: book, before: 'closed' }); this.note('destroy', `爆炸吞了黃銅書${dead.length ? `，炸死了 ${dead.length} 個村民` : ''}。`, {}); }
-    else this.note('meteor', `爆炸被村民擋下了，書安然無恙${dead.length ? `，但炸死了 ${dead.length} 個村民` : ''}。`, {});
   }
   cartHop(cart) { const p = this.player, d = sub(cart.pos, p.cell); if (Math.abs(d[0]) + Math.abs(d[1]) !== 1) return null; const fcell = add(cart.pos, d), land = add(fcell, d); const fence = [...this.world.objects.values()].find(o => o.type === 'fence' && o.pos && eq(o.pos, fcell) && o.state === 'intact'); if (!fence || this.grid.blocked(land)) return null; return land; }
   dropItem(id) { const o = this.world.objects.get(id); this.world.attempt('outsider', 'drop', id, { to: this.dropSpot() }); return { done: true }; }
@@ -247,8 +225,6 @@ export class Game {
     if (book && book.pos) out.push({ id: 'book', cell: book.heldBy ? this.player.cell : book.pos, text: '黃銅書（圖書館）', cls: 'book' });
     const goat = [...w.objects.values()].find(o => o.type === 'goat');
     if (goat && goat.pos) out.push({ id: 'goat', cell: goat.fpos || goat.pos, text: '山羊', cls: 'goat' });
-    const met = [...w.objects.values()].find(o => o.type === 'meteor');
-    if (met && met.pos && !met.heldBy) out.push({ id: 'meteor', cell: met.pos, text: '隕石魔法書', cls: 'meteor' });
     return out;
   }
   broadcast() { const n = this.world.now; if (!n) return null; return { rule: this.world.rule(n.no), progress: 1 - n.left / this.world.opt.announceSec, hearing: n.listeners.has('outsider') }; }

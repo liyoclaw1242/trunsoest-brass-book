@@ -6,7 +6,7 @@ import { Book } from './book.js';
 import { dist } from './grid.js';
 
 export const ENDINGS = {
-  transformed: '被轉化', escape: '逃跑', empty: '空村（封印一）', exile: '放逐（封印二）', unheard: '無人聆聽（封印三）', destroyed: '損毀（封印四）',
+  transformed: '被轉化', escape: '逃跑', empty: '空村（封印一）', exile: '放逐（封印二）', unheard: '無人聆聽（封印三）',
 };
 
 export class Match {
@@ -89,8 +89,6 @@ export class Match {
   checkEndings() {
     if (this.opt.noEnd) return null;
     const me = this.s.outsider, book = [...this.world.objects.values()].find(o => o.type === 'book');
-    // 損毀（封印四）
-    if (book && book.state === 'destroyed') return { state: 'destroyed', reason: 'destroyed' };
     // 放逐（封印二）：書在荒野深處，且（跟著書走的）範圍內沒有任何村民
     if (book && book.pos && !book.heldBy && !this.s.outsider.carryingBook && this.grid.zone(book.pos) === 'wilddeep') {
       const near = this.s.villagers.list.filter(v => !v.dead && dist(v.pos, book.pos) <= this.grid.radius).length;

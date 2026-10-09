@@ -61,8 +61,6 @@ OBJECTS = [
     dict(type='lamp', id='lamp_01', pos=(51, 49), state='unlit'),
     dict(type='lamp', id='lamp_02', pos=(35, 58), state='unlit'),
     dict(type='lamp', id='lamp_03', pos=(63, 41), state='unlit'),
-    # 隕石魔法書：稀有、放在荒野深處
-    dict(type='meteor', id='meteor_01', pos=(70, 70)),   # 影響範圍內的野地，才能在村民看得到的地方引爆
     *[dict(type='boundary', id=f'boundary_{i+1:02d}', pos=p) for i, p in enumerate(boundary_ring())],
     # 村民：v6 是上一次放逐的搬運者（純人偶，只有山羊鈴鐺喚醒得了）
     dict(type='villager', id='villager_01', pos=(34, 46), state='half'),
