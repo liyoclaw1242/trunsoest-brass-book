@@ -192,3 +192,32 @@
   - `lamppost_08` 和 `door_04` 疊在同一格 (50,70)，門被燈柱永久擋死，村民回不了家。改：移開燈柱；`passable` 改成「擋路的若除了門／圍籬還有別的東西（燈柱等）就是真的過不去」，並處理開著的門；`tools/validate-scene.js` 新增重疊檢查（會擋路的物件不得同格、門不得和擋路物件同格）。
 - **驗收**：`node tools/playtest-v3.js` 22/22（截圖與事件在 `docs/playtest/v3/`）：開場聽「不得離開」→ 沒違規沒人追 → 走出邊界被傳送回中心；目擊違規才追、標籤「追你！」、被抓；夜間靜音／半同化睡覺／人偶守夜持燈／視線圈；夜裡遠處違規沒人看見；提燈拿起點亮；偽裝穿上後 5 格外認不出、2 格內認得出、第一次穿就被寫成條文；重置撕掉「不得離開」→ 狀態列提示 → 窗口內走出去贏（`escaped-unheard`）。`npm test` 33 項。
 - 一個設計 nuance 記進 open-questions #11（躲進追你的村民自己家，他會在門口跟丟）。
+
+## 改版 v2 — R0 盤點（2026-01，Opus 4.8）
+
+依 `docs/plan-v2.md` 重做。新文件已就位：`docs/design.md`（v2，取代舊版）、`docs/rule-pools.md`、`docs/plan-v2.md`；舊 `design.md` 改名 `design-v1.md`；`write-rules`／`audit-rules` 兩個 skill 複製到 `.claude/skills/`；CLAUDE.md 先讀清單更新。repo 目前在原型三（witness-chase、晝夜、偽裝），v2 是全新設計，原型三被取代（design-v3／plan-v3 留作對照）。
+
+### 程式盤點
+
+**沿用（小改即可）**
+- `engine/rulebook-engine.js`：條文結構、重置（清最舊一半）、補丁、公示與認知、`check`／`evaluate`／`violatesFor`、觸發、`VERBS`、`cond` 運算式、時鐘（`phase`/`isNight`）。v2 的「上限與重置、漏洞補丁、公示才生效、規則約束所有存在」都在。要擴充條文物件的欄位（`tier`／`category`／`stage`／`trigger`／`leaks`）並改「上限」為勞動驅動。
+- `engine/grid.js`：格子、尋路、分區、`blocked`、BFS、`minCost`。只需把新物件類型加進 `blocked`，並加「荒野深處」區。
+- `engine/session.js`：組一局。沿用，掛上新的活性／勞動／結局模組。
+- `src/view.js`／`hud.js`／`main.js`／`input.js`：GLTFLoader 載入、狀態子物件切換、標記、晝夜光照、村民標籤、筆記／廣播面板、設計者視角、Playwright 掛鉤。沿用，加活性量表、階段提示、勞動視覺、舒適項目、筆跡分級。
+- `blender/rb.py`＋`make_*.py`＋`build_scene.py`：建模骨架。沿用，加新物件腳本。
+- `tools/pw.js`、`validate-scene.js`、`check-layout.js`、`playtest*.js`：沿用。
+- `.claude/agents/playtest-critic.md`：沿用，優化回合前加 v2 的四個評論角度（機率公平、兩個時鐘、舒適誘惑、結局代價）。
+
+**要大改**
+- `engine/villagers.js`：原型三是「只在目擊違規時追」。v2 改回抓捕令模型（書頒布抓捕令 → 認知到的村民追），另加：勞動循環、傳染（5 格內目睹且 10 秒沒被抓 → 進 1/3 級）、舒適提供、山羊、搬運者只能用鈴鐺喚醒。喚醒改成「連續 30 秒聽不到降一級」沿用。
+- `engine/match.js`：原型三是傳送／逃脫／同化 0–3／三次重置。v2 改成：活性 0–100（時間×勞動比例＋學習＋倒退、階段、到頂輸）、同化 0–5（舒適下限、安靜消退）、六種結局判定、規則上限＝4＋供養村民數。大改。
+
+**重寫／新增**
+- 條文池 `engine/rules.v2.js`（取代 `rules.v3.js`）：三級（粗糙／普通／嚴謹）、五類（行動／藏身／資產與公示／自保／村民）、三階段（限制／義務／定義）、固定條文（憲法含「不得越過界石」、抓捕令、裁決、最後一條）。用 `write-rules` 擴充，每類擴充完用 `audit-rules` 子代理審。
+- 可指定種子的亂數（`engine/rng.js`）：引擎內所有隨機都經過它；`?seed=` 網址參數。原型三的村民用了 `Math.random`，要全部改走 RNG。
+- 活性模組、勞動／經濟模組、抽條文（等級權重隨活性內插、發現漏洞機率、書寫時間）、舒適誘惑、定義類雙效果、傳染、六種結局——都是新的。
+- `tools/validate-rules.js`：機械檢查（key 不重複、動詞在 VERBS、target 指得到、每條有 hole、每類三級齊全），掛進 `npm test`。
+- 新 Blender 物件：工作站（紙坊、墨坊）、山羊、繩子、隕石魔法書、戶籍冊、山羊鈴鐺、刻字石、明確的圖書館、荒野深處區、入口的放逐痕跡。
+
+**丟棄**
+- 原型三的 `rules.v3.js`（被條文池取代）、witness-only 追逐邏輯（回到抓捕令模型）、同化 0–3、固定上限 10。保留檔案在 git 歷史，不刪。

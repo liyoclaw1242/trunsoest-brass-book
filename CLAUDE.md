@@ -1,13 +1,20 @@
-# 規則書 原型二
+# 規則書（改版 v2）
 
-一個俯視視角的遊戲原型：外鄉人誤入烏托邦，那裡藏著一本會自己寫律法的活規則書。這個 repo 要做出可玩的第二版原型，用來驗證機制，不是做成品。
+一個俯視視角的遊戲原型：外鄉人誤入烏托邦，那裡藏著一本靠村民勞動過活、不斷寫律法要轉化他的活規則書。目前正依 v2 設計重做（活性時鐘、抽條文、勞動經濟、舒適的誘惑、六種結局）。
 
-## 先讀
+## 先讀（v2）
 
-- `docs/design.md`：世界觀與機制。分成「已定案」和「這一版先採用的預設」。
-- `docs/scene-spec.md`：Blender 場景物件怎麼做，規則引擎才指得到它們。
-- `docs/plan.md`：里程碑、驗收條件、優化回合的流程。
-- `engine/README.md`：規則引擎的介面，以及畫面端要接的事件。
+- `docs/design.md`：v2 世界觀與機制（寓意、已定案、這一版先採用的預設）。取代舊版。
+- `docs/rule-pools.md`：候選條文池與「寫條文的原則」。
+- `docs/plan-v2.md`：R0–R6 階段、驗收、優化回合。
+- `engine/README.md`：規則引擎的介面與事件。
+- 歷史對照：`docs/design-v1.md`（原型一／二基底）、`docs/design-v3.md`＋`docs/plan-v3.md`（原型三，已被 v2 取代）、`docs/rules-brainstorm.md`、`docs/SUMMARY.md`（原型二總結）。
+
+## skill 與子代理
+
+- `write-rules`（`/write-rules`）：替黃銅書寫／擴充候選條文。
+- `audit-rules`（`/audit-rules`）：審條文池，由沒寫那批條文的子代理執行。
+- `playtest-critic`：優化回合的試玩評論員。
 
 ## 結構
 
