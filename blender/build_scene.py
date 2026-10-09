@@ -65,6 +65,74 @@ for o in layout.OBJECTS:
 # 星露谷風裝飾（非互動、不進 scene.json）
 scenery.scatter(layout, seed=7)
 
+# —— 效能：把上百件靜態裝飾依「平面地貼 / 立體道具」各合併成一個 mesh ——
+# 合併後 three.js 的 draw call 從數千降到依材質數的數十，FPS 大幅提升。裝飾不互動、不需獨立節點。
+def merge_decor():
+    flats, props = [], []
+    for o in list(bpy.data.objects):
+        if o.type != 'MESH':
+            continue
+        root = o
+        while root.parent:
+            root = root.parent
+        if not root.name.startswith('decor'):
+            continue
+        (flats if '_slab' in o.name else props).append(o)
+    for group, newname in [(flats, 'decor_ground_slab_merged'), (props, 'decor_props_merged')]:
+        group = [o for o in group if o.name in bpy.data.objects]
+        if not group:
+            continue
+        for o in group:                       # 先把世界座標烘進 local，解除父子關係
+            mw = o.matrix_world.copy()
+            o.parent = None
+            o.matrix_world = mw
+        try:
+            with bpy.context.temp_override(active_object=group[0], selected_objects=group,
+                                           selected_editable_objects=group):
+                bpy.ops.object.join()
+            group[0].name = newname
+        except Exception as e:
+            print('MERGE skipped for', newname, e)
+    # 清掉空的 decor empties（已無子物件）
+    for o in list(bpy.data.objects):
+        if o.type == 'EMPTY' and o.name.startswith('decor') and not o.children:
+            bpy.data.objects.remove(o, do_unlink=True)
+merge_decor()
+
+# —— 效能：把每個互動物件、每個狀態內的 mesh 合併成一個（共用材質者併為同一 draw call）。
+# 保留 __col（碰撞，驗證器要對照）與屋頂（__intact_roof，進屋時要單獨隱藏）不併。
+def merge_states():
+    def keep(n):
+        return '__col' in n or '__intact_roof' in n
+    # 先收集所有狀態根的名字（join 只會移除 mesh，不動 empty，所以之後以名字重新取用都安全）
+    srnames = []
+    for parent in list(bpy.data.objects):
+        if parent.parent is not None or parent.type != 'EMPTY':
+            continue
+        if parent.name.startswith('decor') or parent.name == 'ground':
+            continue
+        for sr in [c for c in parent.children if c.type == 'EMPTY']:
+            srnames.append(sr.name)
+    for srname in srnames:
+        sr = bpy.data.objects.get(srname)
+        if not sr:
+            continue
+        meshes = [o for o in sr.children_recursive if o.type == 'MESH' and not keep(o.name)]
+        if len(meshes) < 2:
+            continue
+        for o in meshes:
+            mw = o.matrix_world.copy(); o.parent = None; o.matrix_world = mw
+        try:
+            with bpy.context.temp_override(active_object=meshes[0], selected_objects=meshes,
+                                           selected_editable_objects=meshes):
+                bpy.ops.object.join()
+            m = meshes[0]
+            mw = m.matrix_world.copy(); m.parent = sr; m.matrix_world = mw
+            m.name = srname + '_merged'
+        except Exception as e:
+            print('STATE MERGE skip', srname, e)
+merge_states()
+
 os.makedirs(OUT, exist_ok=True)
 with open(os.path.join(OUT, 'scene.json'), 'w', encoding='utf-8') as f:
     json.dump(records, f, ensure_ascii=False, indent=0)
