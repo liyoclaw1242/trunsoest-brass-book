@@ -11,7 +11,7 @@ await pw.wait(3);
 // 活性量表與階段、同化度、勞動
 check('活性量表＋階段顯示', (await text(pw, '#meters')).includes('活性') && /前期|中期|後期/.test(await text(pw, '#meters')));
 check('同化度量表', (await text(pw, '#meters')).includes('同化度'));
-check('勞動人數與規則上限', /勞動 \d+ 人供養/.test(await text(pw, '#meters')) && /規則上限 \d+/.test(await text(pw, '#meters')));
+check('勞動人數與規則上限', /\d+ 人勞動供養/.test(await text(pw, '#meters')) && /規則上限 \d+/.test(await text(pw, '#meters')));
 await pw.shot(DIR, '01-meters');
 // 書寫中提示：拉高活性讓書常動筆，惹它寫
 await pw.eval(() => window.__game.setActivity(40));

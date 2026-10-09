@@ -27,6 +27,7 @@ export class Game {
     this.player = { actor: me, cell: [...meta.start], pos: [...meta.start], from: null, to: null, k: 0, facing: [0, -1], house: null, carrying: null, running: false, walkT: 0, runT: 0, ledGoat: null };
     me.house = null; me.comforts = this.match.assim.comforts;
     this.opening = 0;
+    this.hints = []; this.shownHints = new Set(); this._hintSeen = {};
     this.hookEvents();
     this.match.on(e => { if (e.type === 'teleported') { if (this.player.carrying) this.dropBook(); this.place(e.to); this.note('teleport', '你被送回了村子中心。', {}); } });
   }
@@ -38,14 +39,15 @@ export class Game {
     if (this.match.started) return;
     this.match.start();
     this.opening = opt.opening ?? this.world.opt.announceSec;
+    this._lastStage = this.match.activity.stage;
     this.note('start', '黃銅書察覺了你。廣播器唸起第一條公告。');
   }
   on(fn) { this.listeners.push(fn); }
   note(type, text, data = {}) { const e = { t: +this.t.toFixed(2), type, text, ...data }; this.log.push(e); for (const fn of this.listeners) fn(e); }
   hookEvents() {
     const w = this.world, N = id => id === 'outsider' ? '你' : name(w.objects.get(id));
-    w.on('write', ({ rule }) => this.note('write', `書寫下第${num(rule.no)}條：${rule.text}`, { no: rule.no, tier: rule.tier }));
-    w.on('reset', ({ gone }) => this.note('reset', `—— 以上規則無效 ——（撕掉 ${gone.length} 條）`, { gone: gone.map(r => r.no) }));
+    w.on('write', ({ rule }) => { this.note('write', `書寫下第${num(rule.no)}條：${rule.text}`, { no: rule.no, tier: rule.tier }); if (this.started && this.opening <= 0) this.pushHint('first-write', '書開始立法了。看左上的「活性」量表——它一路在漲，滿了你就被轉化。喚醒村民能拖慢它。'); });
+    w.on('reset', ({ gone }) => { this.note('reset', `—— 以上規則無效 ——（撕掉 ${gone.length} 條）`, { gone: gone.map(r => r.no) }); this.pushHint('first-reset', '「以上規則無效」！界石的封印短暫失效，書要重寫才會封回——這就是逃出去的窗口。'); });
     w.on('faded', ({ faded }) => this.note('fade', `勞動減少，最舊的 ${faded.length} 條褪色失效`, { faded: faded.map(r => r.no) }));
     w.on('broadcastStart', ({ rule }) => this.note('broadcast', `廣播：第${num(rule.no)}條`, { no: rule.no }));
     w.on('broadcastEnd', ({ rule, learned, silenced }) => { if (silenced) this.note('silence', '夜幕落下，廣播器沉默。'); else if (learned && learned.length) this.note('learn', `聽完第${num(rule.no)}條：${learned.map(N).join('、')}認知了`, { no: rule.no, learned }); });
@@ -59,7 +61,7 @@ export class Game {
     w.on('refuse', ({ actor, verb, target, rules }) => this.note('refuse', `${N(actor.id)}拒絕${LABEL[verb] || verb}${name(target)}：第${rules.map(r => num(r.no)).join('、')}條`, {}));
     w.on('object', ({ object: o, before }) => { const what = o.state !== before ? `變成${STATE[o.state] || o.state}` : o.heldBy ? `被${N(o.heldBy)}拿著` : o.pos ? '移動了' : ''; this.note('object', `${name(o)}${what}`, { id: o.id, state: o.state }); });
     w.on('delivered', () => {});
-    w.on('match:captured', () => {}); w.on('captured', ({ actor }) => { this.note('captured', `你被${actor ? N(actor.id) : '村民'}抓住，送回中心（同化度 +1）`, {}); if (this.player.carrying) this.dropBook(); });
+    w.on('match:captured', () => {}); w.on('captured', ({ actor }) => { this.note('captured', `你被${actor ? N(actor.id) : '村民'}抓住，送回中心（同化度 +1）`, {}); if (this.player.carrying) this.dropBook(); this.pushHint('first-capture', '被抓會讓同化度 +1 並送回中心，到 5 就輸。別讓認知到抓捕令的村民看見你違規。'); });
     w.on('level', ({ actor, from, to, why }) => this.note('level', `${N(actor.id)}從${STATE[from]}變成${STATE[to]}（${why === 'quiet' ? '太久沒聽廣播' : why === 'keepsake' ? '收到信物' : why === 'contagion' ? '受你感染' : why}）`, { actor: actor.id, to }));
     w.on('nudge', ({ actor }) => {});
     w.on('match:assim', (e) => { if (e.to > e.from) this.note('assim', `同化度 ${e.from}→${e.to}${e.why?.startsWith('comfort') ? '（接受了' + COMFORT_CN[e.why.split(':')[1]] + '）' : e.why === 'definition' ? '（你認知到自己已被當作市民）' : ''}`, { to: e.to }); });
@@ -115,6 +117,10 @@ export class Game {
     this.player.actor.carryingBook = !!p.carrying;
     if (p.carrying) { const b = this.world.objects.get(p.carrying); b.pos = [...p.cell]; }
     if (p.ledGoat) { const g = this.world.objects.get(p.ledGoat); if (g) g.pos = [...sub(p.cell, p.facing)]; }
+    const st = this.match.activity.stage;
+    if (this._lastStage && this._lastStage !== st) { if (st === 'mid') this.pushHint('stage-mid', '書進入「中期」：開始要求你照它的方式生活（義務類條文）。照做會讓你更像市民。'); if (st === 'late') this.pushHint('stage-late', '書進入「後期」：開始改寫「誰算市民」。小心別聽到剛好套在你身上的那一條定義。'); }
+    this._lastStage = st;
+    if (this.started && this.opening <= 0 && !this.shownHints.has('first-villager')) { const near = this.villagers.find(v => !v.dead && cheb(v.pos, this.player.cell) <= 1 && v.level !== 'puppet'); if (near) this.pushHint('first-villager', '靠近村民按 E：可以接受他的好處（更舒適，但更接近被同化），喚醒的村民則會站到你這邊。'); }
     this.session.tick(dt);
     // 時間分每累積約 1 點就報一次（讓玩家把活性和勞動連起來）
     if (this._actAcc >= 1) { this._actAcc = 0; this.note('activity', `活性隨時間上升（${this.match.economy.workers()} 人在勞動）→ ${Math.round(this.match.activity.value)}`, {}); }
@@ -216,6 +222,22 @@ export class Game {
   act(i = 0) { if (!this.started || this.over || this.opening > 0) return { done: false, reason: 'frozen' }; const o = this.options()[i]; if (!o) return null; if (!o.ok) { this.note('blocked', `做不到：${o.label}`, {}); return { done: false, reason: o.reason }; } return o.run(); }
 
   boundarySealed() { const me = this.player.actor; return this.world.active().some(r => ((r.verb === 'leave' && r.mode !== 'permit') || r.key === 'c-boundary') && me.known.has(r.no)); }
+  /** 一次性提示：同一 key 只顯示一次。 */
+  pushHint(key, text) { if (this.shownHints.has(key)) return; this.shownHints.add(key); this.hints.push({ key, text, t: this.t }); this.note('hint', text, { key }); }
+  /** 畫面端取最新未過期的提示。 */
+  currentHint(life = 9) { const h = this.hints[this.hints.length - 1]; return h && this.t - h.t < life ? h : null; }
+  /** 目前目標（常駐一行，依狀態更新）。 */
+  objective() {
+    const m = this.match;
+    if (!this.started) return '';
+    if (this.opening > 0) return '站著聽完書的第一條公告——先弄清楚這裡的規矩。';
+    if (m.state !== 'playing') return '';
+    if (!this.boundarySealed()) return '界石的封印失效了——趁現在走出影響範圍（白色虛線圈）！';
+    if (m.assim.value >= m.assim.opt.max - 1) return `同化度 ${m.assim.value}/${m.assim.opt.max}，快到頂了！躲到聽不到廣播的地方讓它退下來。`;
+    const awake = this.villagers.filter(v => v.level === 'awake' && !v.dead).length;
+    if (awake === 0) return '目標：喚醒村民來削弱書。砸廣播器讓附近村民聽不到 30 秒，或把信物還給本人。';
+    return `已喚醒 ${awake} 人。繼續喚醒（書會越來越弱），或趁書重寫規則的空檔逃出邊界。`;
+  }
   broadcast() { const n = this.world.now; if (!n) return null; return { rule: this.world.rule(n.no), progress: 1 - n.left / this.world.opt.announceSec, hearing: n.listeners.has('outsider') }; }
   bookWriting() { const p = this.match.book.writing; return p ? { tier: p.def.tier, kind: p.def.kind, progress: 1 - p.left / p.total } : null; }
   quietCell() { const w = this.world, g = this.grid; if (!w.inBroadcast(this.player.cell)) return { steps: 0, cell: [...this.player.cell] }; const r = g.minCost(this.player.cell, c => !w.inBroadcast(c), () => true, c => !g.blocked(c)); return r ? { steps: r.cost, cell: r.cell } : null; }
@@ -229,7 +251,7 @@ export class Game {
       laborRatio: +m.economy.laborRatio().toFixed(2), workers: m.economy.workers(), ruleCap: w.opt.max,
       phase: w.phase(), cell: [...p.cell], house: p.house, zone: this.grid.zone(p.cell), inBroadcast: w.inBroadcast(p.cell), inRange: this.grid.inRange(p.cell),
       held: [...p.actor.held], wearing: p.actor.wearing || null, lit: !!p.actor.lit, carrying: p.carrying, rules: w.active().length, resets: w.resets, opening: Math.ceil(this.opening * 10) / 10,
-      writing: this.bookWriting(),
+      writing: this.bookWriting(), objective: this.objective(), hint: this.currentHint(),
       villagers: this.villagers.map(v => ({ id: v.id, pos: [...v.pos], level: v.level, mode: v.mode, hunting: this.vil.hunts(v), dead: !!v.dead, working: v.mode === 'work', carrying: !!v.carryingGoods })) };
   }
 }

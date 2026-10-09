@@ -14,7 +14,7 @@ export class Hud {
     this.lines = []; this.toastTimer = 0; this.designer = false; this.flash = 0; this.lastGone = [];
     game.on(e => { if (!['broadcast', 'object', 'learn'].includes(e.type)) this.push(e); });
     game.world.on('reset', ({ gone }) => { this.flash = 3; this.lastGone = gone.map(r => r.no); });
-    for (const id of ['meters', 'writing', 'resetflash']) { const d = document.createElement('div'); d.id = id; d.hidden = (id !== 'meters'); $('hud').appendChild(d); this.el[id] = d; }
+    for (const id of ['objective', 'hint', 'meters', 'writing', 'resetflash']) { const d = document.createElement('div'); d.id = id; d.hidden = (id !== 'meters'); $('hud').appendChild(d); this.el[id] = d; }
     this.el.resetflash.innerHTML = '<h1>以上規則無效</h1><div class="small"></div>';
   }
   push(e) { this.lines.push(e); if (this.lines.length > 9) this.lines.shift(); this.el.log.innerHTML = this.lines.map(l => `<div class="${l.type}">[${l.t.toFixed(0)}s] ${l.text}</div>`).join(''); }
@@ -42,12 +42,12 @@ export class Hud {
   }
   toggleDesigner() { this.designer = !this.designer; this.el.designer.hidden = !this.designer; }
   renderMeters(s) {
-    const actColor = s.stage === 'late' ? '#f55' : s.stage === 'mid' ? '#fb4' : '#6c6';
+    const actColor = s.stage === 'late' ? 'var(--danger)' : s.stage === 'mid' ? 'var(--warn)' : 'var(--good)';
+    const pips = Array.from({ length: s.assimMax }, (_, i) => `<s class="${i < s.assim ? 'on' : ''}"></s>`).join('');
     this.el.meters.innerHTML =
-      `<div class="meter"><span>活性 ${Math.round(s.activity)} · ${STAGE[s.stage]}</span><div class="bar"><i style="width:${s.activity}%;background:${actColor}"></i>` +
-      `<u style="left:35%"></u><u style="left:70%"></u></div></div>` +
-      `<div class="meter"><span>同化度 ${s.assim}／${s.assimMax}</span><div class="bar assim"><i style="width:${s.assim / s.assimMax * 100}%"></i></div></div>` +
-      `<div class="sub">勞動 ${s.workers} 人供養 · 規則上限 ${s.ruleCap}（現 ${s.rules}）${s.comforts.length ? ' · 舒適：' + s.comforts.map(c => COMFORT_CN[c]).join('、') : ''}</div>`;
+      `<div class="meter"><div class="row">活性 <b>${Math.round(s.activity)}／100 · ${STAGE[s.stage]}</b></div><div class="bar"><i style="width:${s.activity}%;background:${actColor}"></i><u style="left:35%"></u><u style="left:70%"></u></div></div>` +
+      `<div class="meter"><div class="row">同化度 <b>${s.assim}／${s.assimMax}</b></div><div class="pips">${pips}</div></div>` +
+      `<div class="sub"><span class="acc">${s.workers}</span> 人勞動供養 · 規則上限 <span class="acc">${s.ruleCap}</span>（現 ${s.rules}）${s.comforts.length ? '<br>舒適：' + s.comforts.map(c => COMFORT_CN[c]).join('、') : ''}</div>`;
   }
   renderNotes() {
     const g = this.game, notes = g.world.notes('outsider'), bc = g.broadcast();
@@ -60,15 +60,15 @@ export class Hud {
   }
   renderBroadcast() {
     const g = this.game, bc = g.broadcast(), el = this.el.broadcast, night = g.world.isNight(), inB = g.world.inBroadcast(g.player.cell), q = g.quietCell();
-    el.hidden = false; el.className = inB && !night ? '' : 'out';
+    el.hidden = false; el.className = bc && inB && !night ? 'live' : 'out';
     const where = night ? '夜間廣播器靜音' : inB ? `你在廣播範圍內${q && q.steps ? `，離開約 ${q.steps} 格` : ''}` : '你聽不到廣播';
-    if (bc) { const known = g.player.actor.known.has(bc.rule.no); el.innerHTML = `<div>${inB ? `正在唸：第${num(bc.rule.no)}條　${bc.rule.text}` : `廣播中（你聽不到）：第${num(bc.rule.no)}條${known ? '' : '　？？？'}`}</div><div class="bar"><i style="width:${Math.round(bc.progress * 100)}%"></i></div><div style="font-size:12px;color:#caa">${where}</div>`; }
-    else el.innerHTML = `<div style="color:#999">廣播器沉默</div><div style="font-size:12px;color:#caa">${where}</div>`;
+    if (bc) { const known = g.player.actor.known.has(bc.rule.no); el.innerHTML = `<div class="head">${inB ? `正在唸：第${num(bc.rule.no)}條　${bc.rule.text}` : `廣播中（你聽不到）：第${num(bc.rule.no)}條${known ? '' : '　？？？'}`}</div><div class="bar"><i style="width:${Math.round(bc.progress * 100)}%"></i></div><div class="where">${where}</div>`; }
+    else el.innerHTML = `<div class="head">廣播器沉默</div><div class="where">${where}</div>`;
   }
   renderWriting() {
     const w = this.game.bookWriting();
     this.el.writing.hidden = !w;
-    if (w) this.el.writing.innerHTML = `<div>黃銅書提筆中（${w.kind === 'definition' ? '定義' : TIER_CN[w.tier] || '條文'}）</div><div class="bar"><i style="width:${Math.round(w.progress * 100)}%"></i></div>`;
+    if (w) this.el.writing.innerHTML = `<div class="t">黃銅書提筆中（${w.kind === 'definition' ? '定義' : TIER_CN[w.tier] || '條文'}）</div><div class="bar"><i style="width:${Math.round(w.progress * 100)}%"></i></div>`;
   }
   renderDesigner() {
     if (!this.designer) return;
@@ -81,7 +81,10 @@ export class Hud {
   update(dt) {
     const g = this.game, s = g.status();
     this.renderMeters(s);
-    this.el.status.textContent = `${mmss(s.t)}　${s.phase === 'night' ? '夜' : '日'}　(${s.cell[0]},${s.cell[1]})　${s.house ? s.house : s.zone === 'wild' ? '野地' : s.zone === 'wilddeep' ? '荒野深處' : s.zone === 'plaza' ? '廣場' : '村道'}　${s.inRange ? '範圍內' : '範圍外'}${s.wearing ? '　偽裝中' : ''}${s.carrying ? '　搬著書' : ''}${s.opening > 0 ? `　（聽公告 ${s.opening.toFixed(0)}s）` : ''}`;
+    this.el.status.textContent = `${mmss(s.t)}　(${s.cell[0]},${s.cell[1]})　${s.house ? '住宅內' : s.zone === 'wild' ? '野地' : s.zone === 'wilddeep' ? '荒野深處' : s.zone === 'plaza' ? '廣場' : '村道'}　${s.inRange ? '範圍內' : '範圍外'}${s.wearing ? '　偽裝中' : ''}${s.carrying ? '　搬著書' : ''}`;
+    const obj = g.objective();
+    this.el.objective.hidden = !obj; if (obj) this.el.objective.innerHTML = `<div class="lbl">目前目標</div><div class="txt">${obj}</div>`;
+    const hint = g.currentHint(); this.el.hint.hidden = !hint; if (hint) this.el.hint.textContent = hint.text;
     const opts = g.options();
     this.el.prompt.innerHTML = opts.slice(0, 9).map((o, i) => `<span class="${o.ok ? '' : 'blocked'}${o.violates?.length ? ' violates' : ''}"><b>${i === 0 ? 'E' : i + 1}</b>${o.label}${o.violates?.length ? `（違反第${o.violates.map(num).join('、')}條）` : ''}</span>`).join('');
     if (this.toastTimer > 0) { this.toastTimer -= dt; if (this.toastTimer <= 0) this.el.toast.hidden = true; }
