@@ -92,7 +92,7 @@ export class Match {
     // 損毀（封印四）
     if (book && book.state === 'destroyed') return { state: 'destroyed', reason: 'destroyed' };
     // 放逐（封印二）：書在荒野深處，且（跟著書走的）範圍內沒有任何村民
-    if (book && book.pos && this.grid.zone(book.pos) === 'wilddeep') {
+    if (book && book.pos && !book.heldBy && !this.s.outsider.carryingBook && this.grid.zone(book.pos) === 'wilddeep') {
       const near = this.s.villagers.list.filter(v => !v.dead && dist(v.pos, book.pos) <= this.grid.radius).length;
       if (near === 0) return { state: 'exile', reason: 'exile' };
     }

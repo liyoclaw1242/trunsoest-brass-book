@@ -21,8 +21,8 @@
 "id": "book_01",
 "type": "book",
 "pos": [
-49,
-53
+48,
+54
 ],
 "state": "closed",
 "tags": [
@@ -39,8 +39,8 @@
 "id": "lectern_01",
 "type": "lectern",
 "pos": [
-49,
-53
+48,
+54
 ],
 "state": "intact",
 "tags": [],
@@ -1286,8 +1286,8 @@
 "id": "meteor_01",
 "type": "meteor",
 "pos": [
-90,
-90
+70,
+70
 ],
 "state": "intact",
 "tags": [

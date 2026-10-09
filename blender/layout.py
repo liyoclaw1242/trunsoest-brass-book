@@ -20,8 +20,8 @@ def boundary_ring(n=16):
 OBJECTS = [
     # 圖書館與書（書在圖書館內）
     dict(type='library', id='library_01', pos=(49, 54)),
-    dict(type='book', id='book_01', pos=(49, 53), radius=RADIUS),
-    dict(type='lectern', id='lectern_01', pos=(49, 53)),
+    dict(type='book', id='book_01', pos=(48, 54), radius=RADIUS),
+    dict(type='lectern', id='lectern_01', pos=(48, 54)),
     # 住宅（六棟）
     dict(type='house', id='house_01', pos=(30, 44), owner='villager_01', color_index=0),
     dict(type='house', id='house_02', pos=(68, 44), owner='villager_02', color_index=1),
@@ -62,7 +62,7 @@ OBJECTS = [
     dict(type='lamp', id='lamp_02', pos=(35, 58), state='unlit'),
     dict(type='lamp', id='lamp_03', pos=(63, 41), state='unlit'),
     # 隕石魔法書：稀有、放在荒野深處
-    dict(type='meteor', id='meteor_01', pos=(90, 90)),
+    dict(type='meteor', id='meteor_01', pos=(70, 70)),   # 影響範圍內的野地，才能在村民看得到的地方引爆
     *[dict(type='boundary', id=f'boundary_{i+1:02d}', pos=p) for i, p in enumerate(boundary_ring())],
     # 村民：v6 是上一次放逐的搬運者（純人偶，只有山羊鈴鐺喚醒得了）
     dict(type='villager', id='villager_01', pos=(34, 46), state='half'),

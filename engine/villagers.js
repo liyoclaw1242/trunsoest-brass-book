@@ -91,7 +91,7 @@ export class Villagers {
   startChase(v, verb, rules) {
     const fresh = this.world.t >= v.chaseUntil;
     v.chaseUntil = this.world.t + this.opt.chaseSec; v.lastSeen = [...this.outsider.pos]; v.waitUntil = 0;
-    if (fresh) { v.boostUntil = this.world.t + this.opt.boostSec; this.emit('witness', { actor: v, verb, rules }); }
+    if (fresh) { v.boostUntil = this.world.t + this.opt.boostSec; this.emit(rules && rules.length ? 'witness' : 'spotted', { actor: v, verb, rules }); }
   }
 
   // ---------- 行走（沿用）----------
@@ -138,11 +138,10 @@ export class Villagers {
   myStation(v) { return [...this.world.objects.values()].find(o => o.type === 'workstation' && o.owner === v.id) || [...this.world.objects.values()].find(o => o.type === 'workstation') || null; }
 
   // ---------- 誘導舒適 ----------
-  comfortOffer(v) {
-    if (v.level === 'puppet' || v.dead || v.sleeping) return null;
-    const me = this.outsider;
-    for (const c of ['name', 'clothes', 'house', 'job']) if (!me.comforts.has(c)) return c;
-    return null;
+  comfortOffer(v) { const a = this.comfortOffers(v); return a[0] || null; }
+  comfortOffers(v) {
+    if (v.level === 'puppet' || v.dead || v.sleeping) return [];
+    return ['name', 'clothes', 'house', 'job'].filter(c => !this.outsider.comforts.has(c));
   }
 
   // ---------- 每幀 ----------

@@ -26,6 +26,7 @@ function wire(g) {
   view.setState('outsider', 'intact');
   g.world.on('object', ({ object: o }) => { view.setState(o.id, o.state); if (o.heldBy) view.setVisible(o.id, o.type === 'lamp'); else if (o.pos) { view.setVisible(o.id, true); view.setPos(o.id, o.pos, o.type === 'book' && g.player.carrying === o.id ? 1.4 : 0); } });
   g.world.on('level', ({ actor, to }) => view.setState(actor.id, to));
+  g.world.on('spotted', ({ actor }) => hud.toast(`${actor.id === 'outsider' ? '' : '村民'}發現了你——追你！`, 'warn', 2.5));
   g.on(e => {
     if (['violation', 'captured', 'teleport', 'destroy', 'end'].includes(e.type)) hud.toast(e.text, '', 3);
     else if (e.type === 'witness') hud.toast(e.text, 'warn', 3);

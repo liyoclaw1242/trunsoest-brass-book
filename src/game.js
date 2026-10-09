@@ -53,6 +53,7 @@ export class Game {
     w.on('book:writing', ({ rule, sec }) => this.note('writing', `書提起筆（${TIER_CN[rule.tier]}，約 ${sec.toFixed(0)} 秒）……`, { tier: rule.tier }));
     w.on('violation', ({ actor, verb, target, rules }) => this.note('violation', `${N(actor.id)}違反了第${rules.map(r => num(r.no)).join('、')}條（${LABEL[verb] || verb}${name(target)}）`, { actor: actor.id, verb, rules: rules.map(r => r.no) }));
     w.on('witness', ({ actor, verb, rules }) => this.note('witness', `${N(actor.id)}看見你違規——追你！`, { actor: actor.id }));
+    w.on('spotted', ({ actor }) => this.note('spotted', `${N(actor.id)}發現了你——追你！`, { actor: actor.id }));
     w.on('lost', ({ actor }) => this.note('lost', `${N(actor.id)}跟丟了你`, { actor: actor.id }));
     w.on('conflict', ({ actor, verb, forbid, permit }) => this.note('conflict', `第${num(forbid.no)}條與第${num(permit.no)}條衝突，這次不追究`, {}));
     w.on('refuse', ({ actor, verb, target, rules }) => this.note('refuse', `${N(actor.id)}拒絕${LABEL[verb] || verb}${name(target)}：第${rules.map(r => num(r.no)).join('、')}條`, {}));
@@ -94,10 +95,13 @@ export class Game {
     if (this.t - p[key] > 1.5) { p[key] = this.t; w.attempt('outsider', moveVerb, null, { zone }); }
     // 靠近界石／書
     const bnear = [...w.objects.values()].find(o => o.type === 'boundary' && cheb(next, o.pos) <= 1);
-    if (bnear && ![...w.objects.values()].some(o => o.type === 'boundary' && cheb(p.cell, o.pos) <= 1)) w.attempt('outsider', 'approach', bnear.id, { zone });
+    if (bnear && ![...w.objects.values()].some(o => o.type === 'boundary' && cheb(p.cell, o.pos) <= 1)) {
+      this._appr = this._appr || {};
+      if (!this._appr[bnear.id] || this.t - this._appr[bnear.id] > 30) { this._appr[bnear.id] = this.t; w.attempt('outsider', 'approach', bnear.id, { zone }); }   // 同一塊界石 30 秒內只算一次，不讓人在界石旁 farm 逼寫
+    }
     const book = [...w.objects.values()].find(o => o.type === 'book');
     if (book && book.pos && !book.heldBy && cheb(next, book.pos) <= 1 && cheb(p.cell, book.pos) > 1) w.attempt('outsider', 'approach', book.id, { zone });
-    p.from = [...p.cell]; p.to = next; p.k = 0; p.stepSec = running ? RUN_STEP : STEP;
+    p.from = [...p.cell]; p.to = next; p.k = 0; p.stepSec = p.carrying ? 0.6 : running ? RUN_STEP : STEP;   // 搬書走得慢（放逐要付時間代價）
     return 'ok';
   }
   place(cell) { const p = this.player; p.cell = [...cell]; p.pos = [...cell]; p.from = p.to = null; p.k = 0; p.actor.pos = [...cell]; this.afterArrive(); }
@@ -108,6 +112,7 @@ export class Game {
     this.t += dt;
     const p = this.player;
     if (p.to) { p.k += dt / (p.stepSec || STEP); if (p.k >= 1) { p.cell = p.to; p.pos = [...p.to]; p.to = p.from = null; p.actor.pos = [...p.cell]; this.afterArrive(); } else p.pos = [p.from[0] + (p.to[0] - p.from[0]) * p.k, p.from[1] + (p.to[1] - p.from[1]) * p.k]; }
+    this.player.actor.carryingBook = !!p.carrying;
     if (p.carrying) { const b = this.world.objects.get(p.carrying); b.pos = [...p.cell]; }
     if (p.ledGoat) { const g = this.world.objects.get(p.ledGoat); if (g) g.pos = [...sub(p.cell, p.facing)]; }
     this.session.tick(dt);
@@ -128,8 +133,7 @@ export class Game {
     // 村民：舒適提供、誘導
     for (const v of this.villagers) if (!v.dead && cheb(v.pos, p.cell) <= 1) {
       const vo = w.objects.get(v.id);
-      const offer = this.vil.comfortOffer(v);
-      if (offer && !this.match.assim.has(offer)) out.push({ verb: 'accept', target: v.id, kind: offer, label: `接受${COMFORT_CN[offer]}（${name(vo)}提供，同化度 +1，${COMFORT_BENEFIT[offer]}）`, ok: true, violates: [], run: () => this.acceptComfort(offer, v) });
+      for (const offer of this.vil.comfortOffers(v)) out.push({ verb: 'accept', target: v.id, kind: offer, label: `接受${COMFORT_CN[offer]}（${name(vo)}提供：${COMFORT_BENEFIT[offer]}）`, ok: true, violates: [], run: () => this.acceptComfort(offer, v) });
     }
     // 放棄舒適
     for (const c of this.match.assim.comforts) out.push({ verb: 'drop', target: 'comfort:' + c, label: `放棄${COMFORT_CN[c]}（之後同化度才能再降）`, ok: true, violates: [], run: () => { this.match.assim.give_up(c); this.note('drop', `你放棄了${COMFORT_CN[c]}`, {}); return { done: true }; } });
@@ -178,10 +182,11 @@ export class Game {
   }
   acceptComfort(item, v) {
     const benefit = this.match.assim.accept(item);
-    if (item === 'house') { const h = [...this.world.objects.values()].find(o => o.type === 'house' && o.owner === v.id); if (h) { this.player.ownHouse = h.id; this.invitedTo = h.id; } }
-    if (item === 'name') { this.match.flags.named = true; if ([...this.world.objects.values()].some(o => o.type === 'census' && o.state !== 'torn')) this.match.flags.inCensus = true; }
-    if (item === 'job') this.note('accept', `你接受了工作：可以換到物品——但你的勞動也開始餵養書（活性漲得更快）。`, { item });
-    else this.note('accept', `你接受了${COMFORT_CN[item]}：${benefit}`, { item });
+    v.chaseUntil = 0;   // 收下好處時，提供的村民不再追你（名字只該 +1，不該順便被抓）
+    if (item === 'house') { const h = [...this.world.objects.values()].find(o => o.type === 'house' && o.owner === v.id); if (h) { this.player.ownHouse = h.id; this.invitedTo = h.id; h.owner = 'outsider'; } }
+    if (item === 'name' && [...this.world.objects.values()].some(o => o.type === 'census' && o.state !== 'torn')) this.match.flags.inCensus = true;
+    if (item === 'job') this.match.flags.worked = true;
+    this.note('accept', `你接受了${COMFORT_CN[item]}（同化度 +1）：${benefit}`, { item });
     return { done: true };
   }
   useMeteor(o) {
