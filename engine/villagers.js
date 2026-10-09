@@ -22,6 +22,7 @@ export class Villagers {
       sight: a.role === 'sheriff' ? (opt.sheriffSight || 9) : this.opt.sight, patrol: 0, dwell: 0, carryingGoods: false });
     this.outsider = world.actors.get('outsider');
     this.outsider.immuneUntil = this.outsider.immuneUntil || 0;
+    this.outsider.calmUntil = this.outsider.calmUntil || 0;   // 被抓送回中心後的冷靜期：這段時間村民不追你
     this.outsider.invitedTo = this.outsider.invitedTo || null;
     this.outsider.comforts = this.outsider.comforts || new Set();
     this.goats = [...world.objects.values()].filter(o => o.type === 'goat');
@@ -43,7 +44,8 @@ export class Villagers {
     if (this.coveredByDefinition(v)) return false;
     return true;
   }
-  hunts(v) { return v.chaseUntil > 0 && this.mayChase(v) && this.world.t < v.chaseUntil; }
+  calm() { return this.world.t < (this.outsider.calmUntil || 0); }   // 冷靜期內：全村不追、不抓
+  hunts(v) { return !this.calm() && v.chaseUntil > 0 && this.mayChase(v) && this.world.t < v.chaseUntil; }
   sees(v) {
     if (v.dead || v.sleeping) return false;
     const me = this.outsider;
@@ -57,6 +59,7 @@ export class Villagers {
   /** 外鄉人做了一件事：每個看得見的村民用「自己的認知」判斷他有沒有違規（公示才生效的誠實版）。 */
   onOutsiderAct(verb, target, ctx) {
     const me = this.outsider;
+    if (this.calm()) return;   // 冷靜期內目擊也不觸發追逐
     for (const v of this.list) {
       if (v.dead || !this.sees(v)) continue;
       const rules = this.world.violatesFor(v.id, 'outsider', verb, target?.id || null, ctx);
@@ -130,7 +133,7 @@ export class Villagers {
       if (v.carrying) { const b = w.objects.get(v.carrying); b.pos = [...v.pos]; }
       if (v.cart) { const cart = w.objects.get(v.cart); if (cart) { cart.pos = [...v.pos]; cart.fpos = this.cartTrail(v); } }   // 物流車跟著物流業者
       // 名字舒適：沒目擊違規就不主動追（追逐靠 onViolation 啟動）；沒有名字則一認知抓捕令就追
-      if (!this.hasName() && this.mayChase(v) && this.sees(v) && this.world.t >= v.chaseUntil) this.startChase(v, 'capture', []);
+      if (!this.calm() && !this.hasName() && this.mayChase(v) && this.sees(v) && this.world.t >= v.chaseUntil) this.startChase(v, 'capture', []);
       if (this.hunts(v) && this.sees(v)) { v.chaseUntil = Math.max(v.chaseUntil, w.t + this.opt.chaseSec); v.lastSeen = [...me.pos]; }
       // 抓捕
       if (this.hunts(v) && w.t >= me.immuneUntil && this.adjacent(v.pos, me.pos)) { v.captureT += dt; if (v.captureT >= this.opt.captureSec) { v.captureT = 0; const r = w.attempt(v.id, 'capture', 'outsider'); if (r.done) { me.immuneUntil = w.t + this.opt.immuneSec; for (const u of this.list) if (dist(u.pos, me.pos) <= this.opt.sight) u.chaseUntil = 0; this.emit('captured', { actor: v }); } } } else v.captureT = 0;

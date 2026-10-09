@@ -16,7 +16,7 @@ export class Match {
    */
   constructor(session, opt = {}) {
     this.s = session; this.world = session.world; this.grid = session.grid; this.rng = session.rng;
-    this.opt = { unheardSec: 60, noEnd: false, ...opt };
+    this.opt = { unheardSec: 60, noEnd: false, graceSec: 5, ...opt };
     this.state = 'playing'; this.reason = null; this.started = false; this.t = 0;
     this.activity = new Activity(opt.activity);
     this.economy = new Economy(session.villagers.list, opt.economy);
@@ -33,7 +33,7 @@ export class Match {
     w.on('faded', ({ faded }) => this.stats.faded += faded.length);
     w.on('level', ({ actor, from, to }) => { const L = ['puppet', 'half', 'awake']; if (L.indexOf(to) > L.indexOf(from)) { if (to === 'awake') A.woke(); this.stats.awakened = this.awakenedCount(); } });
     w.on('broadcastEnd', ({ learned }) => { if (learned && learned.length) this.lastCognition = this.t; });
-    w.on('captured', () => { if (!this.started) return; this.stats.captures++; A.captured(); this.assim.captured(); const me = this.s.outsider; me.pos = [...this.s.center]; me.immuneUntil = this.t + 3; this.emit('teleported', { to: [...this.s.center] }); this.stats.teleports++; });
+    w.on('captured', () => { if (!this.started) return; this.stats.captures++; A.captured(); this.assim.captured(); const me = this.s.outsider; me.pos = [...this.s.center]; const grace = this.opt.graceSec; me.immuneUntil = w.t + grace; me.calmUntil = w.t + grace; for (const v of this.s.villagers.list) { v.chaseUntil = 0; v.waitUntil = 0; v.mode = 'work'; } this.emit('teleported', { to: [...this.s.center], grace }); this.stats.teleports++; });
     // 定義類雙效果：外鄉人認知到自己符合的定義 → 同化到頂
     w.on('broadcastEnd', ({ rule, learned }) => { if (rule && rule.kind === 'definition' && learned && learned.includes('outsider') && this.matchesDefn(rule.defn)) { this.assim.set(this.assim.opt.max, 'definition'); } });
     this.assim.on(e => this.emit('assim', e));
