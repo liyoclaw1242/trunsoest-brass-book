@@ -58,7 +58,7 @@ export class Game {
     w.on('refuse', ({ actor, verb, target, rules }) => this.note('refuse', `${N(actor.id)}拒絕${LABEL[verb] || verb}${name(target)}：第${rules.map(r => num(r.no)).join('、')}條`, {}));
     w.on('object', ({ object: o, before }) => { const what = o.state !== before ? `變成${STATE[o.state] || o.state}` : o.heldBy ? `被${N(o.heldBy)}拿著` : o.pos ? '移動了' : ''; this.note('object', `${name(o)}${what}`, { id: o.id, state: o.state }); });
     w.on('delivered', () => {});
-    w.on('match:captured', () => {}); w.on('captured', ({ actor }) => { this.note('captured', `你被${N(actor.id)}抓住，送回中心（同化度 +1）`, {}); if (this.player.carrying) this.dropBook(); });
+    w.on('match:captured', () => {}); w.on('captured', ({ actor }) => { this.note('captured', `你被${actor ? N(actor.id) : '村民'}抓住，送回中心（同化度 +1）`, {}); if (this.player.carrying) this.dropBook(); });
     w.on('level', ({ actor, from, to, why }) => this.note('level', `${N(actor.id)}從${STATE[from]}變成${STATE[to]}（${why === 'quiet' ? '太久沒聽廣播' : why === 'keepsake' ? '收到信物' : why === 'contagion' ? '受你感染' : why}）`, { actor: actor.id, to }));
     w.on('nudge', ({ actor }) => {});
     w.on('match:assim', (e) => { if (e.to > e.from) this.note('assim', `同化度 ${e.from}→${e.to}${e.why?.startsWith('comfort') ? '（接受了' + COMFORT_CN[e.why.split(':')[1]] + '）' : e.why === 'definition' ? '（你認知到自己已被當作市民）' : ''}`, { to: e.to }); });

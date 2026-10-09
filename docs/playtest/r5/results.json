@@ -1,0 +1,37 @@
+[
+ {
+  "n": "被轉化：達成並顯示結局畫面",
+  "ok": true,
+  "info": "state=transformed ov=被轉化 種子 e-activity　用時 0:01　書寫了 "
+ },
+ {
+  "n": "被轉化：達成並顯示結局畫面",
+  "ok": true,
+  "info": "state=transformed ov=被轉化 種子 e-assim　用時 0:01　書寫了 1 條"
+ },
+ {
+  "n": "逃跑：達成並顯示結局畫面",
+  "ok": true,
+  "info": "state=escape ov=逃跑 種子 e-escape　用時 0:01　書寫了 1 條"
+ },
+ {
+  "n": "空村：達成並顯示結局畫面",
+  "ok": true,
+  "info": "state=empty ov=空村（封印一） 種子 e-empty　用時 0:01　書寫了"
+ },
+ {
+  "n": "放逐：達成並顯示結局畫面",
+  "ok": true,
+  "info": "state=exile ov=放逐（封印二） 種子 e-exile　用時 0:01　書寫了"
+ },
+ {
+  "n": "損毀：達成並顯示結局畫面",
+  "ok": true,
+  "info": "state=destroyed ov=損毀（封印四） 種子 e-destroyed　用時 0:01"
+ },
+ {
+  "n": "無人聆聽：達成並顯示結局畫面",
+  "ok": true,
+  "info": "state=unheard ov=無人聆聽（封印三） 種子 e-unheard　用時 0:02"
+ }
+]
