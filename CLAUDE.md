@@ -16,6 +16,13 @@
 - `audit-rules`（`/audit-rules`）：審條文池，由沒寫那批條文的子代理執行。
 - `playtest-critic`：優化回合的試玩評論員。
 
+## 指令（v2）
+
+- `npm test`：引擎測試（engine/broadcast/rules.v2/economy/villagers/match）＋ `validate-rules`。
+- `npm run scene` / `npm run validate`：Blender 重建場景 / 驗證 scene＋佈局＋條文。
+- `npm run dev`：Vite（http://localhost:5173/，`?seed=` 指定種子、`?autostart`、`?nohunt`、`?noidle`）。
+- `node tools/playtest-r3.js`…`r5.js`：R3 介面、R4 經濟、R5 六結局驗收。`node tools/balance.js`：平衡快轉量測。
+
 ## 結構
 
 ```

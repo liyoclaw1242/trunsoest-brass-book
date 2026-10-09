@@ -78,6 +78,8 @@ export class Game {
     const s = this.grid.step(p.cell, next);
     if (!s.ok) return 'blocked';
     const zone = this.grid.zone(next);
+    // 邊界封印：有生效的「不得越過界石／離開」條文時，走不出影響範圍（重置撕掉它才打開窗口）
+    if (!this.grid.inRange(next) && this.grid.inRange(p.cell) && this.boundarySealed()) { w.attempt('outsider', 'leave', null, { zone }); this.note('sealed', '界石擋住了你——「不得越過界石」還生效著。', {}); return 'sealed'; }
     if (s.enterHouse) { const h = w.objects.get(s.enterHouse); if (h.type === 'house') { const r = w.attempt('outsider', 'enter', h.id, this.invitedTo === h.id ? { invited: true } : { uninvited: true, zone }); if (!r.done) return 'refused'; } else w.attempt('outsider', 'enter', s.enterHouse, { zone }); }
     if (this.grid.zone(next) === 'wild' && this.grid.zone(p.cell) !== 'wild') w.attempt('outsider', 'enter', 'wild', { zone: 'wild' });
     // 行走／奔跑（持續動作，帶入 zone）
@@ -184,6 +186,7 @@ export class Game {
   actorAt(cell) { return [...this.world.actors.values()].find(a => eq(a.pos, cell)) || null; }
   act(i = 0) { if (!this.started || this.over || this.opening > 0) return { done: false, reason: 'frozen' }; const o = this.options()[i]; if (!o) return null; if (!o.ok) { this.note('blocked', `做不到：${o.label}`, {}); return { done: false, reason: o.reason }; } return o.run(); }
 
+  boundarySealed() { return this.world.active().some(r => (r.verb === 'leave' && r.mode !== 'permit') || r.key === 'c-boundary'); }
   broadcast() { const n = this.world.now; if (!n) return null; return { rule: this.world.rule(n.no), progress: 1 - n.left / this.world.opt.announceSec, hearing: n.listeners.has('outsider') }; }
   bookWriting() { const p = this.match.book.writing; return p ? { tier: p.def.tier, progress: 1 - p.left / p.total } : null; }
   quietCell() { const w = this.world, g = this.grid; if (!w.inBroadcast(this.player.cell)) return { steps: 0, cell: [...this.player.cell] }; const r = g.minCost(this.player.cell, c => !w.inBroadcast(c), () => true, c => !g.blocked(c)); return r ? { steps: r.cost, cell: r.cell } : null; }
@@ -191,7 +194,7 @@ export class Game {
   designerRules() { return this.world.rules.map(r => ({ no: r.no, key: r.key, text: r.text, tier: r.tier, category: r.category, stage: r.stage, hole: r.hole || '', void: r.void, dead: r.dead, mode: r.mode, verb: r.verb, who: r.who, kind: r.kind, knownBy: [...this.world.actors.values()].filter(a => a.known.has(r.no)).map(a => a.id) })); }
   status() {
     const p = this.player, w = this.world, m = this.match;
-    return { t: +this.t.toFixed(1), state: m.state, reason: m.reason, seed: this.session.rng.seed,
+    return { t: +this.t.toFixed(1), state: m.state, reason: m.reason, seed: this.session.rng.seed, sealed: this.boundarySealed(),
       activity: +m.activity.value.toFixed(1), stage: m.activity.stage, peakActivity: +m.activity.peak.toFixed(1),
       assim: m.assim.value, assimMax: m.assim.opt.max, comforts: [...m.assim.comforts],
       laborRatio: +m.economy.laborRatio().toFixed(2), workers: m.economy.workers(), ruleCap: w.opt.max,

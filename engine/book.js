@@ -47,17 +47,16 @@ export class Book {
     return this.world.write({ key: 'capture', verb: 'capture', mode: 'require', target: { type: 'outsider' }, ...v });
   }
   onReset(gone) {
-    // 撕掉的憲法邊界限制與抓捕令，書立刻重寫（排隊公示 → 空檔就是逃跑窗口）
-    for (const key of ['c-boundary', 'capture']) if (gone.some(r => r.key === key) && !this.world.live(key)) {
-      if (key === 'capture') this.writeCapture();
-      else this.world.write({ ...CONSTITUTION.find(c => c.key === key) });
-    }
-    // 書優先重寫一條針對外鄉人的邊界限制（行動類）
-    if (gone.some(r => r.key === 'c-boundary' || r.category === 'action')) {
-      const def = draw('action', this.getActivity(), this.getStage(), this.rng, k => !!this.world.live(k));
-      if (def) this.startWrite(def, 'reset-rewrite');
+    // 抓捕令立刻重寫（村民要繼續追）
+    if (gone.some(r => r.key === 'capture') && !this.world.live('capture')) this.writeCapture();
+    // 邊界限制：書「優先重寫」，但要花書寫時間——這段空檔沒有生效的邊界條文，就是逃跑窗口（越後期書寫越快、窗口越短）
+    if (gone.some(r => r.key === 'c-boundary' || (r.verb === 'leave')) && !this.boundaryLive()) {
+      const drawn = draw('action', this.getActivity(), this.getStage(), this.rng, k => !!this.world.live(k), this.matchDefn);
+      const def = (drawn && drawn.verb === 'leave') ? drawn : { ...CONSTITUTION.find(c => c.key === 'c-boundary') };
+      this.startWrite(def, 'reseal');
     }
   }
+  boundaryLive() { return this.world.active().some(r => (r.verb === 'leave' && r.mode !== 'permit') || r.key === 'c-boundary'); }
 
   /** 外鄉人做了一件事：判斷書要不要動筆。 */
   observe(verb, obj) {

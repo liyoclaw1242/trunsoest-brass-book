@@ -68,7 +68,7 @@ OBJECTS = [
     dict(type='villager', id='villager_01', pos=(34, 46), state='half'),
     dict(type='villager', id='villager_02', pos=(64, 46), state='puppet'),
     dict(type='villager', id='villager_03', pos=(34, 58), state='half'),
-    dict(type='villager', id='villager_04', pos=(64, 58), state='awake'),
+    dict(type='villager', id='villager_04', pos=(64, 58), state='half'),
     dict(type='villager', id='villager_05', pos=(42, 66), state='half'),
     dict(type='villager', id='villager_06', pos=(49, 24), state='puppet', carrier=True),
     dict(type='outsider', id='outsider', pos=START),
