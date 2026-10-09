@@ -41,7 +41,7 @@ export class World {
    *               recitalGap 兩次複誦間隔、patch 'dep'（依附條文失效後變廢文）或 'solo'（照常生效）
    */
   constructor(scene = [], opt = {}) {
-    this.opt = { max: 10, keep: 5, announceSec: 4, recitalGap: 6, patch: 'dep', daySec: 300, nightSec: 300, nightSilent: true, ...opt };
+    this.opt = { max: 10, keep: null, announceSec: 4, recitalGap: 6, patch: 'dep', daySec: 1e9, nightSec: 0, nightSilent: true, ...opt };
     this.t = 0;
     this.objects = new Map();
     this.actors = new Map();
@@ -134,6 +134,7 @@ export class World {
     const act = this.active().sort((a, b) => a.no - b.no);
     const keep = this.opt.keep ?? Math.ceil(this.opt.max / 2);
     const gone = act.slice(0, Math.max(0, act.length - keep));
+    if (!gone.length) return;   // 沒撕掉任何條（上限剛好）就不算一次重置
     for (const r of gone) r.void = true;
     if (this.opt.patch !== 'solo') {
       for (const r of this.active()) if (r.depNo.some(n => this.rule(n).void)) r.dead = true;

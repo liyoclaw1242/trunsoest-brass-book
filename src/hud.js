@@ -68,7 +68,7 @@ export class Hud {
   renderWriting() {
     const w = this.game.bookWriting();
     this.el.writing.hidden = !w;
-    if (w) this.el.writing.innerHTML = `<div>黃銅書提筆中（${TIER_CN[w.tier]}）</div><div class="bar"><i style="width:${Math.round(w.progress * 100)}%"></i></div>`;
+    if (w) this.el.writing.innerHTML = `<div>黃銅書提筆中（${w.kind === 'definition' ? '定義' : TIER_CN[w.tier] || '條文'}）</div><div class="bar"><i style="width:${Math.round(w.progress * 100)}%"></i></div>`;
   }
   renderDesigner() {
     if (!this.designer) return;

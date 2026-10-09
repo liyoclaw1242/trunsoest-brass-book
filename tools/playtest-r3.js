@@ -41,10 +41,6 @@ await pw.wait(1);
 const cap1 = (await pw.status()).ruleCap;
 check('喚醒村民 → 規則上限下降', cap1 < cap0, `${cap0}→${cap1}`);
 await pw.shot(DIR, '05-labor-drop');
-// 夜晚
-await pw.eval(() => window.__game.setTime(window.__game.game.world.opt.daySec + 1)); await pw.wait(2);
-check('夜晚：畫面變暗、廣播靜音', (await text(pw, '#broadcast')).includes('靜音') || (await pw.status()).phase === 'night');
-await pw.shot(DIR, '06-night');
 writeFileSync(`${DIR}/results.json`, JSON.stringify(results, null, 1));
 const errs = pw.console.filter(l => l.startsWith('[pageerror]') || l.startsWith('[error]'));
 check('瀏覽器沒有錯誤', errs.length === 0, errs.join(' | '));

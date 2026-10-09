@@ -72,13 +72,13 @@ export class Book {
                      : this.opt.discoverBase + a * this.opt.discoverPerActivity;
     if (this.uses[key] >= this.opt.certainAt) p = 1;
     if (!this.rng.chance(Math.min(1, p))) return;
-    const def = draw(key, a, this.getStage(), this.rng, k => !!this.world.live(k), this.matchDefn, 0.5);
+    const def = draw(key, a, this.getStage(), this.rng, k => !!this.world.live(k), this.matchDefn, 0.5, { verb, type: obj?.type });
     if (!def) return;
     this.uses[key] = 0;
     this.startWrite(def, 'discover');
   }
   startWrite(def, why, baseSec = null) {
-    let sec = baseSec != null ? baseSec : (WRITE_SEC[def.tier] ?? 4);
+    let sec = baseSec != null ? baseSec : (def.kind === 'definition' ? 10 : (WRITE_SEC[def.tier] ?? 4));
     if (this.opt.speedByActivity) sec *= 1 - this.getActivity() / 250;   // 後期最多快約 40%
     this.pending = { def, left: sec, total: sec }; this.pendingWhy = why;
     this.emit('writing', { rule: def, sec });

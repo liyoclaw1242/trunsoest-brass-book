@@ -19,7 +19,7 @@ export const POOL = [
   r({ key: 'a-goat-loose', text: '牲口不得被擅自牽引。', tier: 'crude', category: 'action', verb: 'lead', target: { type: 'goat' }, hole: '山羊聽不懂規則，沒牽著時牠自己亂走；繫住不算牽引；書管不到牲口只好繞去管人。', trigger: '外鄉人牽山羊' }),
   r({ key: 'a-run-village', text: '村內不得奔跑。', tier: 'plain', category: 'action', verb: 'run', hole: '推車代步；村民也一起被限速，追你的人追不快。', trigger: '外鄉人奔跑', leaks: '書願意拖累村民' }),
   r({ key: 'a-boundary-cross', text: '外鄉人不得越過界石離村。', tier: 'plain', category: 'action', who: 'outsider', verb: 'leave', hole: '不聽到它就不受約束；重置撕掉它的空檔。', trigger: '外鄉人走近邊界', leaks: '書在意邊界' }),
-  r({ key: 'a-fence-both', text: '圍籬不得翻越或破壞。', tier: 'plain', category: 'action', verb: 'climb', target: { type: 'fence' }, cond: null, hole: '推車墊腳不算翻越也不算破壞。', trigger: '外鄉人破壞圍籬' }),
+  r({ key: 'a-fence-both', text: '圍籬不得被破壞。', tier: 'plain', category: 'action', verb: 'break', target: { type: 'fence' }, hole: '翻越是另一條管的；推車墊腳不算破壞。', trigger: '外鄉人破壞圍籬' }),
   r({ key: 'a-wild-enter', text: '外鄉人不得進入荒野。', tier: 'plain', category: 'action', who: 'outsider', verb: 'enter', target: { zone: 'wild' }, hole: '天黑前就站在荒野裡的人沒有「進入」；界石被搬後荒野的邊沒了定義。', trigger: '外鄉人走向村外' }),
   r({ key: 'a-speed-any', text: '任何存在不得奔跑，無論緣由。', tier: 'strict', category: 'action', verb: 'run', hole: '村民同樣追不快，書自己吃虧；山羊聽不懂；不聽到它；等重置。', trigger: '外鄉人反覆奔跑', leaks: '書願意拖累全村' }),
   r({ key: 'a-leave-any', text: '外鄉人不得離開本村，無論經由何處、以何種方式。', tier: 'strict', category: 'action', who: 'outsider', verb: 'leave', hole: '不聽到它；等它被撕掉的空檔；影響範圍會跟著書走，把書帶出去等於村也出去了。', trigger: '外鄉人試圖離開', leaks: '書在意邊界' }),
@@ -30,19 +30,19 @@ export const POOL = [
   r({ key: 'h-cart-hide', text: '外鄉人不得藏身於推車。', tier: 'crude', category: 'hide', who: 'outsider', verb: 'use', target: { type: 'cart' }, hole: '水井、草堆、圖書館都能藏；推著走不算藏身。', trigger: '外鄉人躲進推車' }),
   r({ key: 'h-well-hide', text: '外鄉人不得藏身於井中。', tier: 'crude', category: 'hide', who: 'outsider', verb: 'use', target: { type: 'well' }, hole: '別處能藏；站在井裡取水不算藏。', trigger: '外鄉人躲進水井' }),
   r({ key: 'h-building-any', text: '外鄉人不得進入任何建築。', tier: 'plain', category: 'hide', who: 'outsider', verb: 'enter', target: { tag: 'building' }, hole: '屬於自己的那間房子算不算建築沒有定義；水井、草堆不是建築。', trigger: '外鄉人進入圖書館或工作站' }),
-  r({ key: 'h-well-enter', text: '任何存在不得進入水井。', tier: 'plain', category: 'hide', verb: 'enter', target: { type: 'well' }, hole: '村民沒法打水，書得補「市民取水不在此限」，你可以說自己在取水。', trigger: '外鄉人躲進水井', leaks: '書願意拖累村民' }),
+  r({ key: 'h-well-enter', text: '任何存在不得進入水井。', tier: 'plain', category: 'hide', verb: 'use', target: { type: 'well' }, hole: '村民沒法打水，書得補「市民取水不在此限」，你可以說自己在取水。', trigger: '外鄉人躲進水井', leaks: '書願意拖累村民' }),
   r({ key: 'h-invite-strict', text: '任何市民不得邀請或收留外鄉人。', tier: 'strict', category: 'hide', who: 'citizen', verb: 'invite', hole: '已喚醒的村民還算不算市民沒有定義；山羊不是市民。', trigger: '村民邀請外鄉人' }),
-  r({ key: 'h-well-strict', text: '水井僅供市民取水，取水以外的進入一律禁止。', tier: 'strict', category: 'hide', verb: 'enter', target: { type: 'well' }, hole: '已喚醒的村民算不算市民沒定義；請村民替你下去。', trigger: '外鄉人反覆躲井' }),
+  r({ key: 'h-well-strict', text: '水井僅供市民取水，取水以外一律禁止進入。', tier: 'strict', category: 'hide', verb: 'use', target: { type: 'well' }, hole: '已喚醒的村民算不算市民沒定義；請村民替你下去。', trigger: '外鄉人反覆躲井' }),
   r({ key: 'h-stay-indoors', text: '外鄉人不得滯留於任何有頂之處。', tier: 'plain', category: 'hide', who: 'outsider', verb: 'stay', target: { tag: 'roofed' }, hole: '樹蔭、草堆沒有「頂」；路過不算滯留。', trigger: '外鄉人久留室內' }),
 
   // ========== 資產與公示 asset（限制）==========
   r({ key: 's-speaker-break', text: '廣播器不得被破壞。', tier: 'crude', category: 'asset', verb: 'break', target: { type: 'speaker' }, hole: '沒聽到的人不受約束；沒說不能搬走或遮住。', trigger: '外鄉人破壞廣播器' }),
   r({ key: 's-ears-block', text: '任何存在不得堵塞耳朵。', tier: 'crude', category: 'asset', verb: 'use', target: { type: 'earplug' }, hole: '潛進井裡聽不到也不算堵耳；讓鐘聲蓋過廣播。', trigger: '外鄉人裝聾' }),
   r({ key: 's-notice-deface', text: '公告牌不得被塗毀。', tier: 'crude', category: 'asset', verb: 'deface', target: { type: 'notice' }, hole: '山羊吃紙不算塗毀；雨會淋濕；還是可以讀。', trigger: '外鄉人塗毀公告牌' }),
-  r({ key: 's-speaker-three', text: '廣播器不得被破壞、搬動或遮蔽。', tier: 'plain', category: 'asset', verb: 'break', target: { type: 'speaker' }, hole: '山羊會咬斷廣播器的線；沒聽到的人不受約束。', trigger: '外鄉人搬動或遮蔽廣播器' }),
+  r({ key: 's-speaker-three', text: '廣播器不得被搬動。', tier: 'plain', category: 'asset', verb: 'move', target: { type: 'speaker' }, hole: '破壞或遮蔽沒被提到；山羊會咬斷線；沒聽到的人不受約束。', trigger: '外鄉人搬動廣播器' }),
   r({ key: 's-notice-protect', text: '公告牌不得被塗毀或損壞。', tier: 'plain', category: 'asset', verb: 'deface', target: { type: 'notice' }, hole: '山羊吃紙；讓它空白不算損壞。', trigger: '外鄉人破壞公告牌' }),
   r({ key: 's-broadcast-stay', text: '廣播響起時，外鄉人應停留原地直到播畢。', tier: 'strict', category: 'asset', who: 'outsider', verb: 'stay', mode: 'require', cond: 'broadcasting', hole: '廣播響起前就離開範圍，就沒有「響起時」；聽不到就不觸發。', trigger: '外鄉人在廣播時走動' }),
-  r({ key: 's-speaker-strict', text: '廣播器為公器，任何存在不得使其靜默。', tier: 'strict', category: 'asset', verb: 'break', target: { type: 'speaker' }, hole: '山羊聽不懂，讓山羊去咬；夜間書自己讓它靜音，那時不算「使其靜默」。', trigger: '外鄉人反覆破壞廣播器' }),
+  r({ key: 's-speaker-strict', text: '廣播器為公器，不得被遮蔽。', tier: 'strict', category: 'asset', verb: 'use', target: { type: 'speaker' }, hole: '山羊聽不懂，讓山羊去咬斷線；夜間書自己讓它靜音，那時不算。', trigger: '外鄉人遮蔽廣播器' }),
   r({ key: 's-notice-strict', text: '公告牌所載為律法，不得使其不可辨識。', tier: 'strict', category: 'asset', verb: 'deface', target: { type: 'notice' }, hole: '山羊吃紙是山羊的事；雨不是存在。', trigger: '外鄉人反覆破壞公告牌' }),
 
   // ========== 自保 selfprotect（限制，威脅到書或圖書館時察覺機率至少 90%）==========
@@ -123,13 +123,15 @@ export function stagesUnlocked(stage) {
  * 書針對某一類行為動筆：從該類、已解鎖階段、尚未生效的候選裡，依活性的三級權重抽一條。
  * @returns 條文定義物件，或 null（該類已無可寫）。
  */
-export function draw(category, activity, stage, rng, isLive, isMatchable = null, defBias = 0) {
+export function draw(category, activity, stage, rng, isLive, isMatchable = null, defBias = 0, match = null) {
   const unlocked = new Set(stagesUnlocked(stage));
   let pool = POOL.filter(d => d.category === category && unlocked.has(d.stage) && !isLive(d.key));
   // 定義類只在外鄉人目前符合那條定義時才抽得到（否則「大家當你市民」的局面不是你的行為造成的）
   if (isMatchable) pool = pool.filter(d => d.kind !== 'definition' || isMatchable(d.defn));
   // 後期偏置：有可用的定義類時，有機率直接只抽定義（讓「大家當你市民」的局面真的會出現）
   if (defBias > 0 && stage === 'late') { const defs = pool.filter(d => d.kind === 'definition'); if (defs.length && rng.chance(defBias)) pool = defs; }
+  // 偏好與觸發行為相符的條文（砸廣播器 → 抽廣播器條文，而不是公告牌條文）：漏洞的因果才讀得出來
+  if (match && (match.verb || match.type)) { const m = pool.filter(d => (match.type && d.target?.type === match.type) || (match.verb && d.verb === match.verb)); if (m.length) pool = m; }
   if (!pool.length) return null;
   const weights = tierWeights(activity);
   // 先依權重選等級，該等級沒有就往鄰近等級退

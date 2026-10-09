@@ -26,8 +26,8 @@ export class Villagers {
     this.pendingViolations = [];   // 傳染用：{pos, rules(keys), t}
     this.goats = [...world.objects.values()].filter(o => o.type === 'goat');
     for (const g of this.goats) { g.gidle = 0; g.fpos = [...g.pos]; g.gmove = null; }
-    world.on('acted', ({ actor, verb, target, ctx, violates }) => { if (actor.id === 'outsider' && violates && violates.length) this.onViolation(verb, target, ctx, violates); });
-    world.on('captured', () => { this.pendingViolations = []; });
+    world.on('acted', ({ actor, verb, target, ctx }) => { if (actor.id === 'outsider') this.onOutsiderAct(verb, target, ctx); });
+    world.on('captured', () => { for (const pv of this.pendingViolations) pv.capturedSince = true; });
     // 收到自己的信物／鈴鐺 → 降一級（搬運者只有鈴鐺有效）
     world.on('act', ({ verb, target }) => {
       if (verb === 'give' && (target?.type === 'keepsake' || target?.type === 'bell') && target.heldBy && target.owner === target.heldBy) {
@@ -76,16 +76,16 @@ export class Villagers {
     return dist(v.pos, me.pos) <= range;
   }
 
-  /** 外鄉人違規：啟動目擊者的追捕（有名字時才需目擊）、記錄給傳染用。 */
-  onViolation(verb, target, ctx, violates) {
+  /** 外鄉人做了一件事：每個看得見的村民用「自己的認知」判斷他有沒有違規（公示才生效的誠實版）。 */
+  onOutsiderAct(verb, target, ctx) {
     const me = this.outsider;
-    const keys = violates.map(r => (typeof r === 'number' ? r : r.no));
-    this.pendingViolations.push({ pos: [...me.pos], keys, t: this.world.t });
     for (const v of this.list) {
-      if (!this.sees(v)) continue;
-      if (!this.mayChase(v)) continue;
-      // 目擊者是否也認知到被違反的其中一條？傳染要用
-      this.startChase(v, verb, keys);
+      if (v.dead || !this.sees(v)) continue;
+      const rules = this.world.violatesFor(v.id, 'outsider', verb, target?.id || null, ctx);
+      if (!rules.length) continue;
+      const keys = rules.map(r => r.no);
+      this.pendingViolations.push({ villager: v.id, pos: [...me.pos], keys, t: this.world.t });   // 傳染：目擊當下記下
+      if (this.mayChase(v)) this.startChase(v, verb, rules);
     }
   }
   startChase(v, verb, rules) {
@@ -158,9 +158,9 @@ export class Villagers {
       if (!this.hasName() && this.mayChase(v) && this.sees(v) && this.world.t >= v.chaseUntil) this.startChase(v, 'capture', []);
       if (this.hunts(v) && this.sees(v)) { v.chaseUntil = Math.max(v.chaseUntil, w.t + this.opt.chaseSec); v.lastSeen = [...me.pos]; }
       // 抓捕
-      if (this.hunts(v) && w.t >= me.immuneUntil && this.adjacent(v.pos, me.pos)) { v.captureT += dt; if (v.captureT >= this.opt.captureSec) { v.captureT = 0; const r = w.attempt(v.id, 'capture', 'outsider'); if (r.done) { me.immuneUntil = w.t + this.opt.immuneSec; v.chaseUntil = 0; this.emit('captured', { actor: v }); } } } else v.captureT = 0;
+      if (this.hunts(v) && w.t >= me.immuneUntil && this.adjacent(v.pos, me.pos)) { v.captureT += dt; if (v.captureT >= this.opt.captureSec) { v.captureT = 0; const r = w.attempt(v.id, 'capture', 'outsider'); if (r.done) { me.immuneUntil = w.t + this.opt.immuneSec; for (const u of this.list) if (dist(u.pos, me.pos) <= this.opt.sight) u.chaseUntil = 0; this.emit('captured', { actor: v }); } } } else v.captureT = 0;
       // 傳染判定：有一筆違規在這村民 5 格內、涉及他也認知的條文、且過了 delay 外鄉人還沒被抓
-      if (v.level !== 'puppet') for (const pv of this.pendingViolations) if (this.world.t - pv.t >= this.opt.contagionDelay && dist(v.pos, pv.pos) <= this.opt.contagionDist && pv.keys.some(no => v.known.has(no)) && !pv.used) { pv.used = true; this.nudge(v); }
+      if (v.level !== 'puppet') for (const pv of this.pendingViolations) if (pv.villager === v.id && this.world.t - pv.t >= this.opt.contagionDelay && !pv.used && !pv.capturedSince) { pv.used = true; this.nudge(v); }
       // 模式
       if (this.hunts(v) && w.t >= v.waitUntil) v.mode = 'chase';
       else if (v.level === 'awake') v.mode = 'idle';

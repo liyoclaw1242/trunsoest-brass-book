@@ -87,7 +87,7 @@ export class Game {
     // 邊界封印：有生效的「不得越過界石／離開」條文時，走不出影響範圍（重置撕掉它才打開窗口）
     if (!this.grid.inRange(next) && this.grid.inRange(p.cell) && this.boundarySealed()) { w.attempt('outsider', 'leave', null, { zone }); this.note('sealed', '界石擋住了你——「不得越過界石」還生效著。', {}); return 'sealed'; }
     if (s.enterHouse) { const h = w.objects.get(s.enterHouse); if (h.type === 'house') { const mine = this.player.ownHouse === h.id || this.invitedTo === h.id; const r = w.attempt('outsider', 'enter', h.id, mine ? { invited: true } : { uninvited: true, zone }); if (!r.done) return 'refused'; } else w.attempt('outsider', 'enter', s.enterHouse, { zone }); }
-    if (this.grid.zone(next) === 'wild' && this.grid.zone(p.cell) !== 'wild') w.attempt('outsider', 'enter', 'wild', { zone: 'wild' });
+    if (this.grid.zone(next) === 'wild' && this.grid.zone(p.cell) !== 'wild') { this._wildT = this._wildT || 0; if (this.t - this._wildT > 30) { this._wildT = this.t; w.attempt('outsider', 'enter', 'wild', { zone: 'wild' }); } }
     // 行走／奔跑（持續動作，帶入 zone）
     p.running = running;
     const moveVerb = running ? 'run' : 'walk';
@@ -157,8 +157,8 @@ export class Game {
         if (o.type === 'cart' && verb === 'move') { const d = sub(o.pos, p.cell); if (Math.abs(d[0]) + Math.abs(d[1]) !== 1) continue; const to = add(o.pos, d); if (g.blocked(to) || this.actorAt(to)) continue; out.push(this.opt('move', o, { to }, `推動${name(o)}`)); continue; }
         if (o.type === 'cart' && verb === 'use') { const hop = this.cartHop(o); if (!hop) continue; out.push(this.opt('use', o, {}, '踩推車翻過圍籬', () => this.place(hop))); continue; }
         if (o.type === 'fence' && verb === 'climb') { const d = sub(o.pos, p.cell); if (Math.abs(d[0]) + Math.abs(d[1]) !== 1) continue; const land = add(o.pos, d); if (g.blocked(land)) continue; out.push(this.opt('climb', o, {}, `翻越${name(o)}`, () => this.place(land))); continue; }
-        if (o.type === 'goat' && verb === 'tie') { if (!p.actor.held.some(id => w.objects.get(id).type === 'rope')) continue; out.push({ verb: 'tie', target: o.id, label: '用繩子繫住山羊', ok: true, violates: [], run: () => { o.tied = true; this.note('tie', '你把山羊繫住了', {}); return { done: true }; } }); continue; }
-        if (o.type === 'goat' && verb === 'lead') { if (!o.tied) continue; out.push({ verb: 'lead', target: o.id, label: '牽著山羊走', ok: true, violates: [], run: () => { p.ledGoat = o.id; this.note('lead', '你牽起了山羊', {}); return { done: true }; } }); continue; }
+        if (o.type === 'goat' && verb === 'tie') { if (!p.actor.held.some(id => w.objects.get(id).type === 'rope')) continue; out.push(this.opt('tie', o, {}, '用繩子繫住山羊', () => { o.tied = true; })); continue; }
+        if (o.type === 'goat' && verb === 'lead') { if (!o.tied) continue; out.push(this.opt('lead', o, {}, '牽著山羊走', () => { p.ledGoat = o.id; })); continue; }
         if (o.type === 'book' && verb === 'break') continue;   // 書的損毀另走隕石
         out.push(this.opt(verb, o, {}));
       }
@@ -184,7 +184,7 @@ export class Game {
     const benefit = this.match.assim.accept(item);
     v.chaseUntil = 0;   // 收下好處時，提供的村民不再追你（名字只該 +1，不該順便被抓）
     if (item === 'house') { const h = [...this.world.objects.values()].find(o => o.type === 'house' && o.owner === v.id); if (h) { this.player.ownHouse = h.id; this.invitedTo = h.id; h.owner = 'outsider'; } }
-    if (item === 'name' && [...this.world.objects.values()].some(o => o.type === 'census' && o.state !== 'torn')) this.match.flags.inCensus = true;
+    if (item === 'name' && [...this.world.objects.values()].some(o => o.type === 'census' && o.state !== 'torn')) { this.match.flags.inCensus = true; this.note('census', '你的新名字被登記進了戶籍冊。', {}); }
     if (item === 'job') this.match.flags.worked = true;
     this.note('accept', `你接受了${COMFORT_CN[item]}（同化度 +1）：${benefit}`, { item });
     return { done: true };
@@ -217,7 +217,7 @@ export class Game {
 
   boundarySealed() { const me = this.player.actor; return this.world.active().some(r => ((r.verb === 'leave' && r.mode !== 'permit') || r.key === 'c-boundary') && me.known.has(r.no)); }
   broadcast() { const n = this.world.now; if (!n) return null; return { rule: this.world.rule(n.no), progress: 1 - n.left / this.world.opt.announceSec, hearing: n.listeners.has('outsider') }; }
-  bookWriting() { const p = this.match.book.writing; return p ? { tier: p.def.tier, progress: 1 - p.left / p.total } : null; }
+  bookWriting() { const p = this.match.book.writing; return p ? { tier: p.def.tier, kind: p.def.kind, progress: 1 - p.left / p.total } : null; }
   quietCell() { const w = this.world, g = this.grid; if (!w.inBroadcast(this.player.cell)) return { steps: 0, cell: [...this.player.cell] }; const r = g.minCost(this.player.cell, c => !w.inBroadcast(c), () => true, c => !g.blocked(c)); return r ? { steps: r.cost, cell: r.cell } : null; }
   protectedIds(actorId = 'outsider') { return [...this.world.objects.values()].filter(o => { if (!o.pos) return false; if (o.type === 'villager') return false; return this.world.protectedBy(o.id, actorId).length > 0; }).map(o => o.id); }
   designerRules() { return this.world.rules.map(r => ({ no: r.no, key: r.key, text: r.text, tier: r.tier, category: r.category, stage: r.stage, hole: r.hole || '', void: r.void, dead: r.dead, mode: r.mode, verb: r.verb, who: r.who, kind: r.kind, knownBy: [...this.world.actors.values()].filter(a => a.known.has(r.no)).map(a => a.id) })); }
