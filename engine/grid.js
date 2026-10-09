@@ -20,7 +20,8 @@ export class Grid {
   constructor(objects, opt = {}) {
     this.objects = objects instanceof Map ? objects : new Map(objects.map(o => [o.id, o]));
     this.roads = opt.roads || [];          // [[x0,y0,x1,y1], ...] 村道矩形；其餘是野地。沒有村道資料時全部算村道。
-    this.plaza = opt.plaza || null;
+    this.plaza = opt.plaza || null;        // [x0,y0,x1,y1] 廣場
+    this.wildDeep = opt.wildDeep || null;  // [x0,y0,x1,y1] 荒野深處（放逐結局）
     const book = [...this.objects.values()].find(o => o.type === 'book');
     this.radius = opt.radius ?? book?.radius ?? 20;
     const margin = opt.margin ?? 10;
@@ -41,10 +42,13 @@ export class Grid {
   houseAt(pos) { return this.cellHouse.get(key(...pos)) || null; }
   /** 'road' 村道（含住宅與其門前）或 'wild' 野地。 */
   zone([x, y]) {
+    const inRect = ([x0, y0, x1, y1]) => x >= x0 && x <= x1 && y >= y0 && y <= y1;
+    if (this.wildDeep && inRect(this.wildDeep)) return 'wilddeep';
+    if (this.plaza && inRect(this.plaza)) return 'plaza';
     if (!this.roads.length) return 'road';
     if (this.houseAt([x, y])) return 'road';
     for (const o of this.objects.values()) if (o.type === 'house') { const [hx, hy] = o.pos; if (x >= hx - 3 && x <= hx + 2 && y >= hy - 4 && y <= hy + 2) return 'road'; }
-    return this.roads.some(([x0, y0, x1, y1]) => x >= x0 && x <= x1 && y >= y0 && y <= y1) ? 'road' : 'wild';
+    return this.roads.some(inRect) ? 'road' : 'wild';
   }
 
   /** 這一格現在擋不擋路（不含角色）。 */

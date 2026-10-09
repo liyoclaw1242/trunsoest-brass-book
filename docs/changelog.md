@@ -221,3 +221,32 @@
 
 **丟棄**
 - 原型三的 `rules.v3.js`（被條文池取代）、witness-only 追逐邏輯（回到抓捕令模型）、同化 0–3、固定上限 10。保留檔案在 git 歷史，不刪。
+
+## 改版 v2 — R1 引擎（2026-01，Opus 4.8）
+
+全部純邏輯，node 測試。`npm test` 現在跑 engine／broadcast／rules.v2／economy／villagers／match 六個測試檔 + validate-rules，全通過。
+
+**新模組**
+- `engine/rng.js`：可指定種子的 mulberry32（`?seed=` 用）。引擎內隨機都走它。
+- `engine/activity.js`：活性 0–100。時間（每 10 秒 +1×勞動比例）、學習（補漏洞 +3、撐過重置 +5、抓到 +2）、倒退（喚醒 −4、裁決／廢文 −1）、階段（前 0–34／中 35–69／後 70–99）、到頂。全村工作約 17 分鐘到頂。
+- `engine/economy.js`：勞動比例＝工作村民數÷總數；可維持規則數＝4＋供養村民數；追人／喚醒／睡覺不算工作。
+- `engine/assimilation.js`：同化 0–5；舒適（名字／衣服／房子／工作）各 +1 並給好處；安靜處每 30 秒 −1 但不低於持有的舒適項目數；放棄才能再降。
+- `engine/rules.v2.js`：候選條文池（60 條）、固定條文、三級權重內插（0→70/25/5、50→35/45/20、100→10/35/55）、`draw()` 依類別與活性抽、階段解鎖、定義類只抽外鄉人目前符合的。
+- `engine/book.js`：書的動筆。行為→類別、發現漏洞機率（20%＋活性×0.6%、第 5 次必中、威脅書／圖書館 ≥90%）、書寫時間（粗糙 2／普通 4／嚴謹 10 秒，後期加快）、寫完排入廣播、重置後重寫邊界限制與抓捕令。
+- `engine/match.js`（重寫）：活性／勞動／同化／書的整合；規則上限隨勞動浮動、掉下來最舊褪色（`World.fade`）；定義雙效果（村民把符合者當市民／外鄉人認知到自己符合就同化到頂）；六種結局判定。
+- `engine/villagers.js`（重寫）：回到抓捕令追捕模型；名字舒適時只在目擊違規後才追；傳染（5 格內目睹且 10 秒沒被抓 → 半同化推進 1/3 級、人偶免疫）；定義涵蓋就不追；勞動循環（生產→送圖書館）；舒適提供。
+- `engine/session.js`（重寫）：種子注入、憲法、村民、Match 組裝。
+- `tools/validate-rules.js`：key 不重複、動詞在 VERBS、target 指得到已知類型／區／標籤、每條有 hole、每限制類三級齊全、每項舒適有對應定義類。
+- 引擎擴充：`VERBS` 加 talk/greet/listen/reside/accept/harm/invite；`matches` 支援 target.zone／target.tag；`evaluate`／`violatesFor` 旁觀者判定；`World.fade`。
+
+**條文池（60 條，詳見 `engine/rules.v2.js`）**
+- 行動 12（含「不得越過界石」「以快於步行移動」等嚴謹條）、藏身 8、資產與公示 8、自保 8、村民限制 8；義務 8（問安／穿著／聆聽晨播／居住／勞作／讀全部條文／宵禁／領受名字）；定義 8（有姓名／穿村服／居村宅／戶籍／滿三日／曾勞作／曾問安／領受其一者為市民）。固定：憲法 5、抓捕令 3 級、裁決、最後一條。
+
+**驗收**：兩個統計測試通過——1000 次抽選三級比例在活性 0/50/100 各符合權重（容差 <6pp）；同種子兩次寫出的條文完全相同、不同種子不同。六種結局在合成場景各自觸發。
+
+**條文審查（audit-rules，三個子代理，各審沒寫的那批）**
+- 資產／自保：無高嚴重度。已處理方向：M3 同一鏈三級共用同一 verb（R2 給 speaker 加 move/use 讓「搬走／遮蔽」成立）；require 類（s-broadcast-stay、p-fire-out）需義務檢查器（R4）；多條指向 R2 才生出的物件（library/fire/meteor/earplug）。
+- 村民／義務／定義：**H1 定義類接線**——已補 `defn` 判定器（match.matchesDefn／definitionsCovering、villagers.coveredByDefinition）並 gate draw（只抽符合的定義）。M1 義務 require 的「照做 +1／不照做違規」接線留 R4（需舒適 UI）。M4 已改 `v-help-strict` 為外鄉人面向（who:outsider/verb:induce）。M3 已補 `d-greeted` 的系統出路。M2/M5/M6（workstation/bell/census/roofed tag/reside 動詞）留 R2 補物件與 tag。L1 重複、L2 cond 傳入留記錄。
+- 行動／藏身：審查結果待該子代理回報後處理（下一次 commit）。
+
+**暫定與待辦**見 `docs/open-questions.md`。

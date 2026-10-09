@@ -92,3 +92,14 @@ v2 是全新設計，依 plan-v2「以新設計為準」。舊項目處理如下
 - **#11 躲進追你的村民自己家跟丟**：隨 villagers 大改重定。
 
 舊的 #1（重置後抓捕令空檔）、#2（視角）仍成立，沿用。
+
+---
+
+# 改版 v2 — R1 的暫定與待辦
+
+- **義務類 require 的強制（已暫定）**：引擎 `evaluate` 只對 forbid/permit 算違規。義務類「照做 +1 同化、不照做違規」要等 R4 的舒適／工作 UI 才完整接線。現在義務類條文抽得到但還不會產生後果。選了「先把定義雙效果接好，義務留 R4」，因為義務的照做多半是玩家在畫面上的選擇。
+- **scene 物件待補（R2）**：workstation、bell（山羊鈴鐺）、census（戶籍冊）、library、fire、meteor、goat、rope、name 的領受來源、carved-stone。相關條文（o-work、v-post-strict、v-bell-strict、d-census、d-worked、p-library-*、p-fire-*、p-meteor-take 等）要等物件生出才生效。
+- **tag／動詞待補（R2）**：house 等建築要標 `roofed`／`building` tag（o-curfew、h-stay-indoors、h-building-any 才判得準）；house 要支援 `reside` 動詞（o-reside）。
+- **同一鏈共用 verb（R2）**：speaker 要加 `move`/`use` 動詞，notice 的「塗白／吃紙」要有表達方式，粗糙條文宣傳的漏洞才成立、三級才真的有差。
+- **cond 傳入（R3/R4）**：`from-outsider`、`not-chasing`、`broadcasting` 這些 cond 要由畫面端在 attempt 時帶入 ctx。
+- **村民怎麼知道外鄉人在哪（已暫定）**：目前抓捕令模型下，認知抓捕令的村民在視線（6 格、不隔牆）內看見就追；有名字舒適時改為只在目擊違規後才追。沿用原型三的視線，之後可調。

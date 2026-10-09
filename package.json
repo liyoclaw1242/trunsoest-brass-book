@@ -3,9 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node engine/engine.test.js && node engine/broadcast.test.js && node engine/villagers.test.js && node engine/match.test.js",
+    "test": "node engine/engine.test.js && node engine/broadcast.test.js && node engine/rules.v2.test.js && node engine/economy.test.js && node engine/villagers.test.js && node engine/match.test.js && node tools/validate-rules.js",
     "scene": "${BLENDER:-/Applications/Blender.app/Contents/MacOS/Blender} --background --python blender/build_scene.py",
-    "validate": "node tools/validate-scene.js && node tools/check-layout.js",
+    "validate": "node tools/validate-scene.js && node tools/check-layout.js && node tools/validate-rules.js",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"

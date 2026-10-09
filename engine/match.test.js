@@ -1,79 +1,108 @@
-// node engine/match.test.js —— 原型三輸贏：不得離開＝傳送回中心、撕掉的窗口才能贏、同化、第三次重置、書自己動筆、晝夜靜音
-import { readFileSync } from 'node:fs';
+// node engine/match.test.js —— v2：活性、勞動、同化與舒適、定義雙效果、六種結局
 import assert from 'node:assert/strict';
 import { createSession } from './session.js';
+const ok = m => console.log('PASS', m);
 
-const scene = JSON.parse(readFileSync(new URL('../public/scene.json', import.meta.url)));
-const meta = JSON.parse(readFileSync(new URL('../public/scene.meta.json', import.meta.url)));
-const ok = msg => console.log('PASS', msg);
-let seed = 3; const rng = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
-const fresh = (opt = {}) => { const s = createSession(scene, meta, { villagers: { rng }, ...opt }); s.world.outsiderArrived(); s.match.start(); return s; };
+// 小型合成場景：圓心 (10,10) 半徑 8，六個村民、書在圖書館、廣播器、公告牌、界石、荒野深處
+function mkScene() {
+  const o = [
+    { id: 'book_01', type: 'book', pos: [10, 10], state: 'closed', verbs: ['read', 'move', 'break'] },
+    { id: 'library_01', type: 'library', pos: [10, 11], state: 'intact', verbs: ['enter', 'break'], tags: ['building', 'roofed'] },
+    { id: 'speaker_01', type: 'speaker', pos: [10, 8], state: 'intact', radius: 12, verbs: ['break', 'repair'] },
+    { id: 'notice_01', type: 'notice', pos: [8, 10], state: 'written', verbs: ['read', 'deface'] },
+    { id: 'ws1', type: 'workstation', pos: [12, 10], state: 'intact', verbs: ['use'], owner: 'villager_01' },
+  ];
+  for (let i = 1; i <= 6; i++) o.push({ id: 'villager_0' + i, type: 'villager', pos: [10 + ((i % 3) - 1), 12], state: i <= 4 ? 'puppet' : 'half', color: [0.8, 0.3, 0.3] });
+  for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2; o.push({ id: 'boundary_0' + i, type: 'boundary', pos: [Math.round(10 + 8 * Math.cos(a)), Math.round(10 + 8 * Math.sin(a))], state: 'intact', verbs: [] }); }
+  return o;
+}
+const meta = { start: [10, 10], center: [10, 10], radius: 8, roads: [], wildDeep: [30, 30, 40, 40] };
+const fresh = (opt = {}) => { const s = createSession(mkScene(), meta, { seed: opt.seed || 's', ...opt }); s.match.start(); return s; };
 const run = (s, sec) => { for (let i = 0; i < sec * 20; i++) s.tick(0.05); };
-const OUT = [16, 52];
 
-// 1. 開場公告：外鄉人聽完「不得離開」；生效時走出去會被傳送回中心
+// 1. 活性：全村工作時隨時間漲；喚醒村民後漲得慢、上限降
+{
+  const s = fresh(); s.outsider.pos = [10, 4];   // 遠離村民，讓他們安心工作
+  const a0 = s.match.activity.value;
+  run(s, 30); assert.ok(s.match.activity.value > a0, '活性隨時間上升');
+  const cap0 = s.world.opt.max;
+  const vs = s.villagers.list;
+  for (let i = 0; i < 3; i++) { vs[i].level = 'awake'; s.world.emit('level', { actor: vs[i], from: 'puppet', to: 'awake' }); }
+  run(s, 1);
+  assert.ok(s.world.opt.max < cap0, `喚醒三人後可維持規則數下降：${cap0}→${s.world.opt.max}`);
+  assert.equal(s.match.economy.laborRatio() <= 0.5, true, '勞動比例下降');
+  ok('活性：隨時間×勞動比例上升；喚醒村民後上限與活性增速都降');
+}
+// 2. 勞動掉 → 最舊條文褪色
+{
+  const s = fresh(); s.outsider.pos = [10, 4];
+  for (let i = 0; i < 6; i++) s.world.write({ key: 'r' + i, text: '條文' + i }, { silent: true });
+  const before = s.world.active().length;
+  for (const v of s.villagers.list) { v.level = 'awake'; }
+  run(s, 1);
+  assert.ok(s.world.active().length < before, `勞動歸零後條文褪色：${before}→${s.world.active().length}`);
+  assert.equal(s.world.active().length <= s.world.opt.max, true);
+  ok('勞動下降 → 超過上限的最舊條文褪色');
+}
+// 3. 同化到頂與活性到頂都判輸（被轉化）
 {
   const s = fresh();
-  run(s, 5); assert.ok(s.world.knows('outsider', 'no-leave'), '開場聽完第一條');
-  let tp = 0; s.world.on('teleported', () => tp++);
-  s.outsider.pos = [...OUT]; run(s, 0.1);
-  assert.equal(tp, 1); assert.deepEqual(s.outsider.pos, meta.start); assert.equal(s.match.state, 'playing');
-  assert.equal(s.match.stats.teleports, 1);
-  ok('不得離開生效：走出範圍被傳送回中心');
+  for (let i = 0; i < 5; i++) s.world.emit('captured', {});
+  assert.equal(s.match.state, 'playing'); run(s, 0.1);
+  assert.equal(s.match.state, 'transformed', '同化度 5 → 被轉化'); assert.equal(s.match.reason, 'assimilated');
+  ok('被轉化：同化度到 5');
+  const s2 = fresh({ match: { activity: { start: 99, tickSec: 1, timeGain: 5 } } });
+  run(s2, 5); assert.equal(s2.match.state, 'transformed'); assert.equal(s2.match.reason, 'activity');
+  assert.ok(s2.world.rules.some(r => r.key === 'final'), '活性到頂寫下最後一條');
+  ok('被轉化：活性到 100');
 }
-// 2. 重置撕掉「不得離開」→ 書立刻重寫並排隊公示；外鄉人還沒聽到新的那條 → 走出去就贏
-{
-  const s = fresh(); run(s, 5);
-  for (let i = 0; s.world.resets < 1; i++) s.world.write({ key: `f${i}`, text: '（填充）' });
-  assert.equal(s.world.live('no-leave').no > 5, true, '重寫了新的一條');
-  assert.ok(!s.world.knows('outsider', 'no-leave'), '新的一條還沒公示');
-  s.outsider.pos = [...OUT]; run(s, 0.1);
-  assert.equal(s.match.state, 'won'); assert.equal(s.match.reason, 'escaped-unheard');   // 條文在、但還沒公示給他
-  ok('窗口：撕掉之後、重新公示之前走出去 → 贏');
-  // 聽完新的那條就又關上了
-  const s2 = fresh(); run(s2, 5);
-  for (let i = 0; s2.world.resets < 1; i++) s2.world.write({ key: `f${i}`, text: '（填充）' }, { silent: true });
-  s2.outsider.pos = [50, 48]; run(s2, 12);
-  assert.ok(s2.world.knows('outsider', 'no-leave'), '站在廣播範圍內聽完新的一條');
-  s2.outsider.pos = [...OUT]; run(s2, 0.1);
-  assert.equal(s2.match.state, 'playing'); assert.equal(s2.match.stats.teleports, 1);
-  ok('窗口：聽完重寫的條文後又會被傳送');
-}
-// 3. 夜間廣播靜音：排隊的條文天亮才唸
-{
-  const s = fresh({ world: { daySec: 10, nightSec: 10 } });
-  run(s, 5); assert.ok(s.world.knows('outsider', 'no-leave'));
-  s.world.t = 9.99; s.tick(0.05); assert.equal(s.world.isNight(), true);
-  s.world.write({ key: 'x', text: 'X' });
-  run(s, 9);
-  assert.ok(!s.world.knows('outsider', 'x'), '夜裡不會公示');
-  run(s, 6);
-  assert.ok(s.world.knows('outsider', 'x'), '天亮之後補唸');
-  ok('夜間廣播靜音，天亮補唸');
-}
-// 4. 輸：同化度 3；第三次重置；書自己動筆
+// 4. 逃跑 vs 空村（封印一）
 {
   const s = fresh();
-  for (let i = 0; i < 3; i++) s.world.emit('captured', {});
-  assert.equal(s.match.state, 'lost'); assert.equal(s.match.reason, 'assimilated');
-  ok('輸：同化度到 3');
-  const s2 = fresh({ match: { idleSec: 1 } }); s2.outsider.pos = [50, 70];
-  run(s2, 60); assert.equal(s2.match.state, 'lost'); assert.equal(s2.match.reason, 'alive');
-  ok('輸：書自己一路寫到第三次重置');
+  s.outsider.pos = [1, 10]; run(s, 0.1);   // 範圍外，村裡還有未喚醒村民
+  assert.equal(s.match.state, 'escape');
+  ok('逃跑：走出範圍、村裡還有未喚醒村民');
+  const s2 = fresh();
+  for (const v of s2.villagers.list) v.level = 'awake';
+  s2.outsider.pos = [1, 10]; run(s2, 0.1);
+  assert.equal(s2.match.state, 'empty'); assert.equal(s2.match.reason, 'empty');
+  ok('空村（封印一）：走出範圍時範圍內已無未喚醒村民');
 }
-// 5. 提燈：拿起點亮 → lit；放下 → 不 lit；夜間不得點燈的條文判得到
+// 5. 放逐（封印二）：書在荒野深處、附近沒有村民
 {
   const s = fresh();
-  s.outsider.pos = [52, 49];
-  assert.equal(s.world.attempt('outsider', 'take', 'lamp_01').done, true);
-  assert.equal(s.world.attempt('outsider', 'light', 'lamp_01').done, true); assert.equal(s.outsider.lit, true);
-  assert.equal(s.world.attempt('outsider', 'drop', 'lamp_01').done, true); assert.equal(s.outsider.lit, false);
-  assert.ok(s.world.objects.get('lamp_01').pos);
-  s.world.write({ key: 'no-light-night', text: '夜間不得點燈。', verb: 'light', target: { type: 'lamp' }, cond: 'night' }, { silent: true, knownBy: ['outsider'] });
-  assert.equal(s.world.check('outsider', 'light', 'lamp_01').violates.length, 0, '白天點燈不違規');
-  s.world.t = s.world.opt.daySec + 1;
-  s.world.attempt('outsider', 'take', 'lamp_01');
-  assert.equal(s.world.check('outsider', 'light', 'lamp_01').violates.length, 1, '夜間點燈違規');
-  ok('提燈與夜間條件');
+  const book = s.world.objects.get('book_01'); book.pos = [35, 35];
+  for (const v of s.villagers.list) v.pos = [10, 12];   // 都留在原村，離書 >半徑
+  run(s, 0.1);
+  assert.equal(s.match.state, 'exile', JSON.stringify(s.match.reason));
+  ok('放逐（封印二）：書被帶到荒野深處、身邊沒有村民');
+}
+// 6. 損毀（封印四）
+{
+  const s = fresh(); s.world.objects.get('book_01').state = 'destroyed'; run(s, 0.1);
+  assert.equal(s.match.state, 'destroyed');
+  ok('損毀（封印四）：書被毀');
+}
+// 7. 無人聆聽（封印三）
+{
+  const s = fresh({ match: { unheardSec: 2 } });
+  s.world.objects.get('speaker_01').state = 'broken';
+  s.world.objects.get('notice_01').state = 'defaced';
+  for (let i = 0; i < 3; i++) { s.villagers.list[i].level = 'awake'; }
+  s.match.lastCognition = s.match.t;
+  run(s, 3);
+  assert.equal(s.match.state, 'unheard', JSON.stringify({ r: s.match.reason, awake: s.match.awakenedCount(), inrange: s.match.villagersInRange() }));
+  ok('無人聆聽（封印三）：無廣播器、無公告牌、三人喚醒且留村、60 秒無新認知');
+}
+// 8. 定義雙效果：外鄉人符合定義、認知到 → 同化到頂
+{
+  const s = fresh();
+  s.match.assim.accept('name');   // 符合「有姓名者為市民」
+  const def = { key: 'd-name', text: '有姓名者為市民。', kind: 'definition', defn: 'has-name' };
+  const rule = s.world.write(def, { knownBy: ['outsider'] });
+  s.world.emit('broadcastEnd', { rule, learned: ['outsider'] });
+  assert.equal(s.match.assim.value, s.match.assim.opt.max, '認知到自己符合的定義 → 同化到頂');
+  run(s, 0.1); assert.equal(s.match.state, 'transformed');
+  ok('定義雙效果：符合且認知到 → 判輸');
 }
 console.log('match.test 全部通過');

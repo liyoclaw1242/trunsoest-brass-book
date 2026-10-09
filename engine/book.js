@@ -1,0 +1,97 @@
+// book.js —— 黃銅書的「動筆」行為（v2）。純邏輯，靠 RNG。
+// 書觀察外鄉人的行為：每個行為對應一「類」。鑽漏洞被發現的機率 = 20% + 活性×0.6%，同一招第 5 次必中，
+// 威脅到書／圖書館的行為至少 90%。被發現就從那一類依活性的三級權重抽一條，花書寫時間（粗糙 2 / 普通 4 / 嚴謹 10 秒）寫完，排入廣播。
+import { draw, CAPTURE, CONSTITUTION, FINAL } from './rules.v2.js';
+
+const WRITE_SEC = { crude: 2, plain: 4, strict: 10 };
+const THREAT_TARGETS = new Set(['book', 'library', 'meteor', 'fire']);
+
+/** 行為 → 條文類別。回傳 {category, threat} 或 null。 */
+export function categoryOf(verb, obj) {
+  const t = obj?.type;
+  if (THREAT_TARGETS.has(t)) return { category: 'selfprotect', threat: true };
+  if (t === 'speaker' || t === 'notice' || t === 'earplug') return { category: 'asset', threat: false };
+  if (t === 'keepsake' || t === 'bell' || t === 'villager') return { category: 'villager', threat: false };
+  if (verb === 'talk' || verb === 'give' || verb === 'induce') return { category: 'villager', threat: false };
+  if (t === 'house' || t === 'well' || t === 'library' || t === 'cart' && verb === 'use') return { category: 'hide', threat: false };
+  if (['run', 'walk', 'climb', 'approach', 'leave', 'enter'].includes(verb)) return (t === 'house' || t === 'well') ? { category: 'hide', threat: false } : { category: 'action', threat: false };
+  if (verb === 'move' && t === 'goat') return { category: 'action', threat: false };
+  return null;
+}
+
+export class Book {
+  /**
+   * @param world 引擎 World
+   * @param rng   RNG
+   * @param getActivity ()=>活性值、getStage ()=>'early'|'mid'|'late'
+   * @param opt   discoverBase(0.2)、discoverPerActivity(0.006)、certainAt(5)、threatMin(0.9)、speedByActivity(是否隨活性加快書寫)
+   */
+  constructor(world, rng, getActivity, getStage, opt = {}) {
+    this.world = world; this.rng = rng; this.getActivity = getActivity; this.getStage = getStage;
+    this.matchDefn = opt.matchDefn || null;
+    this.opt = { discoverBase: 0.2, discoverPerActivity: 0.006, certainAt: 5, threatMin: 0.9, speedByActivity: true, ...opt };
+    this.uses = {};          // category -> 次數
+    this.pending = null;     // { def, left }
+    this.resets = 0;
+    this.listeners = [];
+    world.on('acted', ({ actor, verb, target }) => { if (actor.id === 'outsider') this.observe(verb, target); });
+    world.on('afterReset', ({ gone }) => this.onReset(gone));
+  }
+  on(fn) { this.listeners.push(fn); return this; }
+  emit(type, data) { for (const fn of this.listeners) fn({ type, ...data }); this.world.emit('book:' + type, data); }
+
+  /** 開場：頒布抓捕令。 */
+  arrive() { return this.writeCapture(); }
+  writeCapture() {
+    const v = CAPTURE[Math.min(this.world.resets, CAPTURE.length - 1)];
+    return this.world.write({ key: 'capture', verb: 'capture', mode: 'require', target: { type: 'outsider' }, ...v });
+  }
+  onReset(gone) {
+    // 撕掉的憲法邊界限制與抓捕令，書立刻重寫（排隊公示 → 空檔就是逃跑窗口）
+    for (const key of ['c-boundary', 'capture']) if (gone.some(r => r.key === key) && !this.world.live(key)) {
+      if (key === 'capture') this.writeCapture();
+      else this.world.write({ ...CONSTITUTION.find(c => c.key === key) });
+    }
+    // 書優先重寫一條針對外鄉人的邊界限制（行動類）
+    if (gone.some(r => r.key === 'c-boundary' || r.category === 'action')) {
+      const def = draw('action', this.getActivity(), this.getStage(), this.rng, k => !!this.world.live(k));
+      if (def) this.startWrite(def, 'reset-rewrite');
+    }
+  }
+
+  /** 外鄉人做了一件事：判斷書要不要動筆。 */
+  observe(verb, obj) {
+    const c = categoryOf(verb, obj);
+    if (!c) return;
+    const key = c.category;
+    this.uses[key] = (this.uses[key] || 0) + 1;
+    if (this.pending) return;   // 一次只寫一條
+    const a = this.getActivity();
+    let p = c.threat ? Math.max(this.opt.threatMin, this.opt.discoverBase + a * this.opt.discoverPerActivity)
+                     : this.opt.discoverBase + a * this.opt.discoverPerActivity;
+    if (this.uses[key] >= this.opt.certainAt) p = 1;
+    if (!this.rng.chance(Math.min(1, p))) return;
+    const def = draw(key, a, this.getStage(), this.rng, k => !!this.world.live(k), this.matchDefn);
+    if (!def) return;
+    this.uses[key] = 0;
+    this.startWrite(def, 'discover');
+  }
+  startWrite(def, why) {
+    let sec = WRITE_SEC[def.tier] ?? 4;
+    if (this.opt.speedByActivity) sec *= 1 - this.getActivity() / 250;   // 後期最多快約 40%
+    this.pending = { def, left: sec, total: sec };
+    this.emit('writing', { rule: def, sec });
+  }
+  tick(dt) {
+    if (!this.pending) return;
+    this.pending.left -= dt;
+    if (this.pending.left <= 0) {
+      const def = this.pending.def; this.pending = null;
+      const rule = this.world.write(def);   // 排入廣播；寫滿會觸發重置
+      if (rule) this.emit('wrote', { rule });
+    }
+  }
+  /** 活性到 100：寫下最後一條。 */
+  writeFinal() { return this.world.write({ ...FINAL, silent: true }, { silent: true }); }
+  get writing() { return this.pending; }
+}

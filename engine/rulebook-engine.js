@@ -3,7 +3,8 @@
 // 畫面端只需要：每幀呼叫 tick(dt)、玩家或村民做事時呼叫 attempt()、監聽事件更新模型。
 
 export const VERBS = ['enter', 'use', 'open', 'take', 'give', 'break', 'repair', 'move', 'climb', 'read', 'deface', 'approach', 'run', 'capture', 'induce',
-  'leave', 'walk', 'wear', 'light', 'stay', 'drop'];   // 原型三加：離開、行走、穿著、點燈、待在、放下
+  'leave', 'walk', 'wear', 'light', 'stay', 'drop',   // 原型三加：離開、行走、穿著、點燈、待在、放下
+  'talk', 'greet', 'listen', 'reside', 'accept', 'harm', 'invite'];   // v2 加：交談、問安、聆聽、居住、領受、傷害、邀請
 
 const CN = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
 export function num(n) {
@@ -131,7 +132,8 @@ export class World {
   /** 「以上規則無效。」清掉最舊的，留下最新的 keep 條。 */
   reset() {
     const act = this.active().sort((a, b) => a.no - b.no);
-    const gone = act.slice(0, act.length - this.opt.keep);
+    const keep = this.opt.keep ?? Math.ceil(this.opt.max / 2);
+    const gone = act.slice(0, Math.max(0, act.length - keep));
     for (const r of gone) r.void = true;
     if (this.opt.patch !== 'solo') {
       for (const r of this.active()) if (r.depNo.some(n => this.rule(n).void)) r.dead = true;
@@ -140,6 +142,19 @@ export class World {
     this.resets++;
     this.emit('reset', { gone, kept: this.active() });
     this.emit('afterReset', { gone });   // 給「重置後書立刻補寫」這類反應用，確保排在 reset 的所有監聽者之後
+  }
+
+  /** 勞動下降使上限降到 cap 以下時，最舊的條文褪色失效（不是重置，不加活性）。 */
+  fade(cap) {
+    const faded = [];
+    while (this.active().length > cap) {
+      const oldest = this.active().sort((a, b) => a.no - b.no)[0];
+      if (!oldest) break;
+      oldest.void = true; faded.push(oldest);
+      this.emit('fade', { rule: oldest });
+    }
+    if (faded.length) this.emit('faded', { faded });
+    return faded;
   }
 
   // ---------- 公示 ----------
@@ -205,9 +220,13 @@ export class World {
     if (r.void || r.dead || r.verb !== verb) return false;
     if (r.who !== 'any' && r.who !== actor.kind) return false;
     if (r.target) {
-      if (!obj) return false;
-      if (r.target.id && r.target.id !== obj.id) return false;
-      if (r.target.type && r.target.type !== obj.type) return false;
+      if (r.target.zone) { if (ctx.zone !== r.target.zone) return false; }
+      else if (r.target.tag) { if (!obj || !(obj.tags || []).includes(r.target.tag)) return false; }
+      else {
+        if (!obj) return false;
+        if (r.target.id && r.target.id !== obj.id) return false;
+        if (r.target.type && r.target.type !== obj.type) return false;
+      }
     }
     if (r.cond && !condOk(r.cond, ctx)) return false;
     return true;
