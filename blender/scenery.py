@@ -79,6 +79,36 @@ def scarecrow(id, pos, rng=random):
         rb.cone(p, f'{id}_straw{j}', 0.1, 0.3, (dx, 0, 1.5), rb.THATCH, rot=(0, 1.5708 if dx > 0 else -1.5708, 0))
     return p
 
+def bench(id, pos, rng=random, face='y'):
+    p = _decor(id, pos)
+    rot = (0, 0, 1.5708) if face == 'x' else (0, 0, 0)
+    rb.box(p, f'{id}_seat', (1.2, 0.4, 0.08), (0, 0, 0.45), rb.WOOD, rot)
+    rb.box(p, f'{id}_back', (1.2, 0.08, 0.4), (0, 0.16, 0.68), rb.WOOD, rot)
+    rb.box(p, f'{id}_legL', (0.1, 0.4, 0.45), (-0.5, 0, 0.22), rb.DARKWOOD, rot)
+    rb.box(p, f'{id}_legR', (0.1, 0.4, 0.45), (0.5, 0, 0.22), rb.DARKWOOD, rot)
+    if face == 'x':
+        for o in p.children:
+            o.location = (o.location.y, o.location.x, o.location.z)
+    return p
+
+def planter(id, pos, rng=random):
+    p = _decor(id, pos)
+    rb.box(p, f'{id}_box', (0.7, 0.7, 0.4), (0, 0, 0.2), rb.TIMBER)
+    rb.box(p, f'{id}_soil', (0.58, 0.58, 0.1), (0, 0, 0.4), rb.SOILC)
+    for j in range(5):
+        dx, dy = rng.uniform(-0.22, 0.22), rng.uniform(-0.22, 0.22)
+        rb.box(p, f'{id}_stem{j}', (0.03, 0.03, 0.26), (dx, dy, 0.55), (0.35, 0.55, 0.25))
+        rb.sphere(p, f'{id}_bloom{j}', 0.1, (dx, dy, 0.7), rng.choice(rb.FLOWERS))
+    return p
+
+def signpost(id, pos, rng=random):
+    p = _decor(id, pos)
+    rb.box(p, f'{id}_post', (0.14, 0.14, 2.0), (0, 0, 1.0), rb.DARKWOOD)
+    rb.box(p, f'{id}_board', (1.2, 0.1, 0.5), (0.2, 0, 1.7), rb.WOOD)
+    rb.box(p, f'{id}_board2', (0.9, 0.1, 0.4), (-0.1, 0, 1.15), rb.WOOD)
+    rb.cyl(p, f'{id}_cap', 0.12, 0.14, (0, 0, 2.05), rb.BRASS)
+    return p
+
 def ground_patch(id, pos, w, d, color, z=0.012):
     p = _decor(id, pos, z)
     rb.box(p, f'{id}_slab', (w, d, 0.02), (0, 0, 0), color)
@@ -190,6 +220,19 @@ def scatter(layout, seed=7):
             fx, fy = o['pos']
             objs.append(scarecrow(f'decor_scarecrow_{si}', (fx + 2, fy + 1), rng))
             si += 1
+
+    # 廣場家具：長椅、花箱、指示牌，讓鎮中心有人味
+    if getattr(layout, 'PLAZA', None):
+        x0, y0, x1, y1 = layout.PLAZA
+        for i, (bx, by, fc) in enumerate([(x0 + 2, y0 + 1, 'y'), (x1 - 2, y0 + 1, 'y'), (x0 + 2, y1 - 1, 'y'), (x1 - 2, y1 - 1, 'y')]):
+            if free(bx, by):
+                objs.append(bench(f'decor_bench_{i}', (bx, by), rng, fc))
+        for i, (px, py) in enumerate([(x0, y0), (x1, y0), (x0, y1), (x1, y1)]):
+            if free(px, py):
+                objs.append(planter(f'decor_planter_{i}', (px, py), rng))
+        sx, sy = (x0 + x1) // 2 - 3, y0
+        if free(sx, sy):
+            objs.append(signpost('decor_sign_0', (sx, sy), rng))
 
     place(bush, 'decor_bush', 26, 6, R - 1)
     place(flowers, 'decor_flower', 48, 4, R - 1)
