@@ -24,7 +24,7 @@ export class Game {
     this.world = this.session.world; this.grid = this.session.grid; this.vil = this.session.villagers; this.villagers = this.vil.list; this.match = this.session.match;
     this.t = 0; this.log = []; this.listeners = [];
     const me = this.session.outsider;
-    this.player = { actor: me, cell: [...meta.start], pos: [...meta.start], from: null, to: null, k: 0, facing: [0, -1], house: null, carrying: null, running: false, walkT: 0, runT: 0, ledGoat: null };
+    this.player = { actor: me, cell: [...meta.start], pos: [...meta.start], from: null, to: null, k: 0, facing: [0, -1], house: null, carrying: null, running: false, walkT: 0, runT: 0, ledGoat: null, seenBook: false };
     me.house = null; me.comforts = this.match.assim.comforts;
     this.opening = 0;
     this.hints = []; this.shownHints = new Set(); this._hintSeen = {};
@@ -41,6 +41,7 @@ export class Game {
     this.opening = opt.opening ?? this.world.opt.announceSec;
     this._lastStage = this.match.activity.stage;
     this.note('start', '黃銅書察覺了你。廣播器唸起第一條公告。');
+    this.pushHint('book-here', '那本書在村子中央的圖書館裡（金色標記）。走進去能看到它——封印它或逃出村子，是你的出路。');
   }
   on(fn) { this.listeners.push(fn); }
   note(type, text, data = {}) { const e = { t: +this.t.toFixed(2), type, text, ...data }; this.log.push(e); for (const fn of this.listeners) fn(e); }
@@ -107,7 +108,7 @@ export class Game {
     return 'ok';
   }
   place(cell) { const p = this.player; p.cell = [...cell]; p.pos = [...cell]; p.from = p.to = null; p.k = 0; p.actor.pos = [...cell]; this.afterArrive(); }
-  afterArrive() { const p = this.player, h = this.grid.houseAt(p.cell); if (h !== p.house) { if (p.house && this.invitedTo === p.house) this.invitedTo = null; p.house = h; p.actor.house = h; } }
+  afterArrive() { const p = this.player, h = this.grid.houseAt(p.cell); if (h !== p.house) { if (p.house && this.invitedTo === p.house) this.invitedTo = null; p.house = h; p.actor.house = h; } const book = [...this.world.objects.values()].find(o => o.type === 'book'); if (book && book.pos && cheb(p.cell, book.pos) <= 1) p.seenBook = true; }
   tick(dt) {
     if (!this.started) return;
     if (this.opening > 0) this.opening = Math.max(0, this.opening - dt);
@@ -149,7 +150,7 @@ export class Game {
       if (o.type === 'clothes') { if (p.actor.wearing !== o.id) out.push(this.opt('wear', o, {}, `穿上${name(o)}`)); out.push({ verb: 'drop', target: id, label: '放下衣物', ok: true, violates: [], run: () => this.dropItem(id) }); }
       if (o.type === 'lamp') { out.push(this.opt('light', o, {}, o.state === 'lit' ? '熄滅提燈' : '點亮提燈')); out.push({ verb: 'drop', target: id, label: '放下提燈', ok: true, violates: [], run: () => this.dropItem(id) }); }
       if (o.type === 'keepsake' || o.type === 'bell') { const owner = this.villagers.find(v => cheb(v.pos, p.cell) <= 1 && v.id === o.owner); if (owner) out.push(this.opt('give', o, { to: owner.id }, `把${name(o)}還給${name(w.objects.get(owner.id))}`)); const anyv = this.villagers.find(v => cheb(v.pos, p.cell) <= 1); if (anyv && anyv.id !== o.owner) out.push(this.opt('give', o, { to: anyv.id }, `把${name(o)}給${name(w.objects.get(anyv.id))}`)); out.push({ verb: 'drop', target: id, label: `放下${name(o)}`, ok: true, violates: [], run: () => this.dropItem(id) }); }
-      if (o.type === 'meteor') { out.push(this.opt('use', o, {}, '使用隕石魔法書（書幾乎必定察覺）')); out.push({ verb: 'drop', target: id, label: '放下隕石魔法書', ok: true, violates: [], run: () => this.dropItem(id) }); }
+      if (o.type === 'meteor') { out.push(this.opt('use', o, {}, '點燃隕石魔法書（引信 5 秒後爆炸，可毀書；書會察覺）')); out.push({ verb: 'drop', target: id, label: '放下隕石魔法書', ok: true, violates: [], run: () => this.dropItem(id) }); }
       if (o.type === 'rope') out.push({ verb: 'drop', target: id, label: '放下繩子', ok: true, violates: [], run: () => this.dropItem(id) });
     }
     if (p.carrying) out.push({ verb: 'drop', target: p.carrying, label: '放下黃銅書', ok: true, violates: [], run: () => this.dropBook() });
@@ -233,10 +234,22 @@ export class Game {
     if (this.opening > 0) return '站著聽完書的第一條公告——先弄清楚這裡的規矩。';
     if (m.state !== 'playing') return '';
     if (!this.boundarySealed()) return '界石的封印失效了——趁現在走出影響範圍（白色虛線圈）！';
+    if (!this.player.seenBook) return '先去村子中央的圖書館，找到那本黃銅書（跟著畫面上的金色標記）。走進去就看得到。';
     if (m.assim.value >= m.assim.opt.max - 1) return `同化度 ${m.assim.value}/${m.assim.opt.max}，快到頂了！躲到聽不到廣播的地方讓它退下來。`;
     const awake = this.villagers.filter(v => v.level === 'awake' && !v.dead).length;
     if (awake === 0) return '目標：喚醒村民來削弱書。砸廣播器讓附近村民聽不到 30 秒，或把信物還給本人。';
     return `已喚醒 ${awake} 人。繼續喚醒（書會越來越弱），或趁書重寫規則的空檔逃出邊界。`;
+  }
+  /** 畫面標記：重要地標（書、山羊、隕石），讓玩家找得到。 */
+  landmarks() {
+    const out = [], w = this.world;
+    const book = [...w.objects.values()].find(o => o.type === 'book');
+    if (book && book.pos) out.push({ id: 'book', cell: book.heldBy ? this.player.cell : book.pos, text: '黃銅書（圖書館）', cls: 'book' });
+    const goat = [...w.objects.values()].find(o => o.type === 'goat');
+    if (goat && goat.pos) out.push({ id: 'goat', cell: goat.fpos || goat.pos, text: '山羊', cls: 'goat' });
+    const met = [...w.objects.values()].find(o => o.type === 'meteor');
+    if (met && met.pos && !met.heldBy) out.push({ id: 'meteor', cell: met.pos, text: '隕石魔法書', cls: 'meteor' });
+    return out;
   }
   broadcast() { const n = this.world.now; if (!n) return null; return { rule: this.world.rule(n.no), progress: 1 - n.left / this.world.opt.announceSec, hearing: n.listeners.has('outsider') }; }
   bookWriting() { const p = this.match.book.writing; return p ? { tier: p.def.tier, kind: p.def.kind, progress: 1 - p.left / p.total } : null; }

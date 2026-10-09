@@ -67,6 +67,12 @@ function loop(now) {
   view.lookAtCell(p.pos, frames === 1);
   hud.update(dt);
   hud.labels(game.villagers.filter(v => !v.dead).map(v => ({ id: v.id, xy: view.project(v.fpos, 2.3), text: `${STATE[v.level]}${game.vil.hunts(v) ? '・追你！' : v.mode === 'work' ? '・工作' : ''}`, cls: v.level + (game.vil.hunts(v) ? ' chase' : '') })));
+  { const W = view.canvas.clientWidth || innerWidth, H = view.canvas.clientHeight || innerHeight, m = 54;
+    hud.marks(game.landmarks().map(L => { const [sx, sy] = view.project(L.cell, 1.6); const on = sx >= 0 && sx <= W && sy >= 0 && sy <= H;
+      const angle = on ? 0 : Math.atan2(sy - H / 2, sx - W / 2);
+      const x = on ? sx : Math.max(m, Math.min(W - m, sx)), y = on ? sy : Math.max(m, Math.min(H - m, sy));
+      const dist = Math.round(Math.hypot(L.cell[0] - game.player.cell[0], L.cell[1] - game.player.cell[1]));
+      return { id: L.id, text: L.text, cls: L.cls, x, y, on, angle, dist }; })); }
   view.render();
   requestAnimationFrame(loop);
 }

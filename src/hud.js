@@ -25,6 +25,17 @@ export class Hud {
     for (const it of items) { let el = have.get(it.id); if (!el) { el = document.createElement('div'); el.dataset.id = it.id; box.appendChild(el); } else have.delete(it.id); el.className = 'label ' + it.cls; el.textContent = it.text; el.style.transform = `translate(${Math.round(it.xy[0])}px, ${Math.round(it.xy[1])}px) translate(-50%, -100%)`; }
     for (const el of have.values()) el.remove();
   }
+  marks(items) {
+    let box = document.getElementById('marks'); if (!box) { box = document.createElement('div'); box.id = 'marks'; document.getElementById('hud').appendChild(box); }
+    const have = new Map([...box.children].map(c => [c.dataset.id, c]));
+    for (const it of items) {
+      let el = have.get(it.id); if (!el) { el = document.createElement('div'); el.dataset.id = it.id; box.appendChild(el); } else have.delete(it.id);
+      el.className = 'mark ' + it.cls + (it.on ? '' : ' off');
+      el.style.transform = `translate(${Math.round(it.x)}px, ${Math.round(it.y)}px) translate(-50%, -50%)`;
+      el.innerHTML = it.on ? `<s class="pin"></s><b>${it.text}</b>` : `<i class="arr" style="transform:rotate(${it.angle}rad)"></i><b>${it.text}　${it.dist}格</b>`;
+    }
+    for (const el of have.values()) el.remove();
+  }
   showStart(onStart, seed) {
     const o = this.el.overlay; o.hidden = false; o.className = 'start';
     o.innerHTML = `<h1>規則書</h1>
