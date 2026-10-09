@@ -24,8 +24,16 @@ export class Villagers {
     this.outsider.invitedTo = this.outsider.invitedTo || null;
     this.outsider.comforts = this.outsider.comforts || new Set();
     this.pendingViolations = [];   // 傳染用：{pos, rules(keys), t}
+    this.goats = [...world.objects.values()].filter(o => o.type === 'goat');
+    for (const g of this.goats) { g.gidle = 0; g.fpos = [...g.pos]; g.gmove = null; }
     world.on('acted', ({ actor, verb, target, ctx, violates }) => { if (actor.id === 'outsider' && violates && violates.length) this.onViolation(verb, target, ctx, violates); });
     world.on('captured', () => { this.pendingViolations = []; });
+    // 收到自己的信物／鈴鐺 → 降一級（搬運者只有鈴鐺有效）
+    world.on('act', ({ verb, target }) => {
+      if (verb === 'give' && (target?.type === 'keepsake' || target?.type === 'bell') && target.heldBy && target.owner === target.heldBy) {
+        const v = world.actors.get(target.heldBy); if (v && v.kind === 'citizen') this.demote(v, target.type === 'bell' ? 'bell' : 'keepsake');
+      }
+    });
     this.match = null;   // session 注入，用來查定義涵蓋與舒適
   }
   emit(type, data) { this.world.emit(type, data); }
@@ -33,6 +41,7 @@ export class Villagers {
 
   // ---------- 同化程度 ----------
   demote(v, why) {
+    if (v.carrier && why !== 'bell') return false;   // 搬運者是純人偶，只有山羊鈴鐺喚醒得了
     const i = LEVELS.indexOf(v.level); if (i >= LEVELS.length - 1) return false;
     const from = v.level; v.level = LEVELS[i + 1]; v.quiet = 0; v.progress = 0; v.chaseUntil = 0; v.mode = 'work'; v.path = [];
     this.emit('level', { actor: v, from, to: v.level, why });
@@ -153,6 +162,22 @@ export class Villagers {
       if (v.mode === 'chase') this.chase(v, dt);
       else if (v.mode === 'work') this.work(v, dt);
       else this.wanderIdle(v, dt);
+    }
+    this.tickGoats(dt);
+  }
+  /** 山羊：不受規則約束，被牽著時不自走；否則亂走、吃相鄰公告牌的紙。 */
+  tickGoats(dt) {
+    for (const g of this.goats) {
+      if (g.gmove) { g.gmove.k += dt / 0.4; if (g.gmove.k >= 1) { g.pos = [...g.gmove.to]; g.fpos = [...g.pos]; g.gmove = null; } else g.fpos = [g.gmove.from[0] + (g.gmove.to[0] - g.gmove.from[0]) * g.gmove.k, g.gmove.from[1] + (g.gmove.to[1] - g.gmove.from[1]) * g.gmove.k]; continue; }
+      if (g.tied || g.carrying) continue;   // 被繫住／牽著／馱書時交給玩家端移動
+      // 吃相鄰的公告牌
+      const notice = [...this.world.objects.values()].find(o => o.type === 'notice' && o.state === 'written' && dist(o.pos, g.pos) <= 1.5);
+      if (notice && this.rand() < 0.02) { notice.state = 'defaced'; this.world.emit('object', { object: notice, before: 'written' }); this.emit('goatEat', { goat: g, notice: notice.id }); continue; }
+      if ((g.gidle -= dt) > 0) continue;
+      g.gidle = 1 + this.rand() * 2;
+      const dir = this.rng ? [[1,0],[-1,0],[0,1],[0,-1]][this.rng.int(4)] : [0,0];
+      const to = [g.pos[0] + dir[0], g.pos[1] + dir[1]];
+      if (this.grid.inRange(to) && !this.grid.blocked(to)) g.gmove = { from: [...g.pos], to, k: 0 };
     }
   }
   adjacent(a, b) { if (eq(a, b)) return true; if (Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]) !== 1) return false; if (this.grid.blocked(b) || this.grid.blocked(a)) return false; return this.grid.houseAt(a) === this.grid.houseAt(b); }

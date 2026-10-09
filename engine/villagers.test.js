@@ -85,4 +85,24 @@ const v = (s, id) => s.world.actors.get(id);
   assert.equal(s.world.check('villager_02', 'enter', 'house_01', { uninvited: true }).violates.length >= 0, true);
   ok('守規則：沿用引擎的 check，村民不違反認知到的規則');
 }
+// 7. 搬運者只有山羊鈴鐺喚醒得了
+{
+  const o = [
+    { id: 'book_01', type: 'book', pos: [10, 10], state: 'closed', verbs: ['read', 'move'] },
+    { id: 'speaker_01', type: 'speaker', pos: [40, 40], state: 'intact', radius: 2, verbs: ['break'] },
+    { id: 'villager_01', type: 'villager', pos: [12, 10], state: 'puppet', color: [1,0,0] },
+    { id: 'bell_01', type: 'bell', pos: [11, 10], owner: 'villager_06', verbs: ['take', 'give', 'use'] },
+    { id: 'villager_06', type: 'villager', pos: [11, 11], state: 'puppet', color: [1,0,0], carrier: true },
+  ];
+  for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2; o.push({ id: 'boundary_0' + i, type: 'boundary', pos: [Math.round(10 + 12 * Math.cos(a)), Math.round(10 + 12 * Math.sin(a))], state: 'intact', verbs: [] }); }
+  const s = createSession(o, { start: [10, 10], center: [10, 10], radius: 12, roads: [] }, { seed: 'c' });
+  s.match.start();
+  const carrier = s.world.actors.get('villager_06');
+  for (let i = 0; i < 40 * 20; i++) s.tick(0.05);   // 40 秒沒廣播
+  assert.equal(carrier.level, 'puppet', '搬運者不會因為沒聽廣播而喚醒');
+  s.world.attempt('outsider', 'take', 'bell_01');
+  s.world.attempt('outsider', 'give', 'bell_01', { to: 'villager_06' });
+  assert.equal(carrier.level, 'half', '收到山羊鈴鐺才降一級');
+  ok('搬運者：只有山羊鈴鐺喚醒得了');
+}
 console.log('villagers.test 全部通過');
