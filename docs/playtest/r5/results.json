@@ -2,36 +2,36 @@
  {
   "n": "被轉化：達成並顯示結局畫面",
   "ok": true,
-  "info": "state=transformed ov=被轉化 種子 e-activity　用時 0:01　書寫了 "
+  "info": "state=transformed ov=被轉化 黃銅書徹底活了過來，寫下最後一條：此地已無外鄉人。 "
  },
  {
   "n": "被轉化：達成並顯示結局畫面",
   "ok": true,
-  "info": "state=transformed ov=被轉化 種子 e-assim　用時 0:01　書寫了 1 條"
+  "info": "state=transformed ov=被轉化 你接受了這裡給你的一切。到最後，你分不清自己原本要去"
  },
  {
   "n": "逃跑：達成並顯示結局畫面",
   "ok": true,
-  "info": "state=escape ov=逃跑 種子 e-escape　用時 0:01　書寫了 1 條"
+  "info": "state=escape ov=逃跑 你走出了界石圍成的圈。身後的村子，照常運轉。 種子 e"
  },
  {
   "n": "空村：達成並顯示結局畫面",
   "ok": true,
-  "info": "state=empty ov=空村（封印一） 種子 e-empty　用時 0:01　書寫了"
+  "info": "state=empty ov=空村（封印一） 你走出去時，村裡已經沒有一個還醒著的人會被它"
  },
  {
   "n": "放逐：達成並顯示結局畫面",
   "ok": true,
-  "info": "state=exile ov=放逐（封印二） 種子 e-exile　用時 0:01　書寫了"
+  "info": "state=exile ov=放逐（封印二） 書被留在無人的荒野深處。沒有人聆聽，它只是一"
  },
  {
   "n": "損毀：達成並顯示結局畫面",
   "ok": true,
-  "info": "state=destroyed ov=損毀（封印四） 種子 e-destroyed　用時 0:01"
+  "info": "state=destroyed ov=損毀（封印四） 火焰吞了黃銅書。它來不及寫下保護自己的那一條"
  },
  {
   "n": "無人聆聽：達成並顯示結局畫面",
   "ok": true,
-  "info": "state=unheard ov=無人聆聽（封印三） 種子 e-unheard　用時 0:02"
+  "info": "state=unheard ov=無人聆聽（封印三） 廣播器沉默、公告無字、醒著的人不再傳話。"
  }
 ]

@@ -27,18 +27,33 @@ export class Hud {
   }
   showStart(onStart, seed) {
     const o = this.el.overlay; o.hidden = false; o.className = 'start';
-    o.innerHTML = `<h1>規則書</h1><div class="small">你誤入一個烏托邦。這裡有一本靠村民勞動過活的活規則書，它不斷寫下新律法，要把你也變成村民。<br>
+    o.innerHTML = `<h1>規則書</h1>
+    <div class="small" style="max-width:640px">
+    入口的草裡有一段磨斷的繩子、一枚山羊鈴鐺、一塊刻著字的石頭——上一個路過這裡的人留下的。<br>
+    這座烏托邦看起來與世無爭，村民溫和而順從。但村子中央的圖書館裡，有一本黃銅書在看著你。<br>
+    它靠村民的勞動過活，不斷寫下新的律法，想把你也變成這裡的一員。你是它等到的下一個外鄉人。</div>
+    <div class="small" style="margin-top:18px;max-width:660px;color:var(--text)">
     兩個時鐘在走：<b>同化度</b>你管得了（被抓、接受好處會漲，躲到聽不到廣播處會退）；<b>活性</b>停不下來（時間與村民的勞動餵養它，滿了書就活過來）。<br>
-    喚醒村民＝讓他們罷工，書會變弱、漲得慢。出路：逃出影響範圍，或封印這本書。<br>
-    書寫得多嚴是抽的——前期多半粗糙、留著漏洞；越到後期越嚴謹。<br><br>
-    WASD／方向鍵移動　Shift 奔跑　E 互動（數字鍵選其他）　N 筆記　Tab 設計者視角<br>
-    <label style="display:block;margin-top:10px">種子：<input id="seed-in" value="${seed}" style="width:140px"></label></div><button id="btn-start">開始</button>`;
+    喚醒村民＝讓他們罷工，書會變弱、漲得慢。出路：逃出影響範圍，或封印這本書。畫面上方「目前目標」會提示你下一步。</div>
+    <div class="small" style="margin-top:14px;color:var(--faint)">WASD／方向鍵移動　Shift 奔跑　E 互動（數字鍵選其他）　N 筆記　Tab 設計者視角</div>
+    <label>種子　<input id="seed-in" value="${seed}"></label><button id="btn-start">踏進村子</button>`;
     o.querySelector('#btn-start').onclick = () => { const sv = o.querySelector('#seed-in').value.trim(); o.hidden = true; onStart(sv); };
   }
   showEnd(state, reason, st) {
     const o = this.el.overlay; o.hidden = false; o.className = (state === 'transformed') ? 'lost' : 'won';
+    const SUB = {
+      activity: '黃銅書徹底活了過來，寫下最後一條：此地已無外鄉人。',
+      assimilated: '你接受了這裡給你的一切。到最後，你分不清自己原本要去哪裡。',
+      escape: '你走出了界石圍成的圈。身後的村子，照常運轉。',
+      empty: '你走出去時，村裡已經沒有一個還醒著的人會被它轉化了。',
+      exile: '書被留在無人的荒野深處。沒有人聆聽，它只是一本書。',
+      unheard: '廣播器沉默、公告無字、醒著的人不再傳話。它寫的律法，再沒有人聽見。',
+      destroyed: '火焰吞了黃銅書。它來不及寫下保護自己的那一條。',
+    };
     const fates = (st.villagers || []).map(v => `${v.id.replace('villager_', '村民')}：${{ stayed: '留下', left: '離開', awake: '喚醒', dead: '死亡' }[v.fate]}`).join('　');
-    o.innerHTML = `<h1>${ENDINGS[state] || state}</h1><div class="small">種子 ${this.game.session.rng.seed}　用時 ${mmss(st.time)}　書寫了 ${st.written} 條　重置 ${st.resets} 次　活性最高 ${Math.round(st.peakActivity)}　被抓 ${st.captures} 次</div><div class="small" style="margin-top:12px">${fates}</div><button onclick="location.reload()">再玩一次</button>`;
+    o.innerHTML = `<h1>${ENDINGS[state] || state}</h1><div class="small" style="max-width:600px">${SUB[reason] || ''}</div>` +
+      `<div class="small" style="margin-top:16px;color:var(--faint)">種子 ${this.game.session.rng.seed}　用時 ${mmss(st.time)}　書寫 ${st.written} 條　重置 ${st.resets} 次　活性最高 ${Math.round(st.peakActivity)}　被抓 ${st.captures} 次</div>` +
+      `<div class="small" style="margin-top:8px">${fates}</div><button onclick="location.reload()">再玩一次</button>`;
   }
   toggleDesigner() { this.designer = !this.designer; this.el.designer.hidden = !this.designer; }
   renderMeters(s) {
