@@ -48,8 +48,6 @@ OBJECTS = [
     *[dict(type='fence', id=f'fence_{i+1:02d}', pos=(46 + i, 26), dir='x') for i in range(6)],
     *[dict(type='fence', id=f'fence_{i+7:02d}', pos=(47 + i, 78), dir='x') for i in range(6)],
     *[dict(type='fence', id=f'fence_{i+13:02d}', pos=(22, 45 + i), dir='y') for i in range(5)],
-    # 信物（都在廣播範圍內）
-    *[dict(type='keepsake', id=f'keepsake_0{i+1}', pos=p, owner=f'villager_0{i+1}') for i, p in enumerate([(26, 48), (72, 48), (29, 58), (69, 58), (44, 66)])],
     # 燈柱
     *[dict(type='lamppost', id=f'lamppost_{i+1:02d}', pos=p, radius=4) for i, p in enumerate([(40, 47), (58, 47), (49, 44), (49, 60), (30, 50), (68, 50), (49, 30), (49, 70)])],
     dict(type='clothes', id='clothes_01', pos=(37, 45), owner='villager_01'),
@@ -65,12 +63,11 @@ OBJECTS = [
     dict(type='villager', id='villager_03', pos=(34, 58), state='half'),
     dict(type='villager', id='villager_04', pos=(64, 58), state='half'),
     dict(type='villager', id='villager_05', pos=(42, 66), state='half'),
-    dict(type='villager', id='villager_06', pos=(49, 24), state='puppet', carrier=True),
+    dict(type='villager', id='villager_06', pos=(49, 24), state='puppet'),
     dict(type='outsider', id='outsider', pos=START),
     # 入口（南邊）上一次放逐的痕跡
     dict(type='carved-stone', id='carved_stone_01', pos=(47, 22)),
     dict(type='rope', id='rope_02', pos=(49, 22), state='frayed'),
-    dict(type='bell', id='bell_01', pos=(51, 22), owner='villager_06'),
     # 區域假物件
     dict(type='wild', id='wild', pos=None),
 ]

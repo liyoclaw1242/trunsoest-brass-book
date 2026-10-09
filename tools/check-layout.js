@@ -35,7 +35,7 @@ if (big.length < 2) fails.push('聽不到的角落不足兩塊');
 if (covered / total < 0.6) fails.push('廣播覆蓋不到六成');
 
 // 2. 關鍵位置在廣播範圍內
-for (const o of scene.filter(o => o.type === 'keepsake' || o.type === 'notice' || o.type === 'clothes' || o.type === 'lamp')) if (!inB(o.pos)) fails.push(`${o.id} 不在廣播範圍內`);
+for (const o of scene.filter(o => o.type === 'notice' || o.type === 'clothes' || o.type === 'lamp')) if (!inB(o.pos)) fails.push(`${o.id} 不在廣播範圍內`);
 
 // 3. 三條不同路線：對每個界石方向找最短路，取兩兩重疊 < 30% 的
 const routes = [];

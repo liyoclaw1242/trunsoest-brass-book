@@ -88,5 +88,5 @@ window.__game = {
   match: () => ({ state: game.match.state, reason: game.match.reason, activity: game.match.activity.value, assim: game.match.assim.value, stats: { ...game.match.stats } }),
   villager: id => { const v = game.world.actors.get(id); return { pos: v.pos, level: v.level, mode: v.mode, dead: !!v.dead }; },
   setActivity: a => { game.match.activity.value = a; }, setTime: t => { game.world.t = t; },
-  wake: id => { const v = game.world.actors.get(id); game.vil.demote(v, 'test'); game.vil.demote(v, 'test'); },
+
 };

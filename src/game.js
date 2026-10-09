@@ -7,7 +7,7 @@ import { COMFORT_CN, COMFORT_BENEFIT } from '../engine/assimilation.js';
 import { ENDINGS } from '../engine/match.js';
 
 export const LABEL = { induce: '誘導', enter: '進入', use: '使用', open: '開啟', take: '取走', give: '給', break: '破壞', repair: '修復', move: '搬動', climb: '翻越', read: '閱讀', deface: '塗毀', approach: '靠近', run: '奔跑', capture: '抓捕', leave: '離開', walk: '行走', wear: '穿上', light: '點火', stay: '停留', drop: '放下', talk: '交談', greet: '問安', listen: '聆聽', reside: '居住', accept: '領受', harm: '傷害', invite: '邀請', tie: '繫上', lead: '牽引' };
-export const TYPE = { book: '黃銅書', lectern: '書台', speaker: '廣播器', notice: '公告牌', house: '住宅', door: '門', fence: '圍籬', keepsake: '信物', boundary: '界石', villager: '村民', outsider: '外鄉人', lamppost: '燈柱', clothes: '衣物', lamp: '提燈', library: '圖書館', workstation: '工作站', goat: '山羊', rope: '繩子', census: '戶籍冊', bell: '山羊鈴鐺', 'carved-stone': '刻字石', well: '水井' };
+export const TYPE = { book: '黃銅書', lectern: '書台', speaker: '廣播器', notice: '公告牌', house: '住宅', door: '門', fence: '圍籬', boundary: '界石', villager: '村民', outsider: '外鄉人', lamppost: '燈柱', clothes: '衣物', lamp: '提燈', library: '圖書館', workstation: '工作站', goat: '山羊', rope: '繩子', census: '戶籍冊', 'carved-stone': '刻字石', well: '水井' };
 export const STATE = { intact: '完好', broken: '損壞', closed: '關著', open: '開著', written: '有字', defaced: '被塗毀', puppet: '人偶', half: '半同化', awake: '已喚醒', torn: '撕破', frayed: '磨斷', unlit: '未點', lit: '亮著', worn: '穿著', destroyed: '毀壞' };
 export const name = o => o ? `${TYPE[o.type] || o.type}${o.id.includes('_') && /\d/.test(o.id) ? ' ' + o.id.split('_').pop() : ''}` : '';
 
@@ -41,13 +41,13 @@ export class Game {
     this.opening = opt.opening ?? this.world.opt.announceSec;
     this._lastStage = this.match.activity.stage;
     this.note('start', '黃銅書察覺了你。廣播器唸起第一條公告。');
-    this.pushHint('book-here', '那本書在村子中央的圖書館裡（金色標記）。走進去能看到它——封印它或逃出村子，是你的出路。');
+    this.pushHint('book-here', '那本書在村子中央的圖書館裡（金色標記）。走進去能看到它——逃出村子、或把它搬到荒野深處放逐，是你的出路。');
   }
   on(fn) { this.listeners.push(fn); }
   note(type, text, data = {}) { const e = { t: +this.t.toFixed(2), type, text, ...data }; this.log.push(e); for (const fn of this.listeners) fn(e); }
   hookEvents() {
     const w = this.world, N = id => id === 'outsider' ? '你' : name(w.objects.get(id));
-    w.on('write', ({ rule }) => { this.note('write', `書寫下第${num(rule.no)}條：${rule.text}`, { no: rule.no, tier: rule.tier }); if (this.started && this.opening <= 0) this.pushHint('first-write', '書開始立法了。看左上的「活性」量表——它一路在漲，滿了你就被轉化。喚醒村民能拖慢它。'); });
+    w.on('write', ({ rule }) => { this.note('write', `書寫下第${num(rule.no)}條：${rule.text}`, { no: rule.no, tier: rule.tier }); if (this.started && this.opening <= 0) this.pushHint('first-write', '書開始立法了。看左上的「活性」量表——它一路在漲，滿了書就活過來、你被轉化。想辦法在那之前離開。'); });
     w.on('reset', ({ gone }) => { this.note('reset', `—— 以上規則無效 ——（撕掉 ${gone.length} 條）`, { gone: gone.map(r => r.no) }); this.pushHint('first-reset', '「以上規則無效」！界石的封印短暫失效，書要重寫才會封回——這就是逃出去的窗口。'); });
     w.on('faded', ({ faded }) => this.note('fade', `勞動減少，最舊的 ${faded.length} 條褪色失效`, { faded: faded.map(r => r.no) }));
     w.on('broadcastStart', ({ rule }) => this.note('broadcast', `廣播：第${num(rule.no)}條`, { no: rule.no }));
@@ -121,7 +121,7 @@ export class Game {
     const st = this.match.activity.stage;
     if (this._lastStage && this._lastStage !== st) { if (st === 'mid') this.pushHint('stage-mid', '書進入「中期」：開始要求你照它的方式生活（義務類條文）。照做會讓你更像市民。'); if (st === 'late') this.pushHint('stage-late', '書進入「後期」：開始改寫「誰算市民」。小心別聽到剛好套在你身上的那一條定義。'); }
     this._lastStage = st;
-    if (this.started && this.opening <= 0 && !this.shownHints.has('first-villager')) { const near = this.villagers.find(v => !v.dead && cheb(v.pos, this.player.cell) <= 1 && v.level !== 'puppet'); if (near) this.pushHint('first-villager', '靠近村民按 E：可以接受他的好處（更舒適，但更接近被同化），喚醒的村民則會站到你這邊。'); }
+    if (this.started && this.opening <= 0 && !this.shownHints.has('first-villager')) { const near = this.villagers.find(v => !v.dead && cheb(v.pos, this.player.cell) <= 1 && v.level !== 'puppet'); if (near) this.pushHint('first-villager', '靠近村民按 E：可以接受他的好處（更舒適，但也更接近被同化、更可能符合後期的『市民』定義）。'); }
     this.session.tick(dt);
     // 時間分每累積約 1 點就報一次（讓玩家把活性和勞動連起來）
     if (this._actAcc >= 1) { this._actAcc = 0; this.note('activity', `活性隨時間上升（${this.match.economy.workers()} 人在勞動）→ ${Math.round(this.match.activity.value)}`, {}); }
@@ -147,7 +147,6 @@ export class Game {
       const o = w.objects.get(id);
       if (o.type === 'clothes') { if (p.actor.wearing !== o.id) out.push(this.opt('wear', o, {}, `穿上${name(o)}`)); out.push({ verb: 'drop', target: id, label: '放下衣物', ok: true, violates: [], run: () => this.dropItem(id) }); }
       if (o.type === 'lamp') { out.push(this.opt('light', o, {}, o.state === 'lit' ? '熄滅提燈' : '點亮提燈')); out.push({ verb: 'drop', target: id, label: '放下提燈', ok: true, violates: [], run: () => this.dropItem(id) }); }
-      if (o.type === 'keepsake' || o.type === 'bell') { const owner = this.villagers.find(v => cheb(v.pos, p.cell) <= 1 && v.id === o.owner); if (owner) out.push(this.opt('give', o, { to: owner.id }, `把${name(o)}還給${name(w.objects.get(owner.id))}`)); const anyv = this.villagers.find(v => cheb(v.pos, p.cell) <= 1); if (anyv && anyv.id !== o.owner) out.push(this.opt('give', o, { to: anyv.id }, `把${name(o)}給${name(w.objects.get(anyv.id))}`)); out.push({ verb: 'drop', target: id, label: `放下${name(o)}`, ok: true, violates: [], run: () => this.dropItem(id) }); }
       if (o.type === 'rope') out.push({ verb: 'drop', target: id, label: '放下繩子', ok: true, violates: [], run: () => this.dropItem(id) });
     }
     if (p.carrying) out.push({ verb: 'drop', target: p.carrying, label: '放下黃銅書', ok: true, violates: [], run: () => this.dropBook() });

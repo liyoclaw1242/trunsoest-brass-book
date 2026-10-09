@@ -34,13 +34,6 @@ await pw.face([1, 0]);
 const s2 = await pw.status();
 check('接受舒適 → 同化度上升、meters 顯示舒適', s2.assim >= 1 && (await text(pw, '#meters')).includes('舒適'), JSON.stringify({ assim: s2.assim, comforts: s2.comforts }));
 await pw.shot(DIR, '04-comfort');
-// 勞動掉 → 規則上限下降、褪色回饋
-const cap0 = (await pw.status()).ruleCap;
-await pw.eval(() => { for (const vv of window.__game.game.villagers.slice(0, 3)) window.__game.wake(vv.id); });
-await pw.wait(1);
-const cap1 = (await pw.status()).ruleCap;
-check('喚醒村民 → 規則上限下降', cap1 < cap0, `${cap0}→${cap1}`);
-await pw.shot(DIR, '05-labor-drop');
 writeFileSync(`${DIR}/results.json`, JSON.stringify(results, null, 1));
 const errs = pw.console.filter(l => l.startsWith('[pageerror]') || l.startsWith('[error]'));
 check('瀏覽器沒有錯誤', errs.length === 0, errs.join(' | '));

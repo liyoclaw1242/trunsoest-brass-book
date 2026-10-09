@@ -8,7 +8,7 @@ const file = process.argv[2] || 'public/scene.json';
 const scene = JSON.parse(readFileSync(file, 'utf8'));
 const errors = [], warn = [];
 const ids = new Set();
-const TYPES = ['book', 'lectern', 'speaker', 'notice', 'house', 'door', 'fence', 'keepsake', 'boundary', 'villager', 'outsider', 'lamppost', 'clothes', 'lamp', 'wild', 'library', 'workstation', 'goat', 'rope', 'census', 'bell', 'carved-stone', 'well'];
+const TYPES = ['book', 'lectern', 'speaker', 'notice', 'house', 'door', 'fence', 'boundary', 'villager', 'outsider', 'lamppost', 'clothes', 'lamp', 'wild', 'library', 'workstation', 'goat', 'rope', 'census', 'carved-stone', 'well'];
 const ZONE = new Set(['wild']);
 for (const o of scene) {
   for (const k of ['id', 'type', 'state', 'verbs']) if (!(k in o)) errors.push(`${o.id || '?'}: 缺 ${k}`);
@@ -35,7 +35,6 @@ const count = t => scene.filter(o => o.type === t).length;
 const expect = { book: [1, 1], lectern: [1, 1], speaker: [4, 10], notice: [2, 4], house: [4, 8], fence: [6, 30], boundary: [8, 20], villager: [3, 8], outsider: [1, 1] };
 for (const [t, [lo, hi]] of Object.entries(expect)) { const n = count(t); if (n < lo || n > hi) errors.push(`${t} 數量 ${n}，規格是 ${lo}–${hi}`); }
 if (count('door') !== count('house')) errors.push('門的數量要等於住宅數量');
-if (count('keepsake') + count('bell') !== count('villager')) errors.push('信物（含山羊鈴鐺）數量要等於村民數量');
 for (const h of scene.filter(o => o.type === 'house')) if (!h.owner) errors.push(`${h.id}: 住宅要有 owner`);
 
 // 與 glb 對照

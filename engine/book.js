@@ -11,7 +11,7 @@ export function categoryOf(verb, obj) {
   const t = obj?.type;
   if (THREAT_TARGETS.has(t)) return { category: 'selfprotect', threat: true };
   if (t === 'speaker' || t === 'notice' || t === 'earplug') return { category: 'asset', threat: false };
-  if (t === 'keepsake' || t === 'bell' || t === 'villager' || t === 'census') return { category: 'villager', threat: false };
+  if (t === 'villager' || t === 'census') return { category: 'villager', threat: false };
   if (verb === 'talk' || verb === 'give' || verb === 'induce') return { category: 'villager', threat: false };
   if (t === 'house' || t === 'well' || t === 'library') return { category: 'hide', threat: false };
   if (['run', 'walk', 'climb', 'approach', 'leave', 'enter'].includes(verb)) return (t === 'house' || t === 'well') ? { category: 'hide', threat: false } : { category: 'action', threat: false };

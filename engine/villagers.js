@@ -23,37 +23,13 @@ export class Villagers {
     this.outsider.immuneUntil = this.outsider.immuneUntil || 0;
     this.outsider.invitedTo = this.outsider.invitedTo || null;
     this.outsider.comforts = this.outsider.comforts || new Set();
-    this.pendingViolations = [];   // 傳染用：{pos, rules(keys), t}
     this.goats = [...world.objects.values()].filter(o => o.type === 'goat');
     for (const g of this.goats) { g.gidle = 0; g.fpos = [...g.pos]; g.gmove = null; }
     world.on('acted', ({ actor, verb, target, ctx }) => { if (actor.id === 'outsider') this.onOutsiderAct(verb, target, ctx); });
-    world.on('captured', () => { for (const pv of this.pendingViolations) pv.capturedSince = true; });
-    // 收到自己的信物／鈴鐺 → 降一級（搬運者只有鈴鐺有效）
-    world.on('act', ({ verb, target }) => {
-      if (verb === 'give' && (target?.type === 'keepsake' || target?.type === 'bell') && target.heldBy && target.owner === target.heldBy) {
-        const v = world.actors.get(target.heldBy); if (v && v.kind === 'citizen') this.demote(v, target.type === 'bell' ? 'bell' : 'keepsake');
-      }
-    });
     this.match = null;   // session 注入，用來查定義涵蓋與舒適
   }
   emit(type, data) { this.world.emit(type, data); }
   rand() { return this.rng ? this.rng.next() : Math.random(); }
-
-  // ---------- 同化程度 ----------
-  demote(v, why) {
-    if (v.carrier && why !== 'bell') return false;   // 搬運者是純人偶，只有山羊鈴鐺喚醒得了
-    const i = LEVELS.indexOf(v.level); if (i >= LEVELS.length - 1) return false;
-    const from = v.level; v.level = LEVELS[i + 1]; v.quiet = 0; v.progress = 0; v.chaseUntil = 0; v.mode = 'work'; v.path = [];
-    this.emit('level', { actor: v, from, to: v.level, why });
-    return true;
-  }
-  /** 傳染：朝喚醒前進 1/3 級，滿一級就降。 */
-  nudge(v) {
-    if (v.level === 'puppet' ? false : true) {} // half/awake 本就偏醒；傳染主要作用在 puppet→half 以外……
-    v.progress += this.opt.contagionStep;
-    if (v.progress >= 1) { v.progress = 0; this.demote(v, 'contagion'); }
-    else this.emit('nudge', { actor: v, progress: v.progress });
-  }
 
   coveredByDefinition(v) {
     if (!this.match) return false;
@@ -83,8 +59,6 @@ export class Villagers {
       if (v.dead || !this.sees(v)) continue;
       const rules = this.world.violatesFor(v.id, 'outsider', verb, target?.id || null, ctx);
       if (!rules.length) continue;
-      const keys = rules.map(r => r.no);
-      this.pendingViolations.push({ villager: v.id, pos: [...me.pos], keys, t: this.world.t });   // 傳染：目擊當下記下
       if (this.mayChase(v)) this.startChase(v, verb, rules);
     }
   }
@@ -147,11 +121,8 @@ export class Villagers {
   // ---------- 每幀 ----------
   tick(dt) {
     const w = this.world, me = this.outsider;
-    // 傳染：清掉過期的、對滿足條件的村民 nudge
-    this.pendingViolations = this.pendingViolations.filter(pv => !pv.used && this.world.t - pv.t < this.opt.contagionDelay + 2);
     for (const v of this.list) {
       if (v.dead) continue;
-      if (w.inBroadcast(v.pos)) v.quiet = 0; else { v.quiet += dt; if (v.quiet >= this.opt.quietSec) { this.demote(v, 'quiet'); v.quiet = 0; } }
       if (v.move) { v.move.k += dt / v.move.sec; if (v.move.k >= 1) { v.pos = [...v.move.to]; v.fpos = [...v.pos]; v.move = null; } else v.fpos = [v.move.from[0] + (v.move.to[0] - v.move.from[0]) * v.move.k, v.move.from[1] + (v.move.to[1] - v.move.from[1]) * v.move.k]; }
       if (v.carrying) { const b = w.objects.get(v.carrying); b.pos = [...v.pos]; }
       // 名字舒適：沒目擊違規就不主動追（追逐靠 onViolation 啟動）；沒有名字則一認知抓捕令就追
@@ -159,8 +130,6 @@ export class Villagers {
       if (this.hunts(v) && this.sees(v)) { v.chaseUntil = Math.max(v.chaseUntil, w.t + this.opt.chaseSec); v.lastSeen = [...me.pos]; }
       // 抓捕
       if (this.hunts(v) && w.t >= me.immuneUntil && this.adjacent(v.pos, me.pos)) { v.captureT += dt; if (v.captureT >= this.opt.captureSec) { v.captureT = 0; const r = w.attempt(v.id, 'capture', 'outsider'); if (r.done) { me.immuneUntil = w.t + this.opt.immuneSec; for (const u of this.list) if (dist(u.pos, me.pos) <= this.opt.sight) u.chaseUntil = 0; this.emit('captured', { actor: v }); } } } else v.captureT = 0;
-      // 傳染判定：有一筆違規在這村民 5 格內、涉及他也認知的條文、且過了 delay 外鄉人還沒被抓
-      if (v.level !== 'puppet') for (const pv of this.pendingViolations) if (pv.villager === v.id && this.world.t - pv.t >= this.opt.contagionDelay && !pv.used && !pv.capturedSince) { pv.used = true; this.nudge(v); }
       // 模式
       if (this.hunts(v) && w.t >= v.waitUntil) v.mode = 'chase';
       else if (v.level === 'awake') v.mode = 'idle';

@@ -53,13 +53,10 @@ export const POOL = [
 
   // ========== 村民 villager（限制）==========
   r({ key: 'v-talk', text: '市民不得與外鄉人交談。', tier: 'crude', category: 'villager', who: 'citizen', verb: 'talk', target: { type: 'outsider' }, hole: '遞東西不算交談；已喚醒者算不算市民。', trigger: '外鄉人與村民互動' }),
-  r({ key: 'v-keepsake-take', text: '外鄉人不得取走信物。', tier: 'crude', category: 'villager', who: 'outsider', verb: 'take', target: { type: 'keepsake' }, hole: '村民可以自己去拿；放在地上的不算「取走」自別人。', trigger: '外鄉人拿信物' }),
   r({ key: 'v-receive', text: '市民不得接受外鄉人的任何物品。', tier: 'plain', category: 'villager', who: 'citizen', verb: 'take', cond: 'from-outsider', hole: '放在地上讓他自己撿不算「接受」。', trigger: '外鄉人把東西給村民' }),
   r({ key: 'v-post-strict', text: '市民不得離開工作崗位，除非為抓捕外鄉人。', tier: 'strict', category: 'villager', who: 'citizen', verb: 'leave', target: { type: 'workstation' }, mode: 'forbid', cond: 'not-chasing', hole: '追你的人不算在工作，書自己少了勞動；已喚醒的村民沒有崗位。', trigger: '外鄉人誘導村民離開工作', leaks: '書靠勞動過活' }),
   r({ key: 'v-help-strict', text: '外鄉人不得唆使市民為其行事。', tier: 'strict', category: 'villager', who: 'outsider', verb: 'induce', target: { type: 'villager' }, hole: '已喚醒者不算市民、唆使他不算違規沒定義；山羊不是市民，可由山羊代勞；不聽到它。', trigger: '外鄉人反覆誘導村民' }),
-  r({ key: 'v-keepsake-plain', text: '信物不得交予外鄉人，亦不得由外鄉人取走。', tier: 'plain', category: 'villager', who: 'any', verb: 'take', target: { type: 'keepsake' }, hole: '放在地上不算交予；村民自己留著用不算。', trigger: '外鄉人或村民動信物' }),
   r({ key: 'v-talk-plain', text: '市民與外鄉人之間不得傳遞言語或物品。', tier: 'plain', category: 'villager', who: 'citizen', verb: 'talk', target: { type: 'outsider' }, hole: '已喚醒者算不算市民；手勢不是言語。', trigger: '外鄉人與村民互動' }),
-  r({ key: 'v-bell-strict', text: '鈴鐺為搬運者之物，任何存在不得搖響。', tier: 'strict', category: 'villager', verb: 'use', target: { type: 'bell' }, hole: '山羊脖子上的鈴自己會響，那不是「搖響」；沒聽到這條的人不受約束。', trigger: '外鄉人拿山羊鈴鐺', leaks: '鈴鐺能喚醒搬運者' }),
 
   // ========== 義務 obligation（中期起）==========
   r({ key: 'o-greet', text: '外鄉人應向所遇市民問安。', tier: 'crude', category: 'villager', stage: 'obligation', who: 'outsider', verb: 'greet', mode: 'require', hole: '不和村民「相遇」就不必問安；問安會讓村民注意到你。', trigger: '進入義務期' }),

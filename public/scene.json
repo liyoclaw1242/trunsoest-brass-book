@@ -891,91 +891,6 @@
 "dir": "y"
 },
 {
-"id": "keepsake_01",
-"type": "keepsake",
-"pos": [
-26,
-48
-],
-"state": "intact",
-"tags": [
-"portable"
-],
-"verbs": [
-"take",
-"give"
-],
-"owner": "villager_01"
-},
-{
-"id": "keepsake_02",
-"type": "keepsake",
-"pos": [
-72,
-48
-],
-"state": "intact",
-"tags": [
-"portable"
-],
-"verbs": [
-"take",
-"give"
-],
-"owner": "villager_02"
-},
-{
-"id": "keepsake_03",
-"type": "keepsake",
-"pos": [
-29,
-58
-],
-"state": "intact",
-"tags": [
-"portable"
-],
-"verbs": [
-"take",
-"give"
-],
-"owner": "villager_03"
-},
-{
-"id": "keepsake_04",
-"type": "keepsake",
-"pos": [
-69,
-58
-],
-"state": "intact",
-"tags": [
-"portable"
-],
-"verbs": [
-"take",
-"give"
-],
-"owner": "villager_04"
-},
-{
-"id": "keepsake_05",
-"type": "keepsake",
-"pos": [
-44,
-66
-],
-"state": "intact",
-"tags": [
-"portable"
-],
-"verbs": [
-"take",
-"give"
-],
-"owner": "villager_05"
-},
-{
 "id": "lamppost_01",
 "type": "lamppost",
 "pos": [
@@ -1582,7 +1497,6 @@
 "verbs": [
 "induce"
 ],
-"carrier": true,
 "color": [
 0.6,
 0.55,
@@ -1634,25 +1548,6 @@
 "verbs": [
 "take"
 ]
-},
-{
-"id": "bell_01",
-"type": "bell",
-"pos": [
-51,
-22
-],
-"state": "intact",
-"tags": [
-"portable",
-"keepsake"
-],
-"verbs": [
-"take",
-"give",
-"use"
-],
-"owner": "villager_06"
 },
 {
 "id": "wild",
