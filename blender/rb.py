@@ -4,16 +4,21 @@ import bpy, math
 
 _mats = {}
 
+# 金屬色（黃銅、灰金屬）給金屬感；其餘走霧面
+_METAL = {(0.85, 0.65, 0.2), (0.45, 0.47, 0.5)}
 def mat(color):
-    """純色材質（快取）。color 是 (r, g, b)。"""
+    """純色 principled 材質（快取）。金屬色自動帶金屬度，石材較粗糙。"""
     key = tuple(round(c, 3) for c in color)
     if key not in _mats:
         m = bpy.data.materials.new('rb_' + '_'.join(str(int(c * 255)) for c in key))
         m.use_nodes = True
         bsdf = m.node_tree.nodes.get('Principled BSDF')
+        metal = key in {tuple(round(c, 3) for c in mc) for mc in _METAL}
+        stone = key in {tuple(round(c, 3) for c in c2) for c2 in ((0.55, 0.55, 0.52), (0.35, 0.35, 0.34))}
         if bsdf:
             bsdf.inputs['Base Color'].default_value = (*key, 1.0)
-            bsdf.inputs['Roughness'].default_value = 0.9
+            bsdf.inputs['Roughness'].default_value = 0.35 if metal else 0.95 if stone else 0.75
+            if 'Metallic' in bsdf.inputs: bsdf.inputs['Metallic'].default_value = 0.8 if metal else 0.0
         m.diffuse_color = (*key, 1.0)
         _mats[key] = m
     return _mats[key]

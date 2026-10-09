@@ -13,12 +13,20 @@ export class View {
     this.canvas = canvas;
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    this.renderer.shadowMap.enabled = true; this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping; this.renderer.toneMappingExposure = 1.05;
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x2a3328);
+    this.scene.background = new THREE.Color(0x8fa9b8);
+    this.scene.fog = new THREE.Fog(0x8fa9b8, 55, 120);
     this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 500);
     this.viewHeight = 26;              // 畫面縱向看得到幾格
-    this.hemi = new THREE.HemisphereLight(0xdfe8ff, 0x55604a, 2.6); this.scene.add(this.hemi);
-    this.sun = new THREE.DirectionalLight(0xfff2dc, 3.2); this.sun.position.set(20, 40, 25); this.scene.add(this.sun);
+    this.hemi = new THREE.HemisphereLight(0xcfe0ff, 0x6b6250, 1.4); this.scene.add(this.hemi);
+    this.sun = new THREE.DirectionalLight(0xfff0d6, 2.6);
+    this.sun.position.set(-28, 46, 20); this.sun.castShadow = true;
+    this.sun.shadow.mapSize.set(2048, 2048); this.sun.shadow.bias = -0.0004; this.sun.shadow.normalBias = 0.5;
+    const c = this.sun.shadow.camera; c.near = 1; c.far = 160; c.left = -48; c.right = 48; c.top = 48; c.bottom = -48;
+    this.scene.add(this.sun); this.scene.add(this.sun.target);
+    this.fill = new THREE.DirectionalLight(0xbcd0e8, 0.5); this.fill.position.set(30, 20, -24); this.scene.add(this.fill);
     this.daylight = 1;
     this.nodes = new Map();           // id -> 父節點
     this.states = new Map();          // id -> { state: Object3D }
@@ -39,6 +47,7 @@ export class View {
   async load(url) {
     const gltf = await new GLTFLoader().loadAsync(url);
     const root = gltf.scene; this.scene.add(root);
+    root.traverse(o => { if (o.isMesh) { const ground = o.name === 'ground'; o.castShadow = !ground; o.receiveShadow = true; if (o.material) { o.material.roughness = o.material.roughness ?? 1; } } });
     for (const node of root.children) {
       if (node.name === 'ground') continue;
       const id = node.name;
@@ -66,6 +75,7 @@ export class View {
   /** 鏡頭目標（格子座標，可為小數）。 */
   lookAtCell(cell, snap = false) {
     const t = toWorld(cell);
+    if (this.sun) { this.sun.target.position.copy(t); this.sun.position.set(t.x - 28, 46, t.z + 20); }
     if (snap) this.camTarget.copy(t); else this.camTarget.lerp(t, 0.15);
     this.camera.position.set(this.camTarget.x, this.camTarget.y + CAM_DIST * Math.sin(PITCH), this.camTarget.z + CAM_DIST * Math.cos(PITCH));
     this.camera.lookAt(this.camTarget);
@@ -75,9 +85,11 @@ export class View {
   setDaylight(target, dt) {
     this.daylight += (target - this.daylight) * Math.min(1, dt * 1.5);
     const d = this.daylight;
-    this.hemi.intensity = 0.45 + 2.15 * d; this.sun.intensity = 0.25 + 2.95 * d;
-    this.hemi.color.setRGB(0.5 + 0.37 * d, 0.55 + 0.36 * d, 0.8 + 0.2 * d);
-    this.scene.background.setRGB(0.05 + 0.11 * d, 0.07 + 0.13 * d, 0.12 + 0.04 * d);
+    this.hemi.intensity = 0.35 + 1.15 * d; this.sun.intensity = 0.2 + 2.5 * d; this.fill.intensity = 0.15 + 0.4 * d;
+    this.hemi.color.setRGB(0.42 + 0.39 * d, 0.5 + 0.38 * d, 0.7 + 0.3 * d);
+    const bg = this.scene.background; bg.setRGB(0.07 + 0.49 * d, 0.09 + 0.57 * d, 0.14 + 0.58 * d);
+    if (this.scene.fog) this.scene.fog.color.copy(bg);
+    this.renderer.toneMappingExposure = 0.85 + 0.25 * d;
   }
   /** 村道：淡色平面，從 meta.roads 的矩形畫。 */
   roads(rects) {
