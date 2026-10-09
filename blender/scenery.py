@@ -21,10 +21,37 @@ def tree(id, pos, kind='round', rng=random):
         for i in range(3):
             s = 1.7 - i * 0.45
             rb.cone(p, f'{id}_canopy{i}', s * 0.6, 1.1, (0, 0, h - 0.1 + i * 0.7), leaf)
+    elif kind == 'fruit':
+        leaf = rng.choice([rb.LEAF2, rb.LEAF3])
+        rb.sphere(p, f'{id}_canopy0', 1.15, (0, 0, h + 0.4), leaf)
+        rb.sphere(p, f'{id}_canopy1', 0.8, (-0.45, 0.2, h + 0.2), leaf)
+        rb.sphere(p, f'{id}_canopy2', 0.82, (0.45, -0.1, h + 0.25), leaf)
+        fruit = rng.choice([rb.ROOF_RED, (0.96, 0.76, 0.24), (0.86, 0.45, 0.76)])
+        for k in range(6):
+            a = 2 * math.pi * k / 6
+            rb.sphere(p, f'{id}_fruit{k}', 0.12, (0.9 * math.cos(a), 0.9 * math.sin(a), h + 0.4), fruit)
     else:
         leaf = rng.choice([rb.LEAF, rb.LEAF2, rb.LEAF3])
         for i, (dx, dy, dz, r) in enumerate([(0, 0, 0, 1.25), (-0.5, 0.2, -0.3, 0.9), (0.5, -0.1, -0.2, 0.95), (0.1, 0.4, 0.4, 0.8)]):
             rb.sphere(p, f'{id}_canopy{i}', r, (dx, dy, h + 0.4 + dz), leaf)
+    return p
+
+def pond(id, pos, r, rng=random):
+    p = _decor(id, pos, 0.01)
+    rb.cyl(p, f'{id}_wateredge_slab', r + 0.3, 0.03, (0, 0, 0), (0.46, 0.4, 0.3))   # 泥岸
+    rb.cyl(p, f'{id}_water_slab', r, 0.04, (0, 0, 0.02), (0.34, 0.54, 0.6))          # 水面
+    rb.cyl(p, f'{id}_water2_slab', r * 0.6, 0.05, (0, 0, 0.03), (0.4, 0.6, 0.66))    # 淺色中心
+    # 蘆葦與石頭
+    for k in range(6):
+        import math
+        a = 2 * math.pi * k / 6
+        ex, ey = (r + 0.1) * math.cos(a), (r + 0.1) * math.sin(a)
+        if k % 2 == 0:
+            for b in range(3):
+                rb.box(p, f'{id}_reed{k}_{b}', (0.05, 0.05, 0.5 + rng.random() * 0.3), (ex + rng.uniform(-0.2, 0.2), ey + rng.uniform(-0.2, 0.2), 0.3), rb.LEAF2)
+        else:
+            o = rb.sphere(p, f'{id}_rock{k}', 0.3, (ex, ey, 0.1), rb.STONE)
+            o.scale = (o.scale[0], o.scale[1], o.scale[2] * 0.5)
     return p
 
 def bush(id, pos, rng=random):
@@ -192,6 +219,15 @@ def scatter(layout, seed=7):
             x = bx + rng.randint(-3, 3); y = by + rng.randint(-3, 3)
             objs.append(tree(f'decor_tree_{ti:02d}', (x, y), rng.choice(['round', 'pine']), rng))
             ti += 1
+
+    # 果園：農田帶東側一叢果樹
+    for k, (ox, oy) in enumerate([(63, 76), (65, 78), (61, 78), (64, 81), (60, 80)]):
+        if 0 <= ox < layout.MAP and 0 <= oy < layout.MAP and free(ox, oy):
+            objs.append(tree(f'decor_orchard_{k}', (ox, oy), 'fruit', rng))
+    # 池塘：遠處野地角落點綴（玩家少去，純氛圍）
+    for k, (px, py, pr) in enumerate([(20, 78, 3.0), (80, 26, 2.6)]):
+        if 0 <= px < layout.MAP and 0 <= py < layout.MAP:
+            objs.append(pond(f'decor_pond_{k}', (px, py), pr, rng))
 
     # 村內的灌木、花、草叢、石頭：掃點撒，避開佔用格與路心，讓村子溫馨
     placed = []

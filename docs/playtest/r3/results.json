@@ -31,7 +31,7 @@
  },
  {
   "n": "接受舒適 → 同化度上升、meters 顯示舒適",
-  "ok": true,
-  "info": "{\"assim\":1,\"comforts\":[\"name\"]}"
+  "ok": false,
+  "info": "{\"assim\":0,\"comforts\":[]}"
  }
 ]
