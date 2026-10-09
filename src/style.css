@@ -46,3 +46,14 @@ html, body { margin: 0; height: 100%; background: #1b1d1a; color: #eee; font: 14
 #hud:has(#overlay:not([hidden])) #labels, #hud:has(#overlay:not([hidden])) #toast, #hud:has(#overlay:not([hidden])) #prompt { display: none !important; }
 #toast.warn { background: rgba(140,70,0,.92); border-color: #fc6; }
 #log div.witness { color: #fc6; font-weight: bold; } #log div.teleport { color: #f99; } #log div.phase { color: #9cf; } #log div.lost, #log div.sleep { color: #aaa; }
+#meters { left: 12px; top: 92px; width: 240px; }
+#meters .meter { background: rgba(0,0,0,.55); padding: 4px 8px; border-radius: 5px; margin-bottom: 4px; font-size: 12px; }
+#meters .meter .bar { position: relative; height: 8px; background: #333; border-radius: 4px; margin-top: 3px; overflow: hidden; }
+#meters .meter .bar i { display: block; height: 100%; }
+#meters .meter .bar.assim i { background: #c6a; }
+#meters .meter .bar u { position: absolute; top: 0; width: 1px; height: 100%; background: rgba(255,255,255,.4); }
+#meters .sub { font-size: 11px; color: #cbb; background: rgba(0,0,0,.45); padding: 3px 8px; border-radius: 5px; }
+#writing { left: 50%; top: 96px; transform: translateX(-50%); background: rgba(40,30,15,.85); border: 1px solid #a85; padding: 6px 12px; border-radius: 6px; min-width: 240px; text-align: center; font-size: 13px; }
+#writing .bar { height: 4px; background: #543; margin-top: 4px; } #writing .bar i { display: block; height: 100%; background: #da6; }
+#log div.witness { color: #fc6; font-weight: bold; } #log div.teleport, #log div.captured { color: #f99; } #log div.phase { color: #9cf; } #log div.fade { color: #c9f; } #log div.accept, #log div.assim { color: #e9c; } #log div.writing { color: #da6; } #log div.end { color: #9f9; font-weight: bold; }
+#toast.warn { background: rgba(140,70,0,.92); border-color: #fc6; }
