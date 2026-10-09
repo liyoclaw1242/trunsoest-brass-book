@@ -27,7 +27,7 @@
 
 ```
 engine/     規則引擎（純邏輯）與測試：rulebook-engine、grid（格子與尋路）、villagers（村民）、match（輸贏）、session（組一局）
-blender/    bpy 腳本：每類物件一支（make_*.py）、layout.py（佈局資料）、build_scene.py
+blender/    bpy 腳本：每類物件一支（make_*.py）、layout.py（佈局資料）、scenery.py（星露谷風裝飾：樹／花／草／鋪石等，非互動不擋路）、build_scene.py（組場景＋合併靜態 mesh 降 draw call＋匯出）
 public/     village.glb、scene.json、scene.meta.json（由 blender/ 產生）
 src/        three.js 畫面端：main（啟動、__game）、view（three）、game（串接與互動）、hud（DOM）、input
 tools/      validate-scene、check-layout、pw（Playwright 共用）、playtest（整局）、playtest-m2…m5（里程碑驗收）
