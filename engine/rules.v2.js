@@ -18,10 +18,10 @@ export const POOL = [
   r({ key: 'a-fence-climb', text: '圍籬不得翻越。', tier: 'crude', category: 'action', verb: 'climb', target: { type: 'fence' }, hole: '破壞圍籬；推車墊腳。', trigger: '外鄉人翻越圍籬' }),
   r({ key: 'a-goat-loose', text: '牲口不得擅自走動。', tier: 'crude', category: 'action', verb: 'move', target: { type: 'goat' }, hole: '山羊聽不懂規則；用繩子牽著不算擅自；書管不到牲口只好這樣寫。', trigger: '山羊亂走' }),
   r({ key: 'a-run-village', text: '村內不得奔跑。', tier: 'plain', category: 'action', verb: 'run', hole: '推車代步；村民也一起被限速，追你的人追不快。', trigger: '外鄉人奔跑', leaks: '書願意拖累村民' }),
-  r({ key: 'a-boundary-cross', text: '外鄉人不得越過界石。', tier: 'plain', category: 'action', who: 'outsider', verb: 'leave', hole: '界石被搬走後，「界」在哪沒有定義；不聽到它就不受約束。', trigger: '外鄉人走近邊界', leaks: '書在意邊界' }),
+  r({ key: 'a-boundary-cross', text: '外鄉人不得越過界石離村。', tier: 'plain', category: 'action', who: 'outsider', verb: 'leave', hole: '不聽到它就不受約束；重置撕掉它的空檔。', trigger: '外鄉人走近邊界', leaks: '書在意邊界' }),
   r({ key: 'a-fence-both', text: '圍籬不得翻越或破壞。', tier: 'plain', category: 'action', verb: 'climb', target: { type: 'fence' }, cond: null, hole: '推車墊腳不算翻越也不算破壞。', trigger: '外鄉人破壞圍籬' }),
   r({ key: 'a-wild-enter', text: '外鄉人不得進入荒野。', tier: 'plain', category: 'action', who: 'outsider', verb: 'enter', target: { zone: 'wild' }, hole: '天黑前就站在荒野裡的人沒有「進入」；界石被搬後荒野的邊沒了定義。', trigger: '外鄉人走向村外' }),
-  r({ key: 'a-speed-any', text: '任何存在不得以快於步行的速度移動，無論方式。', tier: 'strict', category: 'action', verb: 'run', hole: '村民同樣追不快，書自己吃虧；山羊聽不懂；等重置。', trigger: '外鄉人反覆奔跑或用推車', leaks: '書願意拖累全村' }),
+  r({ key: 'a-speed-any', text: '任何存在不得奔跑，無論緣由。', tier: 'strict', category: 'action', verb: 'run', hole: '村民同樣追不快，書自己吃虧；山羊聽不懂；不聽到它；等重置。', trigger: '外鄉人反覆奔跑', leaks: '書願意拖累全村' }),
   r({ key: 'a-leave-any', text: '外鄉人不得離開本村，無論經由何處、以何種方式。', tier: 'strict', category: 'action', who: 'outsider', verb: 'leave', hole: '不聽到它；等它被撕掉的空檔；影響範圍會跟著書走，把書帶出去等於村也出去了。', trigger: '外鄉人試圖離開', leaks: '書在意邊界' }),
   r({ key: 'a-approach-strict', text: '外鄉人不得靠近邊界，亦不得使他人代為靠近。', tier: 'strict', category: 'action', who: 'outsider', verb: 'approach', target: { type: 'boundary' }, hole: '界石全部搬走就沒有可靠近的界石；不聽到它。', trigger: '外鄉人誘導村民搬界石' }),
 

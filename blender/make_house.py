@@ -5,7 +5,7 @@ import rb
 HOUSE_COLORS = [(0.78, 0.6, 0.45), (0.6, 0.68, 0.78), (0.72, 0.72, 0.5), (0.7, 0.55, 0.65)]
 
 def make(id, pos, owner=None, color_index=0, **kw):
-    p = rb.parent_empty(id, pos, rb.props('house', ['enter'], ['shelter'], owner=owner))
+    p = rb.parent_empty(id, pos, rb.props('house', ['enter', 'reside'], ['shelter', 'building', 'roofed'], owner=owner))
     c = HOUSE_COLORS[color_index % len(HOUSE_COLORS)]
     s = rb.state_root(p, 'intact')
     H, T = 2.4, 0.3

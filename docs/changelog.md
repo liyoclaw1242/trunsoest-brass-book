@@ -250,3 +250,12 @@
 - 行動／藏身：審查結果待該子代理回報後處理（下一次 commit）。
 
 **暫定與待辦**見 `docs/open-questions.md`。
+
+## 改版 v2 — R2 場景（2026-01，Opus 4.8）
+
+- **新 Blender 物件**（`blender/make_*.py`）：圖書館（`library`，書放在裡面）、工作站（`workstation`，紙坊／墨坊，`rb_kind`／`rb_owner`）、山羊（`goat`，不擋路）、繩子（`rope`，intact／frayed）、隕石魔法書（`meteor`）、戶籍冊（`census`，intact／torn）、山羊鈴鐺（`bell`）、刻字石（`carved-stone`）、水井（`well`）。
+- **佈局 `layout.py`（v2）**：100×100、書在中央圖書館內 (49,53)、半徑 32、出生點 (50,48) 在圖書館門前廣場。6 棟住宅＋6 村民（v6 是上一次放逐的搬運者，`carrier`，只有山羊鈴鐺喚醒得了）、4 工作站、8 廣播器 r12、3 公告牌、戶籍冊、水井、山羊＋繩、3 推車、5 信物＋1 鈴鐺（＝6 村民）、8 燈柱、3 衣物、3 提燈、16 界石、隕石在荒野深處 (90,90)。入口（南邊）放上一次放逐的痕跡：刻字石、磨斷的繩子、山羊鈴鐺。`scene.meta.json` 加 `plaza`、`wildDeep`。
+- 圖書館用與住宅相同的 4×4 佔地（grid 以 `houseCells` 處理，碰撞逐格一致，共 145 格），但有圓頂、顏色不同；grid 把 library 納入建築地圖、`blocked` 加 workstation／well／census／carved-stone 單格阻擋；山羊不擋路。
+- 依條文審查補：`boundary` 加 `approach` 動詞（書才觀察得到「靠近界石」）；`house`／`library` 加 `building`／`roofed` tag、house 加 `reside` 動詞；`speaker` 加 `move`／`use`（「搬走／遮蔽」才成立）；`VERBS` 加 `tie`／`lead`（山羊）。
+- `tools/validate-scene.js` 加新類型與「信物＋鈴鐺＝村民數」；`tools/validate-rules.js` 加覆蓋冒煙：每條具體 target.type 的條文，場景要有那物件——目前 0 警告（抽象目標 name/fire/earplug 除外）。
+- **驗收**：`node tools/validate-scene.js` 通過（101 物件、__col 145 格一致）、`node tools/check-layout.js` 通過（中心到邊界 4 條不重疊路線、無全程安靜逃脫路）、`npm test` 37 項。俯視與斜視圖在 `docs/playtest/r2/`，新物件（圖書館、工作站、水井、山羊、戶籍冊、入口痕跡）分得出來。

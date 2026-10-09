@@ -30,7 +30,7 @@ export class Grid {
     this.max = [Math.ceil(c[0] + this.radius + margin), Math.ceil(c[1] + this.radius + margin)];
     this.houses = new Map();   // houseId -> { walls, interior, door, front }
     this.cellHouse = new Map(); // "x,y" -> houseId（室內格）
-    for (const o of this.objects.values()) if (o.type === 'house') {
+    for (const o of this.objects.values()) if (o.type === 'house' || o.type === 'library') {
       const hc = houseCells(o); this.houses.set(o.id, hc);
       for (const c of hc.interior) this.cellHouse.set(key(...c), o.id);
     }
@@ -58,7 +58,7 @@ export class Grid {
     for (const o of this.objects.values()) {
       if (!o.pos) continue;
       switch (o.type) {
-        case 'house': {
+        case 'house': case 'library': {
           const hc = this.houses.get(o.id);
           if (hc.walls.some(c => c[0] === x && c[1] === y)) return true;
           break;
@@ -66,6 +66,7 @@ export class Grid {
         case 'door': if (o.pos[0] === x && o.pos[1] === y && o.state === 'closed') return true; break;
         case 'fence': if (o.pos[0] === x && o.pos[1] === y && o.state === 'intact') return true; break;
         case 'cart': case 'lectern': case 'speaker': case 'notice': case 'boundary': case 'lamppost':
+        case 'workstation': case 'well': case 'census': case 'carved-stone':
           if (o.pos[0] === x && o.pos[1] === y) return true; break;
       }
     }

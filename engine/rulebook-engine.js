@@ -4,7 +4,7 @@
 
 export const VERBS = ['enter', 'use', 'open', 'take', 'give', 'break', 'repair', 'move', 'climb', 'read', 'deface', 'approach', 'run', 'capture', 'induce',
   'leave', 'walk', 'wear', 'light', 'stay', 'drop',   // 原型三加：離開、行走、穿著、點燈、待在、放下
-  'talk', 'greet', 'listen', 'reside', 'accept', 'harm', 'invite'];   // v2 加：交談、問安、聆聽、居住、領受、傷害、邀請
+  'talk', 'greet', 'listen', 'reside', 'accept', 'harm', 'invite', 'tie', 'lead'];   // v2 加：交談、問安、聆聽、居住、領受、傷害、邀請
 
 const CN = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
 export function num(n) {

@@ -2,7 +2,7 @@
 import rb
 
 def make(id, pos, radius=8, **kw):
-    p = rb.parent_empty(id, pos, rb.props('speaker', ['break', 'repair'], ['breakable', 'broadcast'], radius=radius))
+    p = rb.parent_empty(id, pos, rb.props('speaker', ['break', 'repair', 'move', 'use'], ['breakable', 'broadcast'], radius=radius))
     s = rb.state_root(p, 'intact')
     rb.box(s, f'{id}__intact_base', (0.5, 0.5, 0.2), (0, 0, 0.1), rb.DARKSTONE)
     rb.cyl(s, f'{id}__intact_pole', 0.07, 2.4, (0, 0, 1.4), rb.METAL)

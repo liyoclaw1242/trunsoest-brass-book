@@ -2,6 +2,7 @@
 // 每條有 hole（定義類與純敘事除外）、每一限制類三個等級都有、定義類有 defn。掛進 npm test。
 import { VERBS } from '../engine/rulebook-engine.js';
 import { POOL, CONSTITUTION, CAPTURE, TIERS } from '../engine/rules.v2.js';
+import { readFileSync, existsSync } from 'node:fs';
 
 // v2 的物件類型目錄（R2 的 scene 會實際產生這些；抽象目標如 name/fire 無實體但條文指得到）
 const TYPES = new Set(['book', 'lectern', 'speaker', 'notice', 'house', 'door', 'fence', 'cart', 'keepsake', 'boundary', 'villager', 'outsider',
@@ -40,6 +41,18 @@ for (const [defn, label] of [['has-name', '名字'], ['wears', '衣服'], ['has-
   if (!POOL.some(d => d.kind === 'definition' && (d.defn === defn || d.defn === 'any-comfort'))) errors.push(`舒適「${label}」沒有對應的定義類條文`);
 }
 
+// 覆蓋冒煙：每條有具體 target.type 的條文，場景裡要有那個物件（抽象目標 name/fire/earplug 除外）
+const ABSTRACT = new Set(['name', 'fire', 'earplug']);
+const scenePath = 'public/scene.json';
+if (existsSync(scenePath)) {
+  const scene = JSON.parse(readFileSync(scenePath, 'utf8'));
+  const present = new Set(scene.map(o => o.type));
+  for (const d of POOL) {
+    if (d.target?.type && !present.has(d.target.type) && !ABSTRACT.has(d.target.type)) warn.push(`${d.key}: 場景沒有 ${d.target.type}，這條目前無法命中`);
+  }
+  const zones = new Set(['plaza', 'road', 'wild', 'wilddeep']);
+  for (const d of POOL) if (d.target?.zone && !zones.has(d.target.zone)) warn.push(`${d.key}: 區 ${d.target.zone} 不存在`);
+}
 for (const w of warn) console.log('WARN', w);
 for (const e of errors) console.log('FAIL', e);
 console.log(errors.length ? `條文驗證失敗：${errors.length} 項` : `條文驗證通過：${all.length} 條候選、${CONSTITUTION.length} 條憲法、${CAPTURE.length} 級抓捕令`);

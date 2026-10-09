@@ -2,7 +2,7 @@
 import rb
 
 def make(id, pos, **kw):
-    p = rb.parent_empty(id, pos, rb.props('boundary', [], ['marker']))
+    p = rb.parent_empty(id, pos, rb.props('boundary', ['approach'], ['marker']))
     s = rb.state_root(p, 'intact')
     rb.box(s, f'{id}__intact_stone', (0.7, 0.7, 1.4), (0, 0, 0.7), rb.STONE)
     rb.box(s, f'{id}__intact_cap', (0.8, 0.8, 0.2), (0, 0, 1.5), rb.DARKSTONE)

@@ -18,7 +18,8 @@ for m in (rb, layout):
     importlib.reload(m)
 
 MAKERS = {t: importlib.import_module(f'make_{t}') for t in
-          ['book', 'lectern', 'speaker', 'notice', 'house', 'door', 'fence', 'cart', 'keepsake', 'boundary', 'villager', 'outsider', 'lamppost', 'clothes', 'lamp']}
+          ['book', 'lectern', 'speaker', 'notice', 'house', 'door', 'fence', 'cart', 'keepsake', 'boundary', 'villager', 'outsider', 'lamppost', 'clothes', 'lamp',
+           'library', 'workstation', 'goat', 'rope', 'meteor', 'census', 'bell', 'carved_stone', 'well']}
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 scene = bpy.context.scene
@@ -42,15 +43,15 @@ for o in layout.OBJECTS:
         kw['color'] = layout.VILLAGER_COLORS[id_]
     if t in ('keepsake', 'clothes'):
         kw['color'] = layout.VILLAGER_COLORS[kw['owner']]
-    p = MAKERS[t].make(id_, pos, **kw)
+    p = MAKERS[t.replace('-', '_')].make(id_, pos, **kw)
     parents.append(p)
     rec = {'id': id_, 'type': t, 'pos': [int(pos[0]), int(pos[1])]}
     default_state = {'book': 'closed', 'speaker': 'intact', 'notice': 'written', 'door': 'closed', 'fence': 'intact',
-                     'cart': 'intact', 'villager': 'puppet', 'lamp': 'unlit'}.get(t, 'intact')
+                     'cart': 'intact', 'villager': 'puppet', 'lamp': 'unlit', 'census': 'intact', 'rope': 'intact'}.get(t, 'intact')
     rec['state'] = o.get('state', default_state)
     rec['tags'] = [s for s in p['rb_tags'].split(',') if s]
     rec['verbs'] = [s for s in p['rb_verbs'].split(',') if s]
-    for k in ('radius', 'owner', 'parent', 'dir'):
+    for k in ('radius', 'owner', 'parent', 'dir', 'kind', 'carrier'):
         if k in o and o[k] is not None:
             rec[k] = o[k]
     if t == 'villager':
@@ -66,7 +67,8 @@ with open(os.path.join(OUT, 'scene.json'), 'w', encoding='utf-8') as f:
     f.write('\n')
 with open(os.path.join(OUT, 'scene.meta.json'), 'w', encoding='utf-8') as f:
     json.dump({'center': list(layout.CENTER), 'radius': layout.RADIUS, 'start': list(layout.START), 'size': size,
-               'roads': getattr(layout, 'ROADS', [])}, f)
+               'roads': getattr(layout, 'ROADS', []),
+               'plaza': getattr(layout, 'PLAZA', None), 'wildDeep': getattr(layout, 'WILDDEEP', None)}, f)
 
 glb = os.path.join(OUT, 'village.glb')
 bpy.ops.export_scene.gltf(filepath=glb, export_format='GLB', export_extras=True, export_apply=True,
