@@ -51,7 +51,8 @@ export class Puzzle {
 
   /** 一條法此刻生效嗎：廣播／公告要聽到／讀到才算；「寫在公告上」的法，公告被毀就失效。 */
   active(l) { return (!l.src || this.heard.has(l.id)) && (!l.onNotice || this.objs.some(o => o.type === 'notice' && !o.gone)); }
-  applies(l) { const c = this.isCitizen(); return !l.who || l.who === 'any' || (l.who === 'citizen' && c) || (l.who === 'outsider' && !c); }
+  /** 此法套不套得到你：who（身分）＋ cond（持有某項舒適才適用，如「著衣者」）。 */
+  applies(l) { const c = this.isCitizen(); const who = !l.who || l.who === 'any' || (l.who === 'citizen' && c) || (l.who === 'outsider' && !c); return who && (!l.cond || this.has.has(l.cond)); }
 
   /** 以目前身分與「聽到」狀態，能不能離開。 */
   leaveAllowed() {
