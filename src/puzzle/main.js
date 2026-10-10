@@ -4,7 +4,7 @@ import { LEVELS } from './levels.js';
 
 const $ = id => document.getElementById(id);
 const GLYPH = { exit: '🚪', name: '📛', clothes: '👕', notice: '🪧', speaker: '📣', goat: '🐐', book: '📖', wilddeep: '🌲', villager: '🧑‍🌾', shed: '🧺' };
-const KEY = 'rb_puzzle_v1';
+const KEY = 'rb_puzzle_v2';
 
 let idx = 0, puz = new Puzzle(LEVELS[0]);
 let solved = new Array(LEVELS.length).fill(false);
