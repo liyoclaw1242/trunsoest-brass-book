@@ -3,7 +3,7 @@ import { Puzzle } from './game.js';
 import { LEVELS } from './levels.js';
 
 const $ = id => document.getElementById(id);
-const GLYPH = { exit: '🚪', name: '📛', clothes: '👕', notice: '🪧', speaker: '📣', goat: '🐐', book: '📖', wilddeep: '🌲', villager: '🧑‍🌾' };
+const GLYPH = { exit: '🚪', name: '📛', clothes: '👕', notice: '🪧', speaker: '📣', goat: '🐐', book: '📖', wilddeep: '🌲', villager: '🧑‍🌾', shed: '🧺' };
 
 let idx = 0, puz = new Puzzle(LEVELS[0]);
 

@@ -1,7 +1,7 @@
 // game.js —— 回合制「鑽規則漏洞」解謎引擎（Baba 式）。純邏輯、可被 node 直接驅動以驗證可解。
 // 格子移動、推動（山羊／廣播器／書）、拾取（名牌／衣物）、讀公告、山羊吃公告／馱書、狀態（市民／已聽）、離開判定、undo／reset。
 
-const WALKABLE = new Set(['exit', 'name', 'clothes', 'notice', 'wilddeep']);
+const WALKABLE = new Set(['exit', 'name', 'clothes', 'notice', 'wilddeep', 'shed']);
 const PUSHABLE = new Set(['goat', 'speaker', 'book', 'villager']);
 const DEF_OF = { name: 'name', clothes: 'clothes' };
 
@@ -14,7 +14,7 @@ export class Puzzle {
       const ch = level.map[y][x];
       if (ch === '#') { this.walls.add(x + ',' + y); continue; }
       if (ch === '@') { this.startPos = [x, y]; continue; }
-      const t = { E: 'exit', N: 'name', C: 'clothes', K: 'notice', S: 'speaker', G: 'goat', B: 'book', V: 'villager', x: 'wilddeep' }[ch];
+      const t = { E: 'exit', N: 'name', C: 'clothes', K: 'notice', S: 'speaker', G: 'goat', B: 'book', V: 'villager', x: 'wilddeep', H: 'shed' }[ch];
       if (t) this.objs.push({ id: 'o' + (n++), type: t, x, y, ox: x, oy: y, gone: false, carries: null });
     }
     this.laws = level.laws.map((l, i) => ({ ...l, id: 'L' + i }));
@@ -27,7 +27,7 @@ export class Puzzle {
 
   reset() {
     this.pos = [...this.startPos];
-    this.has = new Set();
+    this.has = new Set(this.level.has || []);
     this.heard = new Set();
     for (const o of this.objs) { o.x = o.ox; o.y = o.oy; o.gone = false; o.carries = null; }
     this.history = [];
@@ -104,6 +104,7 @@ export class Puzzle {
     if (o.type === 'wilddeep') { this.pos = [tx, ty]; return { moved: true }; }
     if (o.type === 'name') { this.has.add('name'); o.gone = true; this.pos = [tx, ty]; return { moved: true, msg: '你領了一個本村的名字。' }; }
     if (o.type === 'clothes') { this.has.add('clothes'); o.gone = true; this.pos = [tx, ty]; return { moved: true, msg: '你換上了本村的衣服。' }; }
+    if (o.type === 'shed') { this.has.clear(); this.pos = [tx, ty]; return { moved: true, msg: '你脫下了本村的身分，又成了外鄉人。' }; }
     if (o.type === 'notice') { if (o.law) this.heard.add(o.law); else for (const l of this.laws) if (l.src === 'notice') this.heard.add(l.id); this.pos = [tx, ty]; return { moved: true, msg: '你讀了公告——它現在綁得住你了。' }; }
 
     if (PUSHABLE.has(o.type)) {
@@ -115,7 +116,8 @@ export class Puzzle {
       if (o.type === 'goat' && beyond && beyond.type === 'notice') { beyond.gone = true; o.x = bx; o.y = by; this.pos = [tx, ty]; return { moved: true, msg: '山羊把公告吃了——那條法沒人讀得到了。' }; }
       // 山羊被推到書上 → 馱起書
       if (o.type === 'goat' && beyond && beyond.type === 'book') { beyond.gone = true; o.carries = 'book'; o.x = bx; o.y = by; this.pos = [tx, ty]; return { moved: true, msg: '山羊馱起了黃銅書。' }; }
-      if (beyond) return { moved: false, msg: '推不動，後面有東西。' };
+      // 後面若是實心物（另一個可推物）才擋；地貼類（出口、荒野）可以推上去
+      if (beyond && !WALKABLE.has(beyond.type)) return { moved: false, msg: '推不動，後面有東西。' };
       o.x = bx; o.y = by; this.pos = [tx, ty];
       return { moved: true };
     }
