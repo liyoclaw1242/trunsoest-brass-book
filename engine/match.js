@@ -35,7 +35,7 @@ export class Match {
     // 鑽漏洞的回饋：外鄉人逼出矛盾（裁決）→ 書的活性回退，主動玩有回報（B 的核心）
     w.on('conflict', ({ actor }) => { if (this.started && actor && actor.id === 'outsider') { A.ruled(); this.stats.rulings = (this.stats.rulings || 0) + 1; } });
     w.on('broadcastEnd', ({ learned }) => { if (learned && learned.length) this.lastCognition = this.t; });
-    w.on('captured', () => { if (!this.started) return; this.stats.captures++; A.captured(); this.assim.captured(); const me = this.s.outsider; me.pos = [...this.s.center]; const grace = this.opt.graceSec; me.immuneUntil = w.t + grace; me.calmUntil = w.t + grace; for (const v of this.s.villagers.list) { v.chaseUntil = 0; v.waitUntil = 0; v.mode = 'work'; } this.emit('teleported', { to: [...this.s.center], grace }); this.stats.teleports++; });
+    w.on('captured', () => { if (!this.started) return; this.stats.captures++; A.captured(); const me = this.s.outsider; me.pos = [...this.s.center]; const grace = this.opt.graceSec; me.immuneUntil = w.t + grace; me.calmUntil = w.t + grace; for (const v of this.s.villagers.list) { v.chaseUntil = 0; v.waitUntil = 0; v.mode = 'work'; } this.emit('teleported', { to: [...this.s.center], grace }); this.stats.teleports++; });
     // 定義類雙效果：外鄉人認知到自己符合的定義 → 同化到頂
     w.on('broadcastEnd', ({ rule, learned }) => { if (rule && rule.kind === 'definition' && learned && learned.includes('outsider') && this.matchesDefn(rule.defn)) { this.assim.set(this.assim.opt.max, 'definition'); } });
     this.assim.on(e => this.emit('assim', e));

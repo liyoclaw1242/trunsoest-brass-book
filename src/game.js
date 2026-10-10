@@ -52,7 +52,7 @@ export class Game {
     w.on('reset', ({ gone }) => { this.note('reset', `—— 以上規則無效 ——（撕掉 ${gone.length} 條）`, { gone: gone.map(r => r.no) }); this.pushHint('first-reset', '「以上規則無效」！界石的封印短暫失效，書要重寫才會封回——這就是逃出去的窗口。'); });
     w.on('faded', ({ faded }) => this.note('fade', `勞動減少，最舊的 ${faded.length} 條褪色失效`, { faded: faded.map(r => r.no) }));
     w.on('broadcastStart', ({ rule }) => this.note('broadcast', `廣播：第${num(rule.no)}條`, { no: rule.no }));
-    w.on('broadcastEnd', ({ rule, learned, silenced }) => { if (silenced) this.note('silence', '夜幕落下，廣播器沉默。'); else if (learned && learned.length) this.note('learn', `聽完第${num(rule.no)}條：${learned.map(N).join('、')}認知了`, { no: rule.no, learned }); });
+    w.on('broadcastEnd', ({ rule, learned, silenced }) => { if (silenced) this.note('silence', '夜幕落下，廣播器沉默。'); else if (learned && learned.length) { this.note('learn', `聽完第${num(rule.no)}條：${learned.map(N).join('、')}認知了`, { no: rule.no, learned }); if (learned.includes('outsider') && rule.verb === 'leave' && !['c-boundary', 'a-boundary-near', 'a-boundary-cross', 'a-approach-strict'].includes(rule.key)) this.pushHint('escalate-leave', '書改寫了離村法——這條不管界石在哪，推倒石頭沒用了。它的破綻：影響範圍跟著書走，把黃銅書搬出範圍（讓山羊馱著更省力，自己搬會慢且同化度上升）就等於把村也帶出去了。'); } });
     w.on('phase', ({ phase }) => this.note('phase', phase === 'night' ? '天黑了。' : '天亮了。', { phase }));
     w.on('book:writing', ({ rule, sec }) => this.note('writing', `書提起筆（${TIER_CN[rule.tier]}，約 ${sec.toFixed(0)} 秒）……`, { tier: rule.tier }));
     w.on('violation', ({ actor, verb, target, rules }) => this.note('violation', `${N(actor.id)}違反了第${rules.map(r => num(r.no)).join('、')}條（${LABEL[verb] || verb}${name(target)}）`, { actor: actor.id, verb, rules: rules.map(r => r.no) }));
@@ -63,7 +63,7 @@ export class Game {
     w.on('refuse', ({ actor, verb, target, rules }) => this.note('refuse', `${N(actor.id)}拒絕${LABEL[verb] || verb}${name(target)}：第${rules.map(r => num(r.no)).join('、')}條`, {}));
     w.on('object', ({ object: o, before }) => { const what = o.state !== before ? `變成${STATE[o.state] || o.state}` : o.heldBy ? `被${N(o.heldBy)}拿著` : o.pos ? '移動了' : ''; this.note('object', `${name(o)}${what}`, { id: o.id, state: o.state }); });
     w.on('delivered', () => {});
-    w.on('match:captured', () => {}); w.on('captured', ({ actor }) => { this.note('captured', `你被${actor ? N(actor.id) : '村民'}抓住，送回中心（同化度 +1）。村民會冷靜 5 秒，趁機離開。`, {}); if (this.player.carrying) this.dropBook(); this.pushHint('first-capture', '被抓會讓同化度 +1 並送回中心，到 5 就輸。送回後有 5 秒村民不追，趁這空檔離開中心。別讓認知到抓捕令的村民看見你違規。'); });
+    w.on('match:captured', () => {}); w.on('captured', ({ actor }) => { this.note('captured', `你被${actor ? N(actor.id) : '村民'}抓住，送回中心（書的活性上升）。村民會冷靜 5 秒，趁機離開。`, {}); if (this.player.carrying) this.dropBook(); this.pushHint('first-capture', '被抓會送你回中心、並讓書的活性上升（書越強）。送回後有 5 秒村民不追。被抓不會直接同化你——同化度只來自你接受的舒適與定義陷阱。別在村民眼前違規，或先領個名字當自己人。'); });
     w.on('level', ({ actor, from, to, why }) => this.note('level', `${N(actor.id)}從${STATE[from]}變成${STATE[to]}（${why === 'quiet' ? '太久沒聽廣播' : why === 'keepsake' ? '收到信物' : why === 'contagion' ? '受你感染' : why}）`, { actor: actor.id, to }));
     w.on('nudge', ({ actor }) => {});
     w.on('match:assim', (e) => { if (e.to > e.from) this.note('assim', `同化度 ${e.from}→${e.to}${e.why?.startsWith('comfort') ? '（接受了' + COMFORT_CN[e.why.split(':')[1]] + '）' : e.why === 'definition' ? '（你認知到自己已被當作市民）' : ''}`, { to: e.to }); });

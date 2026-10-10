@@ -47,7 +47,7 @@ const run = (s, sec) => { for (let i = 0; i < sec * 20; i++) s.tick(0.05); };
 // 3. 同化到頂與活性到頂都判輸（被轉化）
 {
   const s = fresh();
-  for (let i = 0; i < 5; i++) s.world.emit('captured', {});
+  for (let i = 0; i < 5; i++) s.match.assim.captured();   // 同化度直接拉到 5（被抓本身不再加同化度）
   assert.equal(s.match.state, 'playing'); run(s, 0.1);
   assert.equal(s.match.state, 'transformed', '同化度 5 → 被轉化'); assert.equal(s.match.reason, 'assimilated');
   ok('被轉化：同化度到 5');

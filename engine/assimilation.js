@@ -3,7 +3,7 @@
 export const COMFORTS = ['name', 'clothes', 'house', 'job'];
 export const COMFORT_CN = { name: '名字', clothes: '衣服', house: '房子', job: '工作' };
 export const COMFORT_BENEFIT = {
-  name: '村民不主動追你，除非看到你違規',
+  name: '村民把你當自己人，看到你違規也不追（但你就符合「有姓名者為市民」的定義陷阱）',
   clothes: '村民要到相鄰格才認得出你是外鄉人',
   house: '屬於你的住宅，別人未經邀請不得進入',
   job: '可以換到物品，工作時你也算一份勞動',

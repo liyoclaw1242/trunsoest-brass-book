@@ -18,31 +18,31 @@ const fresh = (opt = {}) => { const s = createSession(mkScene(), meta, { seed: o
 const run = (s, sec) => { for (let i = 0; i < sec * 20; i++) s.tick(0.05); };
 const v = (s, id) => s.world.actors.get(id);
 
-// 1. 認知抓捕令 → 看見外鄉人就追；追到相鄰 0.5 秒抓住
+// 1. 目擊違規 → 追；追到相鄰 0.5 秒抓住（不再「一看到就追」，給玩家讀法想破綻的空間）
 {
   const s = fresh();
   const p = v(s, 'villager_01'); p.known.add(s.world.live('capture').no);
-  s.outsider.pos = [13, 11];   // 在 p 視線內
+  s.outsider.pos = [13, 11];   // 在 p 視線內，但還沒違規
+  run(s, 2);
+  assert.ok(!s.villagers.hunts(p), '只是看到外鄉人、沒目擊違規 → 不追');
+  const rule = s.world.write({ key: 't-run', text: '不得奔跑', verb: 'run', mode: 'forbid' }, { knownBy: ['outsider', 'villager_01'] });
   let captured = false; s.world.on('captured', () => captured = true);
+  s.world.attempt('outsider', 'run', null, {});   // 目擊違規
   run(s, 6);
-  assert.ok(captured, '沒有名字舒適時，認知抓捕令的村民看見就追並抓到');
-  ok('抓捕令：看見外鄉人就追、追到就抓');
+  assert.ok(captured, '目擊違規的村民會追上並抓到');
+  ok('目擊違規 → 追上並抓住；沒違規不追');
 }
-// 2. 名字舒適：村民不主動追，除非目擊違規
+// 2. 名字舒適：被當自己人，連目擊違規都不追（代價是符合定義陷阱）
 {
   const s = fresh();
   for (const vv of s.villagers.list) vv.known.add(s.world.live('capture').no);
   s.match.assim.accept('name'); s.outsider.comforts = s.match.assim.comforts;
-  s.outsider.pos = [13, 12]; run(s, 3);
-  assert.ok(!s.villagers.list.some(x => s.villagers.hunts(x)), '有名字 → 村民不主動追');
-  ok('名字舒適：村民不主動追你');
-  // 目擊違規 → 追。寫一條外鄉人會違反、村民也認知的條文
   const rule = s.world.write({ key: 't-run', text: '不得奔跑', verb: 'run', mode: 'forbid' }, { knownBy: ['outsider', 'villager_01'] });
-  v(s, 'villager_01').pos = [12, 11];
+  v(s, 'villager_01').pos = [12, 11]; s.outsider.pos = [13, 11];
   s.world.attempt('outsider', 'run', null, {});
   run(s, 0.3);
-  assert.ok(s.villagers.hunts(v(s, 'villager_01')), '目擊你違規 → 開始追');
-  ok('名字舒適：目擊你違規後村民才追');
+  assert.ok(!s.villagers.hunts(v(s, 'villager_01')), '有名字 → 連目擊違規都不追（被當自己人）');
+  ok('名字舒適：被當自己人，目擊違規也不追');
 }
 // 4. 定義涵蓋：村民認知到「外鄉人符合」的定義 → 當他是市民，不追
 {
