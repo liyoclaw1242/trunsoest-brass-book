@@ -67,9 +67,9 @@ export class Puzzle {
   takeForbidden(type) {
     return this.laws.some(l => (l.verb === 'accept' || l.verb === 'take') && l.mode === 'forbid' && (l.target ? l.target === type : true) && this.applies(l) && this.active(l));
   }
-  /** 外鄉人搬動某物是否被法條禁止（自己動；山羊代勞不受此限）。 */
+  /** 你自己搬動／牽引某物是否被法條禁止（換成別的對象代勞則不受此限）。 */
   moveForbidden(obj) {
-    return this.laws.some(l => l.verb === 'move' && l.mode === 'forbid' && (l.target ? l.target === obj.type : true) && this.applies(l) && this.active(l));
+    return this.laws.some(l => (l.verb === 'move' || l.verb === 'lead') && l.mode === 'forbid' && (l.target ? l.target === obj.type : true) && this.applies(l) && this.active(l));
   }
 
   // ---------- 行動 ----------
@@ -113,7 +113,7 @@ export class Puzzle {
     if (o.type === 'notice') { if (o.law) this.heard.add(o.law); else for (const l of this.laws) if (l.src === 'notice') this.heard.add(l.id); this.pos = [tx, ty]; return { moved: true, msg: '你讀了公告——它現在綁得住你了。' }; }
 
     if (PUSHABLE.has(o.type)) {
-      if (o.type === 'book' && this.moveForbidden(o)) return { moved: false, msg: '外鄉人不得搬動黃銅書。' };
+      if (this.moveForbidden(o)) return { moved: false, msg: o.type === 'book' ? '外鄉人不得搬動黃銅書。' : o.type === 'goat' ? '外鄉人不得牽引牲口。' : '法條禁止你搬動它。' };
       const bx = tx + dx, by = ty + dy;
       if (this.wall(bx, by)) return { moved: false, msg: '推不動，後面是牆。' };
       const beyond = this.at(bx, by);

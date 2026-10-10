@@ -130,4 +130,22 @@ export const LEVELS = [
     goal: 'leave',
     hintWin: '你讓山羊啃了公告牌——綁住外鄉人的那條法失去了依據，便不再算數。而你始終沒變成市民，所以另一條也套不到你身上。釜底抽薪。',
   },
+  {
+    name: '八、名正言順',
+    teach: '要把書弄進荒野，得靠山羊代勞。可是「外鄉人不得牽引牲口」——那就先別當外鄉人。',
+    map: [
+      '#########',
+      '#@N.....#',
+      '#.GB...x#',
+      '#########',
+    ],
+    laws: [
+      { text: '外鄉人不得搬動黃銅書。', verb: 'move', who: 'outsider', target: 'book', mode: 'forbid' },
+      { text: '外鄉人不得牽引牲口。', verb: 'lead', who: 'outsider', target: 'goat', mode: 'forbid' },
+      { text: '領受本村之名者，即為市民。', def: 'name' },
+      { text: '書被帶出村界，封印便隨之消散。', note: true },
+    ],
+    goal: 'bookOut',
+    hintWin: '你先領了名字成為市民——市民牽牲口不犯法。於是你趕著山羊馱書出村。你用它給的身分，鑽了它自己的法。',
+  },
 ];
