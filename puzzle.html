@@ -47,6 +47,9 @@
   #win h1{font-size:26px;margin-bottom:12px}
   #win p{color:var(--ink);font-size:15px;line-height:1.7}
   #levelsel{color:var(--faint);font-size:12px;margin-top:2px}
+  #dpad{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:2px}
+  #dpad .row{display:flex;gap:6px}
+  #dpad button{width:56px;height:44px;font-size:20px}
   #dots{display:flex;gap:7px;margin-bottom:2px;flex-wrap:wrap;justify-content:center;max-width:460px}
   #dots .dot{width:26px;height:26px;border-radius:50%;background:var(--panel2);border:1px solid var(--line);color:var(--faint);
     display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;user-select:none}
@@ -68,6 +71,10 @@
     <h1 id="lvname"></h1>
     <div id="teach"></div>
     <div id="grid"></div>
+    <div id="dpad">
+      <button data-d="U">↑</button>
+      <div class="row"><button data-d="L">←</button><button data-d="D">↓</button><button data-d="R">→</button></div>
+    </div>
     <div id="controls">
       <button id="b-undo">↶ 復原 (Z)</button>
       <button id="b-reset">↺ 重來 (R)</button>

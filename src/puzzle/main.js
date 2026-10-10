@@ -88,6 +88,8 @@ addEventListener('keydown', e => {
 });
 
 $('dots').onclick = e => { const d = e.target.closest('.dot'); if (d) load(+d.dataset.i); };
+const DMAP = { U: [0, -1], D: [0, 1], L: [-1, 0], R: [1, 0] };
+$('dpad').onclick = e => { const b = e.target.closest('button'); if (b && !puz.won) { puz.move(DMAP[b.dataset.d]); render(); } };
 $('b-undo').onclick = () => { puz.undo(); render(); };
 $('b-reset').onclick = () => { puz.reset(); render(); };
 $('b-prev').onclick = () => load(idx - 1);
