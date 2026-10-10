@@ -92,4 +92,42 @@ export const LEVELS = [
     goal: 'leave',
     hintWin: '你把衣服脫了（🧺）——不再是市民，就不再被「市民不得離開」綁住。定義是雙面刃：穿上它綁你，脫下它放你。',
   },
+  {
+    name: '六、繞路領名',
+    teach: '還是得當市民才走得了。但廣播器喊著一條新規矩——聽到它的人，連名字都不准領。那就別讓它聽見你。',
+    speakerRadius: 1,
+    map: [
+      '#########',
+      '#@.....N#',
+      '#...S...#',
+      '#.......#',
+      '#......E#',
+      '#########',
+    ],
+    laws: [
+      { text: '外鄉人不得離開本村。', verb: 'leave', who: 'outsider', mode: 'forbid' },
+      { text: '市民得自由離去。', verb: 'leave', who: 'citizen', mode: 'permit' },
+      { text: '領受本村之名者，即為市民。', def: 'name' },
+      { text: '聽過此廣播者，不得領受名字。', verb: 'accept', target: 'name', who: 'any', mode: 'forbid', src: 'speaker' },
+    ],
+    goal: 'leave',
+    hintWin: '你繞開廣播、沒聽見那條禁令，才領得到名字；領了名就成市民，大方走出去。先躲聲音、再拿鑰匙——兩手都要對。',
+  },
+  {
+    name: '七、撕掉它',
+    teach: '綁住你的那條法，就寫在那面公告牌上。沒了那面牌子，那條法還站得住嗎？有誰愛啃紙。',
+    map: [
+      '#######',
+      '#@.GK.#',
+      '#....E#',
+      '#######',
+    ],
+    laws: [
+      { text: '外鄉人不得離開本村。', verb: 'leave', who: 'outsider', mode: 'forbid', onNotice: true },
+      { text: '市民不得離開本村。', verb: 'leave', who: 'citizen', mode: 'forbid' },
+      { text: '（此法載於公告牌上，牌子沒了便失其據。）', note: true },
+    ],
+    goal: 'leave',
+    hintWin: '你讓山羊啃了公告牌——綁住外鄉人的那條法失去了依據，便不再算數。而你始終沒變成市民，所以另一條也套不到你身上。釜底抽薪。',
+  },
 ];

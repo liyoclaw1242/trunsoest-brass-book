@@ -49,22 +49,27 @@ export class Puzzle {
     }
   }
 
+  /** 一條法此刻生效嗎：廣播／公告要聽到／讀到才算；「寫在公告上」的法，公告被毀就失效。 */
+  active(l) { return (!l.src || this.heard.has(l.id)) && (!l.onNotice || this.objs.some(o => o.type === 'notice' && !o.gone)); }
+  applies(l) { const c = this.isCitizen(); return !l.who || l.who === 'any' || (l.who === 'citizen' && c) || (l.who === 'outsider' && !c); }
+
   /** 以目前身分與「聽到」狀態，能不能離開。 */
   leaveAllowed() {
-    const citizen = this.isCitizen();
-    const applies = l => !l.who || l.who === 'any' || (l.who === 'citizen' && citizen) || (l.who === 'outsider' && !citizen);
-    const active = l => !l.src || this.heard.has(l.id);
+    const applies = l => this.applies(l);
+    const active = l => this.active(l);
     const rel = this.laws.filter(l => l.verb === 'leave' && applies(l) && active(l));
     const forbid = rel.some(l => l.mode === 'forbid');
     const permit = rel.some(l => l.mode === 'permit');
     return !forbid || permit;
   }
 
+  /** 領受某物（名字／衣物）是否被法條禁止。 */
+  takeForbidden(type) {
+    return this.laws.some(l => (l.verb === 'accept' || l.verb === 'take') && l.mode === 'forbid' && (l.target ? l.target === type : true) && this.applies(l) && this.active(l));
+  }
   /** 外鄉人搬動某物是否被法條禁止（自己動；山羊代勞不受此限）。 */
   moveForbidden(obj) {
-    const citizen = this.isCitizen();
-    return this.laws.some(l => l.verb === 'move' && l.mode === 'forbid' && (l.target ? l.target === obj.type : true) &&
-      (!l.who || l.who === 'any' || (l.who === 'outsider' && !citizen) || (l.who === 'citizen' && citizen)) && (!l.src || this.heard.has(l.id)));
+    return this.laws.some(l => l.verb === 'move' && l.mode === 'forbid' && (l.target ? l.target === obj.type : true) && this.applies(l) && this.active(l));
   }
 
   // ---------- 行動 ----------
@@ -102,8 +107,8 @@ export class Puzzle {
       return { moved: false, msg: citizen ? '這道門不讓你走。' : '你是外鄉人，不得離開。那道門只讓市民過。' };
     }
     if (o.type === 'wilddeep') { this.pos = [tx, ty]; return { moved: true }; }
-    if (o.type === 'name') { this.has.add('name'); o.gone = true; this.pos = [tx, ty]; return { moved: true, msg: '你領了一個本村的名字。' }; }
-    if (o.type === 'clothes') { this.has.add('clothes'); o.gone = true; this.pos = [tx, ty]; return { moved: true, msg: '你換上了本村的衣服。' }; }
+    if (o.type === 'name') { if (this.takeForbidden('name')) return { moved: false, msg: '你被禁止領受名字。' }; this.has.add('name'); o.gone = true; this.pos = [tx, ty]; return { moved: true, msg: '你領了一個本村的名字。' }; }
+    if (o.type === 'clothes') { if (this.takeForbidden('clothes')) return { moved: false, msg: '你被禁止穿上本村的衣服。' }; this.has.add('clothes'); o.gone = true; this.pos = [tx, ty]; return { moved: true, msg: '你換上了本村的衣服。' }; }
     if (o.type === 'shed') { this.has.clear(); this.pos = [tx, ty]; return { moved: true, msg: '你脫下了本村的身分，又成了外鄉人。' }; }
     if (o.type === 'notice') { if (o.law) this.heard.add(o.law); else for (const l of this.laws) if (l.src === 'notice') this.heard.add(l.id); this.pos = [tx, ty]; return { moved: true, msg: '你讀了公告——它現在綁得住你了。' }; }
 
