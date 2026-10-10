@@ -102,4 +102,31 @@ export const LEVELS = [
     goal: 'bookOut',
     hintWin: '你先領了名字成為市民——市民牽牲口不犯法。於是你趕著山羊馱書出村。你用它給的身分，鑽了它自己的法。',
   },
+  {
+    name: '九、雙喇叭',
+    teach: '還是得領名當市民才走得了，而兩座廣播器都喊著「聽到的人不准領名」。它們的聲音之間，有條縫。',
+    speakerRadius: 1,
+    map: ['#########', '#@.....N#', '#..S.S..#', '#.......#', '#.......#', '#......E#', '#########'],
+    laws: [
+      { text: '外鄉人不得離開本村。', verb: 'leave', who: 'outsider', mode: 'forbid' },
+      { text: '市民得自由離去。', verb: 'leave', who: 'citizen', mode: 'permit' },
+      { text: '領受本村之名者，即為市民。', def: 'name' },
+      { text: '聽過廣播者，不得領受名字。', verb: 'accept', target: 'name', who: 'any', mode: 'forbid', src: 'speaker' },
+    ],
+    goal: 'leave',
+    hintWin: '你沿著兩座喇叭聲音的外圍繞到名字那裡，沒被任何一座聽見，才領得了名、成了市民、走得出去。',
+  },
+  {
+    name: '十、兩道鎖',
+    teach: '外鄉人走不了，市民也走不了——兩條法把兩種身分都鎖死。但其中一條，寫在公告牌上。',
+    map: ['########', '#@.N..E#', '#.GK...#', '########'],
+    laws: [
+      { text: '外鄉人不得離開本村。', verb: 'leave', who: 'outsider', mode: 'forbid' },
+      { text: '市民不得離開本村。', verb: 'leave', who: 'citizen', mode: 'forbid', onNotice: true },
+      { text: '領受本村之名者，即為市民。', def: 'name' },
+      { text: '（市民那條載於公告牌上，牌子沒了便失其據。）', note: true },
+    ],
+    goal: 'leave',
+    hintWin: '你兩手並用：領了名字躲開「外鄉人不得離開」，又讓山羊啃掉公告牌、廢掉「市民不得離開」。兩道鎖各有鑰匙，你都找到了。',
+  },
 ];
