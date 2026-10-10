@@ -12,7 +12,7 @@ export class Activity {
    *            onWake(-4) 喚醒村民、onRuling(-1) 裁決或廢文、max(100)
    */
   constructor(opt = {}) {
-    this.opt = { tickSec: 10, timeGain: 1, onPatch: 3, onReset: 5, onCapture: 2, onWake: -4, onRuling: -1, max: 100, ...opt };
+    this.opt = { tickSec: 10, timeGain: 1, onPatch: 3, onReset: 5, onCapture: 2, onWake: -4, onRuling: -5, max: 100, ...opt };
     this.value = opt.start ?? 0;
     this.peak = this.value;
     this.acc = 0;            // 時間累加器

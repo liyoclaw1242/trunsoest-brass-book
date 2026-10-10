@@ -42,7 +42,7 @@ export class Game {
     this.opening = opt.opening ?? this.world.opt.announceSec;
     this._lastStage = this.match.activity.stage;
     this.note('start', '黃銅書察覺了你。廣播器唸起第一條公告。');
-    this.pushHint('book-here', '那本書在村子中央的圖書館裡（金色標記）。走進去能看到它——逃出村子、或把它搬到荒野深處放逐，是你的出路。');
+    this.pushHint('book-here', '書會不斷立法把你綁在村裡。你比它聰明：按 N 打開「法典」，每條法下面都寫著它的破綻——鑽過去就能脫身。');
   }
   on(fn) { this.listeners.push(fn); }
   note(type, text, data = {}) { const e = { t: +this.t.toFixed(2), type, text, ...data }; this.log.push(e); for (const fn of this.listeners) fn(e); }
@@ -59,7 +59,7 @@ export class Game {
     w.on('witness', ({ actor, verb, rules }) => this.note('witness', `${N(actor.id)}看見你違規——追你！`, { actor: actor.id }));
     w.on('spotted', ({ actor }) => this.note('spotted', `${N(actor.id)}發現了你——追你！`, { actor: actor.id }));
     w.on('lost', ({ actor }) => this.note('lost', `${N(actor.id)}跟丟了你`, { actor: actor.id }));
-    w.on('conflict', ({ actor, verb, forbid, permit }) => this.note('conflict', `第${num(forbid.no)}條與第${num(permit.no)}條衝突，這次不追究`, {}));
+    w.on('conflict', ({ actor, verb, forbid, permit }) => { this.note('conflict', `你逼出了矛盾：第${num(forbid.no)}條與第${num(permit.no)}條打架，這次不追究`, {}); if (actor && actor.id === 'outsider') this.pushHint('first-conflict', '漂亮——你讓書自相矛盾了。被「禁」和「准」同時蓋到的行為，書當下拿你沒辦法。這就是鑽漏洞。'); });
     w.on('refuse', ({ actor, verb, target, rules }) => this.note('refuse', `${N(actor.id)}拒絕${LABEL[verb] || verb}${name(target)}：第${rules.map(r => num(r.no)).join('、')}條`, {}));
     w.on('object', ({ object: o, before }) => { const what = o.state !== before ? `變成${STATE[o.state] || o.state}` : o.heldBy ? `被${N(o.heldBy)}拿著` : o.pos ? '移動了' : ''; this.note('object', `${name(o)}${what}`, { id: o.id, state: o.state }); });
     w.on('delivered', () => {});
@@ -69,7 +69,7 @@ export class Game {
     w.on('match:assim', (e) => { if (e.to > e.from) this.note('assim', `同化度 ${e.from}→${e.to}${e.why?.startsWith('comfort') ? '（接受了' + COMFORT_CN[e.why.split(':')[1]] + '）' : e.why === 'definition' ? '（你認知到自己已被當作市民）' : ''}`, { to: e.to }); });
     this._actAcc = 0;
     w.on('match:activity', ({ delta, why, to }) => {
-      const R = { patch: '書補上了你鑽的漏洞', reset: '書撐過了一次重置', capture: '你被抓回來', wake: '有村民罷工了', ruling: '書多寫了裁決' };
+      const R = { patch: '書補上了你鑽的漏洞', reset: '書撐過了一次重置', capture: '你被抓回來', wake: '有村民罷工了', ruling: '你逼出矛盾，書退了一步' };
       if (why === 'time') { this._actAcc += delta; return; }
       this.note('activity', `活性 ${delta > 0 ? '+' : ''}${delta.toFixed(0)}（${R[why] || why}）→ ${Math.round(to)}`, { to });
     });
@@ -205,12 +205,12 @@ export class Game {
   objective() {
     const m = this.match;
     if (!this.started) return '';
-    if (this.opening > 0) return '站著聽完書的第一條公告——先弄清楚這裡的規矩。';
+    if (this.opening > 0) return '站著聽完書的第一條公告——先弄清楚它立了什麼法。';
     if (m.state !== 'playing') return '';
-    if (!this.boundarySealed()) return '界石的封印失效了——趁現在走出影響範圍（白色虛線圈）！';
-    if (!this.player.seenBook) return '先去村子中央的圖書館，找到那本黃銅書（跟著畫面上的金色標記）。走進去就看得到。';
-    if (m.assim.value >= m.assim.opt.max - 1) return `同化度 ${m.assim.value}/${m.assim.opt.max}，快到頂了！躲到聽不到廣播的地方讓它退下來。`;
-    return '趁書重寫規則的空檔走出影響範圍逃走，或把黃銅書搬到荒野深處放逐它。小心巡邏的治安官。';
+    if (!this.boundarySealed()) return '界石封印失效了——趁書重寫封回來之前，鑽出影響範圍（白色虛線圈）！';
+    if (m.assim.value >= m.assim.opt.max - 1) return `同化度 ${m.assim.value}/${m.assim.opt.max}，再被同化一次就輸了——別照書的法生活，躲開廣播、放棄舒適。`;
+    if (!this.player.seenBook) return '先去中央圖書館看看那本書（金色標記）。讀懂它立的法，才找得到脫身的破綻。';
+    return '鑽書立的法脫身：按 N 看「法典」裡每條法的破綻（搬界石、讓山羊馱書、逼它自相矛盾、趁重置衝出界石）。拖越久活性越高、書越強。';
   }
   /** 畫面標記：重要地標（書、山羊、隕石），讓玩家找得到。 */
   landmarks() {

@@ -63,7 +63,7 @@ export class Hud {
     };
     const fates = (st.villagers || []).map(v => `${v.id.replace('villager_', '村民')}：${{ stayed: '留下', left: '離開', awake: '喚醒', dead: '死亡' }[v.fate]}`).join('　');
     o.innerHTML = `<h1>${ENDINGS[state] || state}</h1><div class="small" style="max-width:600px">${SUB[reason] || ''}</div>` +
-      `<div class="small" style="margin-top:16px;color:var(--faint)">種子 ${this.game.session.rng.seed}　用時 ${mmss(st.time)}　書寫 ${st.written} 條　重置 ${st.resets} 次　活性最高 ${Math.round(st.peakActivity)}　被抓 ${st.captures} 次</div>` +
+      `<div class="small" style="margin-top:16px;color:var(--faint)">種子 ${this.game.session.rng.seed}　用時 ${mmss(st.time)}　書寫 ${st.written} 條　逼矛盾 ${st.rulings || 0} 次　重置 ${st.resets} 次　活性最高 ${Math.round(st.peakActivity)}　被抓 ${st.captures} 次</div>` +
       `<div class="small" style="margin-top:8px">${fates}</div><button onclick="location.reload()">再玩一次</button>`;
   }
   toggleDesigner() { this.designer = !this.designer; this.el.designer.hidden = !this.designer; }
@@ -76,13 +76,18 @@ export class Hud {
       `<div class="sub"><span class="acc">${s.workers}</span> 人勞動供養 · 規則上限 <span class="acc">${s.ruleCap}</span>（現 ${s.rules}）${s.comforts.length ? '<br>舒適：' + s.comforts.map(c => COMFORT_CN[c]).join('、') : ''}</div>`;
   }
   renderNotes() {
-    const g = this.game, notes = g.world.notes('outsider'), bc = g.broadcast();
-    const known = notes.filter(n => n.known);
-    const unknown = notes.filter(n => !n.known && !n.void);
-    const line = n => `<div class="rule${n.void ? ' void' : n.dead ? ' dead' : ''}${bc && bc.rule.no === n.no ? ' now' : ''}">第${num(n.no)}條　${n.text}</div>`;
-    this.el.notes.innerHTML = `<h3>你的筆記　生效 ${g.world.active().length}／${g.world.opt.max} 條　重置 ${g.world.resets} 次</h3>` +
-      (known.length ? known.map(line).join('') : '<div class="rule unknown">（你還沒聽過任何條文）</div>') +
-      (unknown.length ? `<div class="rule unknown">另有 ${unknown.length} 條你沒聽過</div>` : '') + `<div class="rule unknown" style="border:0">N 收合　Tab 設計者視角</div>`;
+    const g = this.game, bc = g.broadcast();
+    const rules = g.designerRules();
+    const heard = rules.filter(r => r.knownBy.includes('outsider') && !r.void && r.kind !== 'ruling');
+    const unheard = rules.filter(r => !r.knownBy.includes('outsider') && !r.void && r.kind !== 'lore' && r.kind !== 'ruling');
+    const line = r => `<div class="rule${r.void ? ' void' : r.dead ? ' dead' : ''}${bc && bc.rule.no === r.no ? ' now' : ''}">` +
+      `第${num(r.no)}條　${r.text}` +
+      (r.hole ? `<div class="hole">破綻：${r.hole}</div>` : '') + `</div>`;
+    this.el.notes.innerHTML = `<h3>法典　已聽 ${heard.length} 條 · 生效 ${g.world.active().length} 條 · 重置 ${g.world.resets} 次</h3>` +
+      (heard.length ? heard.map(line).join('')
+        : '<div class="rule unknown">你還沒聽過任何條文。讀公告牌或聽廣播——知道書立了什麼法，才找得到破綻。</div>') +
+      (unheard.length ? `<div class="rule unknown">另有 ${unheard.length} 條你沒聽過（沒聽到的法不綁你，但你也看不到它的破綻）</div>` : '') +
+      `<div class="rule unknown" style="border:0">N 收合　Tab 設計者視角</div>`;
   }
   renderBroadcast() {
     const g = this.game, bc = g.broadcast(), el = this.el.broadcast, night = g.world.isNight(), inB = g.world.inBroadcast(g.player.cell), q = g.quietCell();
