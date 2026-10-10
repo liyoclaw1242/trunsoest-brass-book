@@ -24,7 +24,12 @@
   .cell.wall{background:var(--wall);box-shadow:inset 0 0 0 1px #3a322b}
   .cell.earshot::after{content:"";position:absolute;inset:0;background:var(--earshot);border-radius:6px}
   .cell.exit{background:#d9c9a3}
-  .tok{position:relative;z-index:1;filter:drop-shadow(0 2px 1px rgba(0,0,0,.25));animation:pop .13s ease-out}
+  #gridwrap{position:relative;display:inline-block}
+  #tokens{position:absolute;left:0;top:0;pointer-events:none}
+  #tokens.notrans .token{transition:none}
+  .token{position:absolute;left:0;top:0;display:flex;align-items:center;justify-content:center;font-size:30px;
+    filter:drop-shadow(0 2px 1px rgba(0,0,0,.3));transition:transform .12s ease;z-index:2}
+  .token .badge{position:absolute;right:0;bottom:-2px;font-size:15px;filter:none}
   @keyframes pop{from{transform:scale(.6);opacity:.4}to{transform:scale(1);opacity:1}}
   .cell.open{box-shadow:inset 0 0 0 2px var(--good),0 0 12px rgba(143,201,138,.55);animation:glow 1.1s ease-in-out infinite alternate}
   @keyframes glow{from{box-shadow:inset 0 0 0 2px var(--good),0 0 6px rgba(143,201,138,.4)}to{box-shadow:inset 0 0 0 2px var(--good),0 0 16px rgba(143,201,138,.75)}}
@@ -73,7 +78,7 @@
     <div id="levelsel"></div>
     <h1 id="lvname"></h1>
     <div id="teach"></div>
-    <div id="grid"></div>
+    <div id="gridwrap"><div id="grid"></div><div id="tokens"></div></div>
     <div id="dpad">
       <button data-d="U">↑</button>
       <div class="row"><button data-d="L">←</button><button data-d="D">↓</button><button data-d="R">→</button></div>

@@ -25,29 +25,56 @@ function renderDots() {
   $('dots').innerHTML = LEVELS.map((l, i) => `<div class="dot ${i === idx ? 'cur' : ''} ${solved[i] ? 'done' : ''}" data-i="${i}" title="${l.name}">${solved[i] ? '✓' : i + 1}</div>`).join('');
 }
 
+let cellEls = new Map(), tokenEls = new Map();
+
+// 建一次格子背景與一組持久的 token（之後只移動 token，產生滑動動畫）
+function buildBoard() {
+  const s = puz.status(), g = $('grid');
+  g.style.gridTemplateColumns = `repeat(${s.w}, auto)`;
+  cellEls = new Map();
+  let html = '';
+  for (let y = 0; y < s.h; y++) for (let x = 0; x < s.w; x++) html += `<div class="cell" data-k="${x},${y}"></div>`;
+  g.innerHTML = html;
+  for (const c of g.children) cellEls.set(c.dataset.k, c);
+  const tk = $('tokens'); tk.innerHTML = ''; tokenEls = new Map();
+  const mk = (id, glyph) => { const e = document.createElement('div'); e.className = 'token'; e.innerHTML = `<span class="g">${glyph}</span>`; tk.appendChild(e); tokenEls.set(id, e); return e; };
+  for (const o of puz.objs) if (GLYPH[o.type]) mk(o.id, GLYPH[o.type]);
+  mk('player', '🧍');
+  tk.classList.add('notrans');
+  updateBoard();
+  void tk.offsetHeight;
+  tk.classList.remove('notrans');
+}
+
+function setPos(el, x, y) { const c = cellEls.get(x + ',' + y); if (c) { el.style.width = c.offsetWidth + 'px'; el.style.height = c.offsetHeight + 'px'; el.style.transform = `translate(${c.offsetLeft}px,${c.offsetTop}px)`; } }
+
+function updateBoard() {
+  const s = puz.status();
+  const ear = earshot();
+  for (const [k, c] of cellEls) {
+    const [x, y] = k.split(',').map(Number), isWall = puz.wall(x, y), o = puz.at(x, y);
+    c.className = 'cell' + ((x + y) % 2 ? ' alt' : '') + (isWall ? ' wall' : '') + (!isWall && ear.has(k) ? ' earshot' : '') + (o && o.type === 'exit' ? ' exit' + (s.leaveAllowed ? ' open' : '') : '');
+  }
+  for (const o of puz.objs) {
+    const e = tokenEls.get(o.id); if (!e) continue;
+    e.style.display = o.gone ? 'none' : '';
+    if (o.gone) continue;
+    setPos(e, o.x, o.y);
+    e.querySelector('.g').textContent = GLYPH[o.type];
+    let b = e.querySelector('.badge');
+    if (o.carries === 'book') { if (!b) { b = document.createElement('span'); b.className = 'badge'; e.appendChild(b); } b.textContent = '📖'; }
+    else if (b) b.remove();
+  }
+  const p = tokenEls.get('player'); p.querySelector('.g').textContent = s.citizen ? '🧑‍🌾' : '🧍'; setPos(p, s.pos[0], s.pos[1]);
+}
+
 function render() {
   const s = puz.status();
   renderDots();
   $('levelsel').textContent = `第 ${idx + 1} / ${LEVELS.length} 關　·　步數 ${puz.history.length}`;
   $('lvname').textContent = puz.level.name;
   $('teach').textContent = puz.level.teach || '';
-  const g = $('grid');
-  g.style.gridTemplateColumns = `repeat(${s.w}, auto)`;
-  const ear = earshot();
-  let html = '';
-  for (let y = 0; y < s.h; y++) for (let x = 0; x < s.w; x++) {
-    const key = x + ',' + y, isWall = puz.wall(x, y), objHere = puz.at(x, y);
-    const cls = ['cell'];
-    if ((x + y) % 2) cls.push('alt');
-    if (isWall) cls.push('wall');
-    if (!isWall && ear.has(key)) cls.push('earshot');
-    if (objHere && objHere.type === 'exit') { cls.push('exit'); if (s.leaveAllowed) cls.push('open'); }
-    let glyph = '';
-    if (s.pos[0] === x && s.pos[1] === y) glyph = s.citizen ? '🧑‍🌾' : '🧍';
-    else if (objHere) glyph = GLYPH[objHere.type] || '';
-    html += `<div class="${cls.join(' ')}">${glyph ? `<span class="tok">${glyph}</span>` : ''}</div>`;
-  }
-  g.innerHTML = html;
+  updateBoard();
   $('laws').innerHTML = puz.laws.map(l => {
     const c = l.note ? 'law note' : l.def ? 'law def' : 'law';
     const tag = l.src === 'speaker' ? '（廣播器喊的：聽到才綁你）' : l.src === 'notice' ? '（寫在公告上：讀了才綁你）' : l.onNotice ? '（載於公告牌：牌子沒了便失效）' : '';
@@ -71,7 +98,7 @@ function win() {
 }
 const hideWin = () => $('win').style.display = 'none';
 
-function load(i) { idx = (i + LEVELS.length) % LEVELS.length; puz = new Puzzle(LEVELS[idx]); hideWin(); render(); }
+function load(i) { idx = (i + LEVELS.length) % LEVELS.length; puz = new Puzzle(LEVELS[idx]); hideWin(); buildBoard(); render(); }
 function nextLevel() {
   if (idx + 1 < LEVELS.length) return load(idx + 1);
   const unsolved = solved.findIndex(v => !v);
@@ -97,4 +124,4 @@ $('b-next').onclick = () => load(idx + 1);
 $('b-wnext').onclick = nextLevel;
 $('b-begin').onclick = () => { $('intro').style.display = 'none'; const resume = solved.findIndex(v => !v); load(resume < 0 ? 0 : resume); };
 
-render();
+buildBoard(); render();
