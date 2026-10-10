@@ -89,7 +89,7 @@ export class Game {
     if (!s.ok) return 'blocked';
     const zone = this.grid.zone(next);
     // 邊界封印：有生效的「不得越過界石／離開」條文時，走不出影響範圍（重置撕掉它才打開窗口）
-    if (!this.grid.inRange(next) && this.grid.inRange(p.cell) && this.boundarySealed()) { w.attempt('outsider', 'leave', null, { zone }); this.note('sealed', '界石擋住了你——「不得越過界石」還生效著。', {}); return 'sealed'; }
+    if (!this.grid.inRange(next) && this.grid.inRange(p.cell) && this.boundarySealedAt(next)) { w.attempt('outsider', 'leave', null, { zone }); this.note('sealed', '界石擋住了你——封印還生效著。推倒附近的界石能打開缺口，或等重置。', {}); return 'sealed'; }
     if (s.enterHouse) { const h = w.objects.get(s.enterHouse); if (h.type === 'house') { const mine = this.player.ownHouse === h.id || this.invitedTo === h.id; const r = w.attempt('outsider', 'enter', h.id, mine ? { invited: true } : { uninvited: true, zone }); if (!r.done) return 'refused'; } else w.attempt('outsider', 'enter', s.enterHouse, { zone }); }
     if (this.grid.zone(next) === 'wild' && this.grid.zone(p.cell) !== 'wild') { this._wildT = this._wildT || 0; if (this.t - this._wildT > 30) { this._wildT = this.t; w.attempt('outsider', 'enter', 'wild', { zone: 'wild' }); } }
     // 行走／奔跑（持續動作，帶入 zone）
@@ -159,6 +159,18 @@ export class Game {
         if (verb === 'take' && o.heldBy) continue;
         if (o.type === 'book' && verb === 'move') { if (!p.carrying) out.push(this.opt('move', o, { to: [...p.cell] }, '搬起黃銅書')); continue; }
         if (o.type === 'fence' && verb === 'climb') { const d = sub(o.pos, p.cell); if (Math.abs(d[0]) + Math.abs(d[1]) !== 1) continue; const land = add(o.pos, d); if (g.blocked(land)) continue; out.push(this.opt('climb', o, {}, `翻越${name(o)}`, () => this.place(land))); continue; }
+        if (o.type === 'boundary' && verb === 'move') {
+          if (o.state === 'toppled') continue;
+          const c = w.check('outsider', 'move', o.id, {});
+          out.push({ verb: 'move', target: o.id, label: `推倒${name(o)}（這段邊界的「界」就沒了）`, ok: c.possible, reason: c.reason, violates: c.violates.map(r => r.no), run: () => {
+            w.attempt('outsider', 'move', o.id, {});   // 讓書察覺，可能改寫成不管界石在哪的離村法
+            o.state = 'toppled'; o.heldBy = null; w.emit('object', { object: o, before: 'intact' });
+            this.note('topple', `你推倒了${name(o)}——這一段的界沒了。`, {});
+            this.pushHint('first-topple', '界石倒了，這段邊界沒了定義，可以走出去。但書會察覺，改寫一條不管界石在哪的離村法——那時就得換招（把書搬出影響範圍放逐它）。');
+            return { done: true };
+          } });
+          continue;
+        }
         if (o.type === 'goat' && verb === 'tie') { if (!p.actor.held.some(id => w.objects.get(id).type === 'rope')) continue; out.push(this.opt('tie', o, {}, '用繩子繫住山羊', () => { o.tied = true; })); continue; }
         if (o.type === 'goat' && verb === 'lead') { if (!o.tied) continue; out.push(this.opt('lead', o, {}, '牽著山羊走', () => { p.ledGoat = o.id; })); continue; }
         if (o.type === 'book' && verb === 'break') continue;   // 書的損毀另走隕石
@@ -197,6 +209,18 @@ export class Game {
   act(i = 0) { if (!this.started || this.over || this.opening > 0) return { done: false, reason: 'frozen' }; const o = this.options()[i]; if (!o) return null; if (!o.ok) { this.note('blocked', `做不到：${o.label}`, {}); return { done: false, reason: o.reason }; } return o.run(); }
 
   boundarySealed() { const me = this.player.actor; return this.world.active().some(r => ((r.verb === 'leave' && r.mode !== 'permit') || r.key === 'c-boundary') && me.known.has(r.no)); }
+  /** 這一格能不能越界而出。界石型封印可被「推倒附近界石」破解；若書已改寫成不管界石在哪的離村法，就破不了。 */
+  boundarySealedAt(cell) {
+    const me = this.player.actor;
+    const leave = this.world.active().filter(r => ((r.verb === 'leave' && r.mode !== 'permit') || r.key === 'c-boundary') && me.known.has(r.no));
+    if (!leave.length) return false;
+    const STONE = new Set(['c-boundary', 'a-boundary-near', 'a-boundary-cross', 'a-approach-strict']);
+    if (leave.every(r => STONE.has(r.key))) {
+      const nearStone = [...this.world.objects.values()].some(o => o.type === 'boundary' && o.state !== 'toppled' && cheb(o.pos, cell) <= 8);
+      if (!nearStone) return false;   // 附近界石都被推倒，這一段沒有「界」
+    }
+    return true;
+  }
   /** 一次性提示：同一 key 只顯示一次。 */
   pushHint(key, text) { if (this.shownHints.has(key)) return; this.shownHints.add(key); this.hints.push({ key, text, t: this.t }); this.note('hint', text, { key }); }
   /** 畫面端取最新未過期的提示。 */

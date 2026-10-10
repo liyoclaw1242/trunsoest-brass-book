@@ -65,7 +65,8 @@ export class Grid {
         }
         case 'door': if (o.pos[0] === x && o.pos[1] === y && o.state === 'closed') return true; break;
         case 'fence': if (o.pos[0] === x && o.pos[1] === y && o.state === 'intact') return true; break;
-        case 'lectern': case 'speaker': case 'notice': case 'boundary': case 'lamppost':
+        case 'boundary': if (o.pos[0] === x && o.pos[1] === y && o.state !== 'toppled') return true; break;   // 推倒的界石不擋路（留出缺口）
+        case 'lectern': case 'speaker': case 'notice': case 'lamppost':
         case 'workstation': case 'well': case 'census': case 'carved-stone':
         case 'granary': case 'shop': case 'post':
           if (o.pos[0] === x && o.pos[1] === y) return true; break;

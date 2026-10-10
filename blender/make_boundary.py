@@ -2,7 +2,7 @@
 import rb
 
 def make(id, pos, **kw):
-    p = rb.parent_empty(id, pos, rb.props('boundary', ['approach'], ['marker']))
+    p = rb.parent_empty(id, pos, rb.props('boundary', ['approach', 'move'], ['marker']))
     s = rb.state_root(p, 'intact')
     rb.box(s, f'{id}__intact_plinth', (0.9, 0.9, 0.2), (0, 0, 0.1), rb.DARKSTONE)
     rb.box(s, f'{id}__intact_stone', (0.66, 0.66, 1.5), (0, 0, 0.9), rb.STONE)
@@ -14,5 +14,11 @@ def make(id, pos, **kw):
     rb.box(s, f'{id}__intact_band', (0.72, 0.72, 0.12), (0, 0, 0.5), rb.BRASS)
     # 頂上的發亮銅珠（封印的信號）
     rb.sphere(s, f'{id}__intact_orb', 0.22, (0, 0, 1.95), rb.BRASS)
+    # 推倒：石柱橫躺在基座旁，銅珠黯淡——這一段的「界」沒了
+    t = rb.state_root(p, 'toppled')
+    rb.box(t, f'{id}__toppled_plinth', (0.9, 0.9, 0.2), (0, 0, 0.1), rb.DARKSTONE)
+    rb.box(t, f'{id}__toppled_stone', (0.66, 0.66, 1.5), (0, 0.75, 0.33), rb.STONE, rot=(1.5708, 0, 0))
+    rb.box(t, f'{id}__toppled_cap', (0.8, 0.8, 0.18), (0, 1.45, 0.33), rb.DARKSTONE, rot=(1.5708, 0, 0))
+    rb.sphere(t, f'{id}__toppled_orb', 0.2, (0, 1.75, 0.3), (0.4, 0.34, 0.16))
     rb.col(p, (0.8, 0.8, 1.6), (0, 0, 0.8))
     return p
