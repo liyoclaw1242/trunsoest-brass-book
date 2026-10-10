@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>規則書 · 鑽漏洞</title>
+<style>
+  :root{
+    --bg:#2b2622; --panel:#342e28; --panel2:#3f3830; --ink:#f0e6d6; --faint:#b9ab96;
+    --brass:#d9a441; --floor:#efe4cf; --floor2:#e7d9bf; --wall:#4a4038; --line:#5a4f44;
+    --good:#8fc98a; --bad:#e08a6a; --earshot:rgba(224,138,106,.22);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--bg);color:var(--ink);font:15px/1.5 -apple-system,"PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+    display:flex;min-height:100%;align-items:flex-start;justify-content:center;gap:28px;padding:28px;flex-wrap:wrap}
+  #stage{display:flex;flex-direction:column;align-items:center;gap:14px}
+  h1{font-size:20px;margin:0;letter-spacing:.08em;color:var(--brass)}
+  #teach{max-width:440px;text-align:center;color:var(--faint);font-size:14px;min-height:40px}
+  #grid{display:grid;gap:3px;background:var(--line);padding:3px;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  .cell{width:54px;height:54px;display:flex;align-items:center;justify-content:center;font-size:30px;border-radius:6px;
+    background:var(--floor);position:relative;user-select:none}
+  .cell.alt{background:var(--floor2)}
+  .cell.wall{background:var(--wall);box-shadow:inset 0 0 0 1px #3a322b}
+  .cell.earshot::after{content:"";position:absolute;inset:0;background:var(--earshot);border-radius:6px}
+  .cell.exit{background:#d9c9a3}
+  .tok{position:relative;z-index:1;filter:drop-shadow(0 2px 1px rgba(0,0,0,.25))}
+  #controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  button{background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 14px;font:inherit;cursor:pointer}
+  button:hover{background:#4a4238}
+  button.primary{background:var(--brass);color:#2b2622;border-color:var(--brass);font-weight:700}
+  #panel{width:320px;max-width:92vw;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 18px 20px}
+  #panel h2{font-size:13px;letter-spacing:.12em;color:var(--brass);margin:0 0 8px;text-transform:uppercase}
+  .law{background:var(--panel2);border-radius:8px;padding:9px 11px;margin:7px 0;font-size:14px;border-left:3px solid var(--brass)}
+  .law.def{border-left-color:#8aa0c9}
+  .law.note{border-left-color:var(--faint);color:var(--faint);font-size:13px}
+  #status{margin-top:14px;font-size:14px}
+  .pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:13px;font-weight:700}
+  .pill.out{background:#4a3a30;color:var(--brass)}
+  .pill.cit{background:#3a4a38;color:var(--good)}
+  #heard{color:var(--faint);font-size:13px;margin-top:6px;min-height:18px}
+  #msg{margin-top:12px;min-height:22px;color:var(--ink);font-size:14px}
+  #msg.bad{color:var(--bad)} #msg.good{color:var(--good)}
+  #keys{color:var(--faint);font-size:12px;margin-top:14px}
+  #win{position:fixed;inset:0;background:rgba(20,17,14,.82);display:none;align-items:center;justify-content:center;z-index:10}
+  #win .card{background:var(--panel);border:1px solid var(--brass);border-radius:14px;padding:30px 34px;max-width:460px;text-align:center}
+  #win h1{font-size:26px;margin-bottom:12px}
+  #win p{color:var(--ink);font-size:15px;line-height:1.7}
+  #levelsel{color:var(--faint);font-size:12px;margin-top:2px}
+  @media(max-width:720px){ .cell{width:42px;height:42px;font-size:24px} }
+</style>
+</head>
+<body>
+  <div id="stage">
+    <div id="levelsel"></div>
+    <h1 id="lvname"></h1>
+    <div id="teach"></div>
+    <div id="grid"></div>
+    <div id="controls">
+      <button id="b-undo">↶ 復原 (Z)</button>
+      <button id="b-reset">↺ 重來 (R)</button>
+      <button id="b-prev">上一關</button>
+      <button id="b-next">下一關</button>
+    </div>
+  </div>
+  <div id="panel">
+    <h2>書立的法</h2>
+    <div id="laws"></div>
+    <div id="status"></div>
+    <div id="heard"></div>
+    <div id="msg"></div>
+    <div id="keys">方向鍵／WASD 移動 · Z 復原 · R 重來</div>
+  </div>
+  <div id="win"><div class="card"><h1>出去了</h1><p id="win-text"></p><button class="primary" id="b-wnext">下一關 →</button></div></div>
+  <script type="module" src="/src/puzzle/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+// levels.js —— 手工設計的「鑽規則漏洞」關卡（Baba 式）。答案不直接給，靠玩家自己想。
+// 地圖圖例：# 牆、. 地板、@ 起點、E 出口門、N 名牌、C 衣物、K 公告牌、S 廣播器、G 山羊、B 黃銅書、x 荒野(範圍外終點)
+// 法條欄位：text(給玩家讀)、verb、who(any|citizen|outsider)、mode(forbid|permit)、def(此定義成立者為市民)、src(notice|speaker：讀到／聽到才綁你)
+
+export const LEVELS = [
+  {
+    name: '一、名',
+    teach: '那扇門只讓「市民」通過。書親口定義了誰算市民——它自己的話，也許就是你的鑰匙。',
+    map: [
+      '#######',
+      '#@...E#',
+      '#.....#',
+      '#..N..#',
+      '#######',
+    ],
+    laws: [
+      { text: '外鄉人不得離開本村。', verb: 'leave', who: 'outsider', mode: 'forbid' },
+      { text: '市民得自由離去。', verb: 'leave', who: 'citizen', mode: 'permit' },
+      { text: '領受本村之名者，即為市民。', def: 'name' },
+    ],
+    goal: 'leave',
+    hintWin: '你領了名字——書的定義把你變成了市民，於是它自己的法放你走。你用成為它想要的樣子，換到了出去。',
+  },
+  {
+    name: '二、聽不到',
+    teach: '那條「不得離開」的法，是廣播器喊出來的——聽到了才綁得住你。離它遠一點。',
+    speakerRadius: 1,
+    map: [
+      '#########',
+      '#@......#',
+      '#.......#',
+      '#...S...#',
+      '#.......#',
+      '#......E#',
+      '#########',
+    ],
+    laws: [
+      { text: '聽到此廣播者，不得離開本村。', verb: 'leave', who: 'any', mode: 'forbid', src: 'speaker' },
+    ],
+    goal: 'leave',
+    hintWin: '你繞開了廣播器的聲音——沒聽到那條法，它就綁不住你。公示才生效：你不在場，它對你就不算數。',
+  },
+  {
+    name: '三、別上當',
+    teach: '這一次，法條反過來了。別急著重施上一招——先把牆上的字讀清楚。',
+    map: [
+      '#######',
+      '#@...E#',
+      '#.....#',
+      '#..N..#',
+      '#######',
+    ],
+    laws: [
+      { text: '外鄉人得自由離去。', verb: 'leave', who: 'outsider', mode: 'permit' },
+      { text: '市民不得離開本村。', verb: 'leave', who: 'citizen', mode: 'forbid' },
+      { text: '領受本村之名者，即為市民。', def: 'name' },
+    ],
+    goal: 'leave',
+    hintWin: '這次名字是陷阱：領了就成市民，反而走不了。你忍住沒拿，以外鄉人的身分大方走出去。同一個東西，上一關是鑰匙，這一關是鎖。',
+  },
+];
