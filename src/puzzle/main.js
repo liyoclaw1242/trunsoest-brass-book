@@ -28,7 +28,7 @@ function renderDots() {
 function render() {
   const s = puz.status();
   renderDots();
-  $('levelsel').textContent = `第 ${idx + 1} / ${LEVELS.length} 關`;
+  $('levelsel').textContent = `第 ${idx + 1} / ${LEVELS.length} 關　·　步數 ${puz.history.length}`;
   $('lvname').textContent = puz.level.name;
   $('teach').textContent = puz.level.teach || '';
   const g = $('grid');
@@ -41,7 +41,7 @@ function render() {
     if ((x + y) % 2) cls.push('alt');
     if (isWall) cls.push('wall');
     if (!isWall && ear.has(key)) cls.push('earshot');
-    if (objHere && objHere.type === 'exit') cls.push('exit');
+    if (objHere && objHere.type === 'exit') { cls.push('exit'); if (s.leaveAllowed) cls.push('open'); }
     let glyph = '';
     if (s.pos[0] === x && s.pos[1] === y) glyph = s.citizen ? '🧑‍🌾' : '🧍';
     else if (objHere) glyph = GLYPH[objHere.type] || '';

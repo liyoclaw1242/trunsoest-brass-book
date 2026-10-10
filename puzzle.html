@@ -24,7 +24,10 @@
   .cell.wall{background:var(--wall);box-shadow:inset 0 0 0 1px #3a322b}
   .cell.earshot::after{content:"";position:absolute;inset:0;background:var(--earshot);border-radius:6px}
   .cell.exit{background:#d9c9a3}
-  .tok{position:relative;z-index:1;filter:drop-shadow(0 2px 1px rgba(0,0,0,.25))}
+  .tok{position:relative;z-index:1;filter:drop-shadow(0 2px 1px rgba(0,0,0,.25));animation:pop .13s ease-out}
+  @keyframes pop{from{transform:scale(.6);opacity:.4}to{transform:scale(1);opacity:1}}
+  .cell.open{box-shadow:inset 0 0 0 2px var(--good),0 0 12px rgba(143,201,138,.55);animation:glow 1.1s ease-in-out infinite alternate}
+  @keyframes glow{from{box-shadow:inset 0 0 0 2px var(--good),0 0 6px rgba(143,201,138,.4)}to{box-shadow:inset 0 0 0 2px var(--good),0 0 16px rgba(143,201,138,.75)}}
   #controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
   button{background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 14px;font:inherit;cursor:pointer}
   button:hover{background:#4a4238}
