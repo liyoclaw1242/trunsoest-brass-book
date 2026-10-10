@@ -47,7 +47,8 @@ export class Hud {
     兩個時鐘在走：<b>同化度</b>你管得了（被抓、接受好處會漲，躲到聽不到廣播處會退）；<b>活性</b>停不下來（時間與村民的勞動餵養它，滿了書就活過來）。<br>
     喚醒村民＝讓他們罷工，書會變弱、漲得慢。出路：逃出影響範圍，或封印這本書。畫面上方「目前目標」會提示你下一步。</div>
     <div class="small" style="margin-top:14px;color:var(--faint)">WASD／方向鍵移動　Shift 奔跑　E 互動（數字鍵選其他）　N 筆記　Tab 設計者視角</div>
-    <label>種子　<input id="seed-in" value="${seed}"></label><button id="btn-start">踏進村子</button>`;
+    <label>種子　<input id="seed-in" value="${seed}"></label><button id="btn-start">踏進村子</button>
+    <div class="small" style="margin-top:16px;color:var(--faint)">想玩「鑽規則漏洞」的解謎版？ <a href="/puzzle.html" style="color:var(--brass)">規則書 · 鑽漏洞 →</a></div>`;
     o.querySelector('#btn-start').onclick = () => { const sv = o.querySelector('#seed-in').value.trim(); o.hidden = true; onStart(sv); };
   }
   showEnd(state, reason, st) {
