@@ -3,7 +3,7 @@ import { Puzzle } from './game.js';
 import { LEVELS } from './levels.js';
 
 const $ = id => document.getElementById(id);
-const GLYPH = { exit: '🚪', name: '📛', clothes: '👕', notice: '🪧', speaker: '📣', goat: '🐐', book: '📖', wilddeep: '🌲', villager: '🧑‍🌾', shed: '🧺' };
+const GLYPH = { exit: '🚪', name: '📛', clothes: '👕', notice: '🪧', speaker: '📣', goat: '🐐', book: '📖', wilddeep: '🌲', villager: '👷', shed: '🧺', door: '🚧' };
 const KEY = 'rb_puzzle_v2';
 
 let idx = 0, puz = new Puzzle(LEVELS[0]);
@@ -57,8 +57,9 @@ function updateBoard() {
   }
   for (const o of puz.objs) {
     const e = tokenEls.get(o.id); if (!e) continue;
-    e.style.display = o.gone ? 'none' : '';
-    if (o.gone) continue;
+    const hidden = o.gone || (o.type === 'door' && o.state === 'open');
+    e.style.display = hidden ? 'none' : '';
+    if (hidden) continue;
     setPos(e, o.x, o.y);
     e.querySelector('.g').textContent = GLYPH[o.type];
     let b = e.querySelector('.badge');

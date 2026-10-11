@@ -3,7 +3,6 @@
 
 const WALKABLE = new Set(['exit', 'name', 'clothes', 'notice', 'wilddeep', 'shed']);
 const PUSHABLE = new Set(['goat', 'speaker', 'book', 'villager']);
-const DEF_OF = { name: 'name', clothes: 'clothes' };
 
 export class Puzzle {
   constructor(level) {
@@ -14,8 +13,8 @@ export class Puzzle {
       const ch = level.map[y][x];
       if (ch === '#') { this.walls.add(x + ',' + y); continue; }
       if (ch === '@') { this.startPos = [x, y]; continue; }
-      const t = { E: 'exit', N: 'name', C: 'clothes', K: 'notice', S: 'speaker', G: 'goat', B: 'book', V: 'villager', x: 'wilddeep', H: 'shed' }[ch];
-      if (t) this.objs.push({ id: 'o' + (n++), type: t, x, y, ox: x, oy: y, gone: false, carries: null });
+      const t = { E: 'exit', N: 'name', C: 'clothes', K: 'notice', S: 'speaker', G: 'goat', B: 'book', V: 'villager', x: 'wilddeep', H: 'shed', D: 'door' }[ch];
+      if (t) this.objs.push({ id: 'o' + (n++), type: t, x, y, ox: x, oy: y, gone: false, carries: null, state: t === 'door' ? 'closed' : null, ostate: t === 'door' ? 'closed' : null });
     }
     this.laws = level.laws.map((l, i) => ({ ...l, id: 'L' + i }));
     // 把廣播器連到它所播的法與半徑
@@ -29,7 +28,7 @@ export class Puzzle {
     this.pos = [...this.startPos];
     this.has = new Set(this.level.has || []);
     this.heard = new Set();
-    for (const o of this.objs) { o.x = o.ox; o.y = o.oy; o.gone = false; o.carries = null; }
+    for (const o of this.objs) { o.x = o.ox; o.y = o.oy; o.gone = false; o.carries = null; o.state = o.ostate; }
     this.history = [];
     this.won = false; this.msg = '';
     this.refreshHeard();
@@ -76,12 +75,12 @@ export class Puzzle {
   // ---------- 行動 ----------
   snapshot() {
     return JSON.stringify({ pos: this.pos, has: [...this.has], heard: [...this.heard],
-      objs: this.objs.map(o => [o.x, o.y, o.gone ? 1 : 0, o.carries || '']) });
+      objs: this.objs.map(o => [o.x, o.y, o.gone ? 1 : 0, o.carries || '', o.state || '']) });
   }
   restore(s) {
     const d = JSON.parse(s);
     this.pos = d.pos; this.has = new Set(d.has); this.heard = new Set(d.heard);
-    d.objs.forEach((v, i) => { const o = this.objs[i]; o.x = v[0]; o.y = v[1]; o.gone = !!v[2]; o.carries = v[3] || null; });
+    d.objs.forEach((v, i) => { const o = this.objs[i]; o.x = v[0]; o.y = v[1]; o.gone = !!v[2]; o.carries = v[3] || null; o.state = v[4] || null; });
     this.won = false; this.msg = '';
   }
   undo() { if (this.history.length) { this.restore(this.history.pop()); return true; } return false; }
@@ -91,7 +90,7 @@ export class Puzzle {
     if (this.won) return { moved: false };
     const before = this.snapshot();
     const r = this._apply(dir);
-    if (r.moved) { this.history.push(before); this.refreshHeard(); if (this.checkWin()) { this.won = true; r.win = true; } }
+    if (r.moved) { this.history.push(before); this.openGates(); this.refreshHeard(); if (this.checkWin()) { this.won = true; r.win = true; } }
     this.msg = r.msg || '';
     return r;
   }
@@ -112,6 +111,7 @@ export class Puzzle {
     if (o.type === 'clothes') { if (this.takeForbidden('clothes')) return { moved: false, msg: '你被禁止穿上本村的衣服。' }; this.has.add('clothes'); o.gone = true; this.pos = [tx, ty]; return { moved: true, msg: '你換上了本村的衣服。' }; }
     if (o.type === 'shed') { this.has.clear(); this.pos = [tx, ty]; return { moved: true, msg: '你脫下了本村的身分，又成了外鄉人。' }; }
     if (o.type === 'notice') { if (o.law) this.heard.add(o.law); else for (const l of this.laws) if (l.src === 'notice') this.heard.add(l.id); this.pos = [tx, ty]; return { moved: true, msg: '你讀了公告——它現在綁得住你了。' }; }
+    if (o.type === 'door') { if (o.state === 'open') { this.pos = [tx, ty]; return { moved: true }; } return { moved: false, msg: '門鎖著——外鄉人開不了，得有市民去開。' }; }
 
     if (PUSHABLE.has(o.type)) {
       if (this.moveForbidden(o)) return { moved: false, msg: o.type === 'book' ? '外鄉人不得搬動黃銅書。' : o.type === 'goat' ? '外鄉人不得牽引牲口。' : '法條禁止你搬動它。' };
@@ -122,14 +122,21 @@ export class Puzzle {
       if (o.type === 'goat' && beyond && beyond.type === 'notice') { beyond.gone = true; o.x = bx; o.y = by; this.pos = [tx, ty]; return { moved: true, msg: '山羊把公告吃了——那條法沒人讀得到了。' }; }
       // 山羊被推到書上 → 馱起書
       if (o.type === 'goat' && beyond && beyond.type === 'book') { beyond.gone = true; o.carries = 'book'; o.x = bx; o.y = by; this.pos = [tx, ty]; return { moved: true, msg: '山羊馱起了黃銅書。' }; }
-      // 後面若是實心物（另一個可推物）才擋；地貼類（出口、荒野）可以推上去
-      if (beyond && !WALKABLE.has(beyond.type)) return { moved: false, msg: '推不動，後面有東西。' };
+      // 後面若是實心物才擋；地貼類（出口、荒野）與開著的門可以推上去
+      if (beyond && !WALKABLE.has(beyond.type) && !(beyond.type === 'door' && beyond.state === 'open')) return { moved: false, msg: '推不動，後面有東西。' };
       o.x = bx; o.y = by; this.pos = [tx, ty];
       return { moved: true };
     }
     return { moved: false, msg: '過不去。' };
   }
 
+  /** 市民（村民）走到門旁，門就開了（外鄉人自己開不了）。 */
+  openGates() {
+    for (const d of this.objs) {
+      if (d.gone || d.type !== 'door' || d.state === 'open') continue;
+      if (this.objs.some(v => v.type === 'villager' && !v.gone && Math.abs(v.x - d.x) + Math.abs(v.y - d.y) === 1)) { d.state = 'open'; this.msg = '市民替你把門開了。'; }
+    }
+  }
   checkWin() {
     if (this.goal === 'leave') return this.pos[0] === this.at0('exit')?.x && this.pos[1] === this.at0('exit')?.y && this.leaveAllowed();
     if (this.goal === 'bookOut') {
