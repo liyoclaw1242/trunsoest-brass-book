@@ -5,9 +5,9 @@ const WALKABLE = new Set(['exit', 'name', 'clothes', 'notice', 'wilddeep', 'shed
 const PUSHABLE = new Set(['goat', 'speaker', 'book', 'villager', 'tile']);
 
 // Baba 式字塊：法條由可推動的字塊排成一句「主詞 情態 動詞」而生效；玩家推字塊就能改規則。
-const SUBJ = { '外鄉人': 'outsider', '市民': 'citizen', '任何人': 'any', '山羊': 'goat' };
+const SUBJ = { '外鄉人': 'outsider', '市民': 'citizen', '任何人': 'any', '山羊': 'goat', '物': 'item' };
 const MODAL = { '不得': 'forbid', '得': 'permit' };
-const VERB = { '離開': 'leave', '進入': 'enter', '搬書': 'move' };
+const VERB = { '離開': 'leave', '進入': 'enter', '搬書': 'move', '推': 'push', '吃': 'eat' };
 const TILE_KIND = w => (w in SUBJ ? 'subject' : w in MODAL ? 'modal' : w in VERB ? 'verb' : 'word');
 
 export class Puzzle {
@@ -119,6 +119,18 @@ export class Puzzle {
   moveForbidden(obj) {
     return this.laws.some(l => (l.verb === 'move' || l.verb === 'lead') && l.mode === 'forbid' && (l.target ? l.target === obj.type : true) && this.applies(l) && this.active(l));
   }
+  /** 物件對應的「主詞」身分（供「物不得推」「山羊不得吃」這類管物件的法用）。 */
+  objWho(o) { return o.type === 'goat' ? ['goat', 'item'] : ['item']; }
+  playerWho() { return [this.isCitizen() ? 'citizen' : 'outsider', 'any']; }
+  /** 推動某物是否被法條禁止（可針對推的人，也可針對被推的物，如「物不得推」）。 */
+  pushForbidden(o) {
+    const whos = new Set([...this.playerWho(), ...this.objWho(o)]);
+    return this.laws.some(l => l.mode === 'forbid' && (l.verb === 'push' || l.verb === 'move') && this.active(l) && (!l.who || l.who === 'any' || whos.has(l.who)));
+  }
+  /** 山羊吃東西是否被法條禁止（如「山羊不得吃」）。 */
+  eatForbidden() {
+    return this.laws.some(l => l.mode === 'forbid' && l.verb === 'eat' && this.active(l) && (!l.who || l.who === 'any' || l.who === 'goat' || l.who === 'item'));
+  }
 
   // ---------- 行動 ----------
   snapshot() {
@@ -170,11 +182,12 @@ export class Puzzle {
     if (PUSHABLE.has(o.type)) {
       if (o.type === 'tile' && o.fixed) return { moved: false, msg: '這個字塊像是刻死的，推不動。' };
       if (this.moveForbidden(o)) return { moved: false, msg: o.type === 'book' ? '外鄉人不得搬動黃銅書。' : o.type === 'goat' ? '外鄉人不得牽引牲口。' : '法條禁止你搬動它。' };
+      if (o.type !== 'tile' && this.pushForbidden(o)) return { moved: false, msg: '法條禁止推動' + (o.type === 'goat' ? '牲口' : '物品') + '。（先改掉那條法）' };
       const bx = tx + dx, by = ty + dy;
       if (this.wall(bx, by)) return { moved: false, msg: '推不動，後面是牆。' };
       const beyond = this.at(bx, by);
       // 山羊被推到公告上 → 吃掉公告
-      if (o.type === 'goat' && beyond && beyond.type === 'notice') { beyond.gone = true; o.x = bx; o.y = by; this.pos = [tx, ty]; return { moved: true, msg: '山羊把公告吃了——那條法沒人讀得到了。' }; }
+      if (o.type === 'goat' && beyond && beyond.type === 'notice') { if (this.eatForbidden()) return { moved: false, msg: '法條禁止山羊吃紙。（先改掉那條法）' }; beyond.gone = true; o.x = bx; o.y = by; this.pos = [tx, ty]; return { moved: true, msg: '山羊把公告吃了——那條法沒人讀得到了。' }; }
       // 山羊被推到書上 → 馱起書
       if (o.type === 'goat' && beyond && beyond.type === 'book') { beyond.gone = true; o.carries = 'book'; o.x = bx; o.y = by; this.pos = [tx, ty]; return { moved: true, msg: '山羊馱起了黃銅書。' }; }
       // 後面若是實心物才擋；地貼類（出口、荒野）與開著的門可以推上去
