@@ -24,6 +24,11 @@ export class Puzzle {
     }
     // 可推動的字塊（Baba 式：玩家自己排規則）
     for (const t of (level.tiles || [])) this.objs.push({ id: 'o' + (n++), type: 'tile', word: t.word, kind: TILE_KIND(t.word), x: t.x, y: t.y, ox: t.x, oy: t.y, gone: false, carries: null, state: null, ostate: null });
+    // 活書：大型關裡書不停立法——預先造好「還沒寫下」的字塊（隱藏），每隔幾步揭露一組
+    this.livingBook = level.livingBook || null;
+    if (this.livingBook) this.livingBook.writes.forEach((grp, g) => grp.forEach(t =>
+      this.objs.push({ id: 'o' + (n++), type: 'tile', word: t.word, kind: TILE_KIND(t.word), x: t.x, y: t.y, ox: t.x, oy: t.y, gone: true, pending: true, group: g, carries: null, state: null, ostate: null })));
+    for (const o of this.objs) o.ogone = o.gone;
     // 固定法條（給教學關）；大型關的法多由字塊即時解析而來
     this.staticLaws = (level.laws || []).map((l, i) => ({ ...l, id: 'L' + i }));
     const spLaw = this.staticLaws.find(l => l.src === 'speaker');
@@ -36,7 +41,8 @@ export class Puzzle {
     this.pos = [...this.startPos];
     this.has = new Set(this.level.has || []);
     this.heard = new Set();
-    for (const o of this.objs) { o.x = o.ox; o.y = o.oy; o.gone = false; o.carries = null; o.state = o.ostate; }
+    this.turn = 0; this.bookIdx = 0;
+    for (const o of this.objs) { o.x = o.ox; o.y = o.oy; o.gone = o.ogone; o.carries = null; o.state = o.ostate; }
     this.history = [];
     this.won = false; this.msg = '';
     this.refreshHeard();
@@ -101,12 +107,12 @@ export class Puzzle {
 
   // ---------- 行動 ----------
   snapshot() {
-    return JSON.stringify({ pos: this.pos, has: [...this.has], heard: [...this.heard],
+    return JSON.stringify({ pos: this.pos, has: [...this.has], heard: [...this.heard], turn: this.turn, bookIdx: this.bookIdx,
       objs: this.objs.map(o => [o.x, o.y, o.gone ? 1 : 0, o.carries || '', o.state || '']) });
   }
   restore(s) {
     const d = JSON.parse(s);
-    this.pos = d.pos; this.has = new Set(d.has); this.heard = new Set(d.heard);
+    this.pos = d.pos; this.has = new Set(d.has); this.heard = new Set(d.heard); this.turn = d.turn || 0; this.bookIdx = d.bookIdx || 0;
     d.objs.forEach((v, i) => { const o = this.objs[i]; o.x = v[0]; o.y = v[1]; o.gone = !!v[2]; o.carries = v[3] || null; o.state = v[4] || null; });
     this.won = false; this.msg = '';
     this.refreshHeard(); this.refreshRules();
@@ -118,7 +124,7 @@ export class Puzzle {
     if (this.won) return { moved: false };
     const before = this.snapshot();
     const r = this._apply(dir);
-    if (r.moved) { this.history.push(before); this.openGates(); this.refreshHeard(); this.refreshRules(); if (this.checkWin()) { this.won = true; r.win = true; } }
+    if (r.moved) { this.history.push(before); this.turn++; this.bookWrite(); this.openGates(); this.refreshHeard(); this.refreshRules(); if (this.checkWin()) { this.won = true; r.win = true; } }
     this.msg = r.msg || '';
     return r;
   }
@@ -158,6 +164,14 @@ export class Puzzle {
     return { moved: false, msg: '過不去。' };
   }
 
+  /** 活書：每隔 everyN 步，揭露下一組「書寫下」的字塊（規則隨時間增加）。 */
+  bookWrite() {
+    if (!this.livingBook || this.bookIdx >= this.livingBook.writes.length) return;
+    if (this.turn % this.livingBook.everyN !== 0) return;
+    for (const o of this.objs) if (o.pending && o.group === this.bookIdx) o.gone = false;
+    this.bookIdx++;
+    this.msg = '書又寫下了一條新規則……';
+  }
   /** 市民（村民）走到門旁，門就開了（外鄉人自己開不了）。 */
   openGates() {
     for (const d of this.objs) {
@@ -192,6 +206,7 @@ export class Puzzle {
     return { pos: [...this.pos], w: this.w, h: this.h, won: this.won, msg: this.msg,
       citizen: this.isCitizen(), has: [...this.has], heard: [...this.heard], leaveAllowed: this.leaveAllowed(),
       walls: [...this.walls], objs: this.objs.filter(o => !o.gone).map(o => ({ type: o.type, x: o.x, y: o.y, carries: o.carries })),
-      goal: this.goal };
+      goal: this.goal,
+      book: this.livingBook ? { remaining: this.livingBook.writes.length - this.bookIdx, nextIn: this.bookIdx < this.livingBook.writes.length ? (this.livingBook.everyN - (this.turn % this.livingBook.everyN)) : null } : null };
   }
 }

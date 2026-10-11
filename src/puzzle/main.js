@@ -112,7 +112,8 @@ function render() {
   const goalTxt = puz.goal === 'leave' ? (s.leaveAllowed ? '<span style="color:var(--good)">此刻可離開</span>' : '<span style="color:var(--bad)">此刻不得離開</span>')
     : puz.goal === 'bookOut' ? '目標：把書弄進荒野 🌲'
     : puz.goal === 'reset' ? '目標：逼書自相矛盾，寫出「以上規則無效」' : '';
-  $('status').innerHTML = `你現在是 <span class="pill ${s.citizen ? 'cit' : 'out'}">${s.citizen ? '市　民' : '外鄉人'}</span>　` + goalTxt;
+  const bookTxt = s.book ? `<div style="margin-top:8px;color:var(--brass)">📖 這本書還活著：還要寫 ${s.book.remaining} 條${s.book.nextIn != null ? `，再走 ${s.book.nextIn} 步寫下一條` : ''}。</div>` : '';
+  $('status').innerHTML = `你現在是 <span class="pill ${s.citizen ? 'cit' : 'out'}">${s.citizen ? '市　民' : '外鄉人'}</span>　` + goalTxt + bookTxt;
   $('heard').textContent = s.heard.length ? '已被這些法綁住：' + s.heard.map(id => puz.law(id)?.text || id).join('；') : '';
   const m = $('msg'); m.textContent = s.msg || ''; m.className = /不得|推不動|牆|過不去|禁止/.test(s.msg) ? 'bad' : /出去|吃了|馱|領|換上|繞|脫下/.test(s.msg) ? 'good' : '';
   if (s.won) win();
