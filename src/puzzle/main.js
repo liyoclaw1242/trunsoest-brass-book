@@ -62,7 +62,7 @@ function buildBoard() {
   const tk = $('tokens'); tk.innerHTML = ''; tokenEls = new Map();
   const mk = (id, glyph) => { const e = document.createElement('div'); e.className = 'token'; e.innerHTML = `<span class="g">${glyph}</span>`; tk.appendChild(e); tokenEls.set(id, e); return e; };
   for (const o of puz.objs) {
-    if (o.type === 'tile') { const e = mk(o.id, o.word); e.classList.add('tile', o.kind); }
+    if (o.type === 'tile') { const e = mk(o.id, o.word); e.classList.add('tile', o.kind); if (o.fixed) e.classList.add('fixed'); }
     else if (GLYPH[o.type]) mk(o.id, GLYPH[o.type]);
   }
   mk('player', '🧍');

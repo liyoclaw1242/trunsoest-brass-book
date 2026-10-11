@@ -23,11 +23,11 @@ export class Puzzle {
       if (t) this.objs.push({ id: 'o' + (n++), type: t, x, y, ox: x, oy: y, gone: false, carries: null, state: t === 'door' ? 'closed' : null, ostate: t === 'door' ? 'closed' : null });
     }
     // 可推動的字塊（Baba 式：玩家自己排規則）
-    for (const t of (level.tiles || [])) this.objs.push({ id: 'o' + (n++), type: 'tile', word: t.word, kind: TILE_KIND(t.word), x: t.x, y: t.y, ox: t.x, oy: t.y, gone: false, carries: null, state: null, ostate: null });
+    for (const t of (level.tiles || [])) this.objs.push({ id: 'o' + (n++), type: 'tile', word: t.word, kind: TILE_KIND(t.word), fixed: !!t.fixed, x: t.x, y: t.y, ox: t.x, oy: t.y, gone: false, carries: null, state: null, ostate: null });
     // 活書：大型關裡書不停立法——預先造好「還沒寫下」的字塊（隱藏），每隔幾步揭露一組
     this.livingBook = level.livingBook || null;
     if (this.livingBook) this.livingBook.writes.forEach((grp, g) => grp.forEach(t =>
-      this.objs.push({ id: 'o' + (n++), type: 'tile', word: t.word, kind: TILE_KIND(t.word), x: t.x, y: t.y, ox: t.x, oy: t.y, gone: true, pending: true, group: g, carries: null, state: null, ostate: null })));
+      this.objs.push({ id: 'o' + (n++), type: 'tile', word: t.word, kind: TILE_KIND(t.word), fixed: !!t.fixed, x: t.x, y: t.y, ox: t.x, oy: t.y, gone: true, pending: true, group: g, carries: null, state: null, ostate: null })));
     for (const o of this.objs) o.ogone = o.gone;
     // 固定法條（給教學關）；大型關的法多由字塊即時解析而來
     this.staticLaws = (level.laws || []).map((l, i) => ({ ...l, id: 'L' + i }));
@@ -148,6 +148,7 @@ export class Puzzle {
     if (o.type === 'door') { if (o.state === 'open') { this.pos = [tx, ty]; return { moved: true }; } return { moved: false, msg: '門鎖著——外鄉人開不了，得有市民去開。' }; }
 
     if (PUSHABLE.has(o.type)) {
+      if (o.type === 'tile' && o.fixed) return { moved: false, msg: '這個字塊像是刻死的，推不動。' };
       if (this.moveForbidden(o)) return { moved: false, msg: o.type === 'book' ? '外鄉人不得搬動黃銅書。' : o.type === 'goat' ? '外鄉人不得牽引牲口。' : '法條禁止你搬動它。' };
       const bx = tx + dx, by = ty + dy;
       if (this.wall(bx, by)) return { moved: false, msg: '推不動，後面是牆。' };
