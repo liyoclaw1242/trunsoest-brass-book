@@ -47,7 +47,7 @@ export class Puzzle {
     this.pos = [...this.startPos];
     this.has = new Set(this.level.has || []);
     this.heard = new Set();
-    this.turn = 0; this.bookIdx = 0; this.voided = false; this.didReset = false; this.penRule = 0; this.penWord = 0; this.penAnchor = null; this.penDir = null;
+    this.turn = 0; this.bookIdx = 0; this.voided = false; this.didReset = false; this.lost = false; this.penRule = 0; this.penWord = 0; this.penAnchor = null; this.penDir = null;
     for (const o of this.objs) { o.x = o.ox; o.y = o.oy; o.gone = o.ogone; o.carries = null; o.state = o.ostate; if (o.reactive) { o.word = ''; o.kind = 'word'; } }
     this.history = [];
     this.won = false; this.msg = '';
@@ -134,13 +134,13 @@ export class Puzzle {
 
   // ---------- 行動 ----------
   snapshot() {
-    return JSON.stringify({ pos: this.pos, has: [...this.has], heard: [...this.heard], turn: this.turn, bookIdx: this.bookIdx, penRule: this.penRule, penWord: this.penWord, penAnchor: this.penAnchor, penDir: this.penDir, voided: this.voided ? 1 : 0, didReset: this.didReset ? 1 : 0,
+    return JSON.stringify({ pos: this.pos, has: [...this.has], heard: [...this.heard], turn: this.turn, bookIdx: this.bookIdx, penRule: this.penRule, penWord: this.penWord, penAnchor: this.penAnchor, penDir: this.penDir, voided: this.voided ? 1 : 0, didReset: this.didReset ? 1 : 0, lost: this.lost ? 1 : 0,
       objs: this.objs.map(o => [o.x, o.y, o.gone ? 1 : 0, o.carries || '', o.state || '', o.word || '']) });
   }
   restore(s) {
     const d = JSON.parse(s);
     this.pos = d.pos; this.has = new Set(d.has); this.heard = new Set(d.heard); this.turn = d.turn || 0; this.bookIdx = d.bookIdx || 0;
-    this.penRule = d.penRule || 0; this.penWord = d.penWord || 0; this.penAnchor = d.penAnchor || null; this.penDir = d.penDir || null; this.voided = !!d.voided; this.didReset = !!d.didReset;
+    this.penRule = d.penRule || 0; this.penWord = d.penWord || 0; this.penAnchor = d.penAnchor || null; this.penDir = d.penDir || null; this.voided = !!d.voided; this.didReset = !!d.didReset; this.lost = !!d.lost;
     d.objs.forEach((v, i) => { const o = this.objs[i]; o.x = v[0]; o.y = v[1]; o.gone = !!v[2]; o.carries = v[3] || null; o.state = v[4] || null; if (o.type === 'tile') { o.word = v[5] || o.word; o.kind = TILE_KIND(o.word); } });
     this.won = false; this.msg = '';
     this.refreshHeard(); this.refreshRules();
@@ -149,13 +149,18 @@ export class Puzzle {
 
   /** dir: [dx,dy]。回傳 { moved, win, msg }。 */
   move(dir) {
-    if (this.won) return { moved: false };
+    if (this.won || this.lost) return { moved: false };
     const before = this.snapshot();
     const r = this._apply(dir);
     if (r.moved) {
       this.history.push(before); this.turn++; this.bookWrite(); this.reactiveWrite(); this.openGates(); this.refreshHeard(); this.refreshRules();
       if (!this.voided && this.hasContradiction()) this.triggerReset();
       if (this.checkWin()) { this.won = true; r.win = true; }
+      else if (this.level.deadline != null && this.turn >= this.level.deadline) {
+        // 將軍：書搶在你之前把規則填滿、寫下必殺令——你困死在這裡。
+        this.lost = true; r.lost = true;
+        r.msg = this.level.killer || '書搶先一步把規則填滿了全場、寫下對你的必殺令——你被將死，困在這裡了。';
+      }
     }
     this.msg = r.msg || '';
     return r;
@@ -268,10 +273,11 @@ export class Puzzle {
   at0(type) { return this.objs.find(o => o.type === type); }
 
   status() {
-    return { pos: [...this.pos], w: this.w, h: this.h, won: this.won, msg: this.msg,
+    return { pos: [...this.pos], w: this.w, h: this.h, won: this.won, lost: this.lost, msg: this.msg,
       citizen: this.isCitizen(), has: [...this.has], heard: [...this.heard], leaveAllowed: this.leaveAllowed(),
       walls: [...this.walls], objs: this.objs.filter(o => !o.gone).map(o => ({ type: o.type, x: o.x, y: o.y, carries: o.carries })),
       goal: this.goal,
+      deadline: this.level.deadline ?? null, turnsLeft: this.level.deadline != null ? Math.max(0, this.level.deadline - this.turn) : null,
       book: this.livingBook ? { remaining: this.livingBook.writes.length - this.bookIdx, nextIn: this.bookIdx < this.livingBook.writes.length ? (this.livingBook.everyN - (this.turn % this.livingBook.everyN)) : null } : null };
   }
 }

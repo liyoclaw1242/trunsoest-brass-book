@@ -61,6 +61,10 @@
   #win .card{background:var(--panel);border:1px solid var(--brass);border-radius:14px;padding:30px 34px;max-width:460px;text-align:center}
   #win h1{font-size:26px;margin-bottom:12px}
   #win p{color:var(--ink);font-size:15px;line-height:1.7}
+  #lose{position:fixed;inset:0;background:rgba(20,17,14,.86);display:none;align-items:center;justify-content:center;z-index:10}
+  #lose .card.lose{background:var(--panel);border:1px solid var(--bad);border-radius:14px;padding:30px 34px;max-width:460px;text-align:center}
+  #lose h1{font-size:26px;margin-bottom:12px;color:var(--bad)}
+  #lose p{color:var(--ink);font-size:15px;line-height:1.7}
   #levelsel{color:var(--faint);font-size:12px;margin-top:2px}
   #dpad{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:2px}
   #dpad .row{display:flex;gap:6px}
@@ -109,6 +113,7 @@
     <div id="keys">方向鍵／WASD 移動 · Z 復原 · R 重來</div>
   </div>
   <div id="win"><div class="card"><h1 id="win-h">出去了</h1><p id="win-text"></p><button class="primary" id="b-wnext">下一關 →</button></div></div>
+  <div id="lose"><div class="card lose"><h1 id="lose-h">被將死</h1><p id="lose-text"></p><div style="display:flex;gap:10px;justify-content:center;margin-top:22px"><button id="b-undo2">↶ 退一步 (Z)</button><button class="primary" id="b-retry">↺ 整關重來 (R)</button></div></div></div>
   <div id="intro"><div class="card">
     <h1>規則書 · 鑽漏洞</h1>
     <p>你誤入一個由一本「活規則書」統治的村子。它不斷立法，把你綁在這裡。</p>

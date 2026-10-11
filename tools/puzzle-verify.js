@@ -7,8 +7,8 @@ function solve(level) {
   const start = p.snapshot();
   const seen = new Set([start]);
   let frontier = [[start, '']]; let depth = 0;
-  const CAP = 500000;
-  while (frontier.length && depth < 60) {
+  const CAP = 800000;
+  while (frontier.length && depth < 90) {
     if (seen.size > CAP) return { ok: false, explored: seen.size, capped: true };
     const next = [];
     for (const [s, path] of frontier) {
@@ -16,8 +16,9 @@ function solve(level) {
         p.restore(s); p.won = false;
         const r = p.move(d);
         if (!r.moved) continue;
+        if (p.lost) continue;                 // 書將軍＝死局，這條路不通
         const ns = p.snapshot();
-        if (p.won) return { ok: true, len: path.length + 1, path: path + k };
+        if (p.won) return { ok: true, len: path.length + 1, path: path + k, explored: seen.size };
         if (!seen.has(ns)) { seen.add(ns); next.push([ns, path + k]); }
       }
     }
@@ -28,7 +29,7 @@ function solve(level) {
 let allok = true;
 for (const lv of LEVELS) {
   const r = solve(lv);
-  if (r.ok) console.log(`PASS  ${lv.name} — 最短解 ${r.len} 步：${r.path}`);
+  if (r.ok) console.log(`PASS  ${lv.name} — 最短解 ${r.len} 步（探索 ${r.explored} 狀態）：${r.path}`);
   else { console.log(`FAIL  ${lv.name} — 找不到解（探索 ${r.explored} 狀態）`); allok = false; }
 }
 console.log(allok ? '所有關卡可解' : '有關卡不可解');

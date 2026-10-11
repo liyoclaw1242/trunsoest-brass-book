@@ -26,10 +26,12 @@ function sfx(kind) {
   else if (kind === 'good') beep(540, 0.1, 'triangle', 0.12);
   else if (kind === 'deny') beep(110, 0.13, 'sawtooth', 0.08);
   else if (kind === 'win') [523, 659, 784, 1047].forEach((f, i) => beep(f, 0.2, 'triangle', 0.13, i * 0.09));
+  else if (kind === 'lose') [330, 247, 175, 131].forEach((f, i) => beep(f, 0.28, 'sawtooth', 0.12, i * 0.1));
 }
 function doMove(dir) {
   const r = puz.move(dir); render();
   if (r.win) sfx('win');
+  else if (r.lost) sfx('lose');
   else if (!r.moved) { sfx('deny'); const g = tokenEls.get('player')?.querySelector('.g'); if (g) { g.classList.remove('shake'); void g.offsetWidth; g.classList.add('shake'); } }
   else sfx(/領|換上|吃了|馱|脫下|開了|繞|讀/.test(r.msg || '') ? 'good' : 'move');
 }
@@ -119,11 +121,19 @@ function render() {
     : puz.goal === 'bookOut' ? '目標：把書弄進荒野 🌲'
     : puz.goal === 'reset' ? '目標：逼書自相矛盾，寫出「以上規則無效」' : '';
   const bookTxt = s.book ? `<div style="margin-top:8px;color:var(--brass)">📖 這本書還活著：還要寫 ${s.book.remaining} 條${s.book.nextIn != null ? `，再走 ${s.book.nextIn} 步寫下一條` : ''}。</div>` : '';
-  $('status').innerHTML = `你現在是 <span class="pill ${s.citizen ? 'cit' : 'out'}">${s.citizen ? '市　民' : '外鄉人'}</span>　` + goalTxt + bookTxt;
+  const dlTxt = s.deadline != null ? `<div style="margin-top:8px;color:${s.turnsLeft <= 5 ? 'var(--bad)' : 'var(--brass)'}">⏳ 將軍倒數：還有 <b>${s.turnsLeft}</b> 步，書就把規則填滿、寫出必殺令。別來回空走。</div>` : '';
+  $('status').innerHTML = `你現在是 <span class="pill ${s.citizen ? 'cit' : 'out'}">${s.citizen ? '市　民' : '外鄉人'}</span>　` + goalTxt + bookTxt + dlTxt;
   $('heard').textContent = s.heard.length ? '已被這些法綁住：' + s.heard.map(id => puz.law(id)?.text || id).join('；') : '';
   const m = $('msg'); m.textContent = s.msg || ''; m.className = /不得|推不動|牆|過不去|禁止/.test(s.msg) ? 'bad' : /出去|吃了|馱|領|換上|繞|脫下/.test(s.msg) ? 'good' : '';
   if (s.won) win();
+  else if (s.lost) lose();
 }
+
+function lose() {
+  $('lose-text').textContent = puz.level.killer || '書搶先把規則填滿，寫下對你的必殺令。你被將死了。';
+  $('lose').style.display = 'flex';
+}
+const hideLose = () => $('lose').style.display = 'none';
 
 function win() {
   if (!solved[idx]) { solved[idx] = true; save(); renderDots(); }
@@ -136,7 +146,7 @@ function win() {
 }
 const hideWin = () => $('win').style.display = 'none';
 
-function load(i) { idx = (i + LEVELS.length) % LEVELS.length; puz = new Puzzle(LEVELS[idx]); hideWin(); buildBoard(); render(); }
+function load(i) { idx = (i + LEVELS.length) % LEVELS.length; puz = new Puzzle(LEVELS[idx]); hideWin(); hideLose(); buildBoard(); render(); }
 function nextLevel() {
   if (idx + 1 < LEVELS.length) return load(idx + 1);
   const unsolved = solved.findIndex(v => !v);
@@ -147,6 +157,11 @@ const DIRS = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRig
 addEventListener('keydown', e => {
   if ($('intro').style.display !== 'none') return;
   if ($('win').style.display === 'flex') { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); nextLevel(); } return; }
+  if ($('lose').style.display === 'flex') {
+    if (/^[zZuU]$/.test(e.key)) { puz.undo(); hideLose(); render(); }
+    else if (/^[rR]$/.test(e.key) || e.key === 'Enter' || e.key === ' ') { e.preventDefault(); puz.reset(); hideLose(); render(); }
+    return;
+  }
   if (DIRS[e.key]) { e.preventDefault(); doMove(DIRS[e.key]); }
   else if (/^[zZuU]$/.test(e.key)) { puz.undo(); render(); }
   else if (/^[rR]$/.test(e.key)) { puz.reset(); render(); }
@@ -154,7 +169,7 @@ addEventListener('keydown', e => {
 
 $('dots').onclick = e => { const d = e.target.closest('.dot'); if (d) load(+d.dataset.i); };
 const DMAP = { U: [0, -1], D: [0, 1], L: [-1, 0], R: [1, 0] };
-$('dpad').onclick = e => { const b = e.target.closest('button'); if (b && !puz.won) doMove(DMAP[b.dataset.d]); };
+$('dpad').onclick = e => { const b = e.target.closest('button'); if (b && !puz.won && !puz.lost) doMove(DMAP[b.dataset.d]); };
 $('b-mute').onclick = () => { muted = !muted; try { localStorage.setItem('rb_puzzle_mute', muted ? '1' : '0'); } catch {} $('b-mute').textContent = muted ? '🔇' : '🔊'; if (!muted) sfx('good'); };
 $('b-mute').textContent = muted ? '🔇' : '🔊';
 $('b-undo').onclick = () => { puz.undo(); render(); };
@@ -162,6 +177,8 @@ $('b-reset').onclick = () => { puz.reset(); render(); };
 $('b-prev').onclick = () => load(idx - 1);
 $('b-next').onclick = () => load(idx + 1);
 $('b-wnext').onclick = nextLevel;
+$('b-retry').onclick = () => { puz.reset(); hideLose(); render(); };
+$('b-undo2').onclick = () => { puz.undo(); hideLose(); render(); };
 $('b-begin').onclick = () => { $('intro').style.display = 'none'; const resume = solved.findIndex(v => !v); load(resume < 0 ? 0 : resume); };
 
 buildBoard(); render();
