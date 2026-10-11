@@ -140,4 +140,17 @@ export const LEVELS = [
     goal: 'leave',
     hintWin: '你把市民推到門邊，門為他而開，你就跟著穿過去。你開不了的門，讓本來就有權的人去開。',
   },
+  {
+    name: '十二、名與門',
+    teach: '出村要過一道只有市民開得了的門（🚧），而且外鄉人根本不准離開。名字、市民（👷），你都用得上。',
+    map: ['#########', '#@.N.D.E#', '#...V..##', '#########'],
+    laws: [
+      { text: '外鄉人不得離開本村。', verb: 'leave', who: 'outsider', mode: 'forbid' },
+      { text: '市民得自由離去。', verb: 'leave', who: 'citizen', mode: 'permit' },
+      { text: '領受本村之名者，即為市民。', def: 'name' },
+      { text: '外鄉人不得開啟村門。（市民方可）', verb: 'open', who: 'outsider', target: 'door', mode: 'forbid' },
+    ],
+    goal: 'leave',
+    hintWin: '你領了名字好讓自己有資格離開，又把市民帶到門邊替你開門——兩道關卡、兩種身分，一次解開。',
+  },
 ];
