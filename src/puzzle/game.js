@@ -32,7 +32,7 @@ export class Puzzle {
     this.reactiveBook = level.reactiveBook || null;
     if (this.reactiveBook) {
       const total = (this.reactiveBook.agenda || []).reduce((s, r) => s + r.length, 0);
-      for (let i = 0; i < total; i++) this.objs.push({ id: 'o' + (n++), type: 'tile', word: '', kind: 'word', fixed: true, reactive: true, x: 0, y: 0, ox: 0, oy: 0, gone: true, carries: null, state: null, ostate: null });
+      for (let i = 0; i < total; i++) this.objs.push({ id: 'o' + (n++), type: 'tile', word: '', kind: 'word', fixed: false, reactive: true, x: 0, y: 0, ox: 0, oy: 0, gone: true, carries: null, state: null, ostate: null });
     }
     for (const o of this.objs) o.ogone = o.gone;
     // 固定法條（給教學關）；大型關的法多由字塊即時解析而來
@@ -47,7 +47,7 @@ export class Puzzle {
     this.pos = [...this.startPos];
     this.has = new Set(this.level.has || []);
     this.heard = new Set();
-    this.turn = 0; this.bookIdx = 0; this.voided = false; this.didReset = false; this.penRule = 0; this.penWord = 0;
+    this.turn = 0; this.bookIdx = 0; this.voided = false; this.didReset = false; this.penRule = 0; this.penWord = 0; this.penAnchor = null; this.penDir = null;
     for (const o of this.objs) { o.x = o.ox; o.y = o.oy; o.gone = o.ogone; o.carries = null; o.state = o.ostate; if (o.reactive) { o.word = ''; o.kind = 'word'; } }
     this.history = [];
     this.won = false; this.msg = '';
@@ -122,13 +122,13 @@ export class Puzzle {
 
   // ---------- 行動 ----------
   snapshot() {
-    return JSON.stringify({ pos: this.pos, has: [...this.has], heard: [...this.heard], turn: this.turn, bookIdx: this.bookIdx, penRule: this.penRule, penWord: this.penWord, voided: this.voided ? 1 : 0, didReset: this.didReset ? 1 : 0,
+    return JSON.stringify({ pos: this.pos, has: [...this.has], heard: [...this.heard], turn: this.turn, bookIdx: this.bookIdx, penRule: this.penRule, penWord: this.penWord, penAnchor: this.penAnchor, penDir: this.penDir, voided: this.voided ? 1 : 0, didReset: this.didReset ? 1 : 0,
       objs: this.objs.map(o => [o.x, o.y, o.gone ? 1 : 0, o.carries || '', o.state || '', o.word || '']) });
   }
   restore(s) {
     const d = JSON.parse(s);
     this.pos = d.pos; this.has = new Set(d.has); this.heard = new Set(d.heard); this.turn = d.turn || 0; this.bookIdx = d.bookIdx || 0;
-    this.penRule = d.penRule || 0; this.penWord = d.penWord || 0; this.voided = !!d.voided; this.didReset = !!d.didReset;
+    this.penRule = d.penRule || 0; this.penWord = d.penWord || 0; this.penAnchor = d.penAnchor || null; this.penDir = d.penDir || null; this.voided = !!d.voided; this.didReset = !!d.didReset;
     d.objs.forEach((v, i) => { const o = this.objs[i]; o.x = v[0]; o.y = v[1]; o.gone = !!v[2]; o.carries = v[3] || null; o.state = v[4] || null; if (o.type === 'tile') { o.word = v[5] || o.word; o.kind = TILE_KIND(o.word); } });
     this.won = false; this.msg = '';
     this.refreshHeard(); this.refreshRules();
@@ -193,33 +193,36 @@ export class Puzzle {
     this.bookIdx++;
     this.msg = '書又寫下了一條新規則……';
   }
-  /** 即時對手：書每隔 everyN 步，在你身旁挑最「貼牆、推不動」的空格刻下 agenda 的下一個字。 */
+  /** 即時對手（性格 C：重新封印＋堵路）：把 agenda 的法排成一條「嵌進牆角壁龕、靠近你」的線，一步刻一字。 */
   reactiveWrite() {
     if (!this.reactiveBook) return;
     if (this.turn % (this.reactiveBook.everyN || 1) !== 0) return;
     const ag = this.reactiveBook.agenda || [];
     if (this.penRule >= ag.length) return;
-    const cell = this.pickAdversarialCell();
-    if (!cell) return;
+    if (this.penWord === 0) { const line = this.chooseLine(ag[this.penRule].length); if (!line) return; this.penAnchor = line.anchor; this.penDir = line.dir; }
+    const x = this.penAnchor[0] + this.penWord * this.penDir[0], y = this.penAnchor[1] + this.penWord * this.penDir[1];
+    if (this.wall(x, y) || this.at(x, y)) return;   // 你擋住了它要寫的格，它這步寫不成（你防住了）
     const slot = this.objs.find(o => o.reactive && o.gone);
     if (!slot) return;
     slot.word = ag[this.penRule][this.penWord]; slot.kind = TILE_KIND(slot.word);
-    slot.x = cell.x; slot.y = cell.y; slot.gone = false;
-    this.penWord++; if (this.penWord >= ag[this.penRule].length) { this.penWord = 0; this.penRule++; }
-    this.msg = '書在你身旁又刻下一個字……';
+    slot.x = x; slot.y = y; slot.gone = false;
+    this.penWord++; if (this.penWord >= ag[this.penRule].length) { this.penWord = 0; this.penRule++; this.penAnchor = null; }
+    this.msg = '書盯著你，在牆邊又刻下一個字……';
   }
-  /** 挑玩家四周一格內、最多牆面相鄰（最難被推走）的空格。 */
-  pickAdversarialCell() {
-    const cands = [];
-    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-      const x = this.pos[0] + dx, y = this.pos[1] + dy;
-      if (this.wall(x, y) || this.at(x, y)) continue;
-      let walls = 0; for (const [ax, ay] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) if (this.wall(x + ax, y + ay) || this.at(x + ax, y + ay)) walls++;
-      cands.push({ x, y, score: walls });
+  /** 挑一條 len 格的直線（橫或直），三格全空，最嵌牆（最難被你推散）、又最靠近你（堵路）。回傳 {anchor,dir}。 */
+  chooseLine(len) {
+    let best = null, bestScore = -1e9;
+    const dirs = [[1, 0], [0, 1]];
+    for (let y = 0; y < this.h; y++) for (let x = 0; x < this.w; x++) for (const [dx, dy] of dirs) {
+      const cells = []; let ok = true;
+      for (let k = 0; k < len; k++) { const cx = x + k * dx, cy = y + k * dy; if (this.wall(cx, cy) || this.at(cx, cy)) { ok = false; break; } cells.push([cx, cy]); }
+      if (!ok) continue;
+      let hug = 0; for (const [cx, cy] of cells) for (const [ax, ay] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) if (this.wall(cx + ax, cy + ay)) hug++;
+      const mid = cells[Math.floor(len / 2)], d = Math.abs(mid[0] - this.pos[0]) + Math.abs(mid[1] - this.pos[1]);
+      const score = hug * 10 - d;   // 牆面為主、靠近你為輔
+      if (score > bestScore) { bestScore = score; best = { anchor: [x, y], dir: [dx, dy] }; }
     }
-    if (!cands.length) return null;
-    cands.sort((a, b) => b.score - a.score || (a.x + a.y) - (b.x + b.y));
-    return cands[0];
+    return best;
   }
   /** 市民（村民）走到門旁，門就開了（外鄉人自己開不了）。 */
   openGates() {

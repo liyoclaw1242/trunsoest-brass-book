@@ -25,7 +25,7 @@
 - **搬動／牽引／領受**：`moveForbidden`（move／lead，書／牲口）、`takeForbidden`（accept，名字／衣物）同樣走 applies＋active。
 - **活書（`livingBook`）**：大型關裡書每隔 `everyN` 步揭露一組預置的隱藏字塊（`writes`），規則隨時間變多。
 - **逼重置（`goal:reset`／或當手段）**：同主詞同動詞一禁一准 → `triggerReset`：全場字塊消失、法條全作廢（`voided`）、活書停筆。可當勝利條件，也可在 leave 關當「清空規則的空檔」。
-- **即時對手（`reactiveBook`）**：`agenda`（想寫的法）＋`everyN`；每次在玩家四鄰最多牆面相鄰（最難推、最能堵）的空格刻一字（`pickAdversarialCell`），臨場反應玩家位置。用隱藏備用字塊池實作，故 snapshot 含字塊的 word。
+- **即時對手（`reactiveBook`，性格 C）**：`agenda`（想寫的法）＋`everyN`；它把一條法排成一條「嵌進牆角壁龕、又靠近你」的直線，一步刻一字（`chooseLine`：牆面為主、靠近你為輔），想重新封印＋堵你的路。書寫下的字塊是「可推動」的，只有被逼進角落才真的卡死（貼牆仍能沿牆推）。用隱藏備用字塊池實作；snapshot 含字塊 word 與 penAnchor/penDir。對手是決定性的，故可用解題器逐關驗證「仍解得開」。
 - **刻死字塊（`fixed`）**：推不動、只供解析顯示；大型關用來擺「滿牆的法」而不炸開 BFS 狀態。
 - **字塊（Baba 核心）**：`level.tiles` 放可推動的字塊；相鄰排成「主詞→情態→動詞」（橫或直）即時解析成一條法（`parseTiles`），每步重算。玩家推字塊＝改規則。字典見 `SUBJ/MODAL/VERB`。
 - **代勞**：山羊被推到書上＝馱書（書的「不得搬動」只綁人）；山羊被推到公告上＝吃掉（`onNotice` 法失效）；把村民（`villager`，市民）推到門（`door`）旁，門自動開（外鄉人開不了門）。
