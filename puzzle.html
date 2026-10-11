@@ -68,8 +68,10 @@
   #dots{display:flex;gap:7px;margin-bottom:2px;flex-wrap:wrap;justify-content:center;max-width:460px}
   #dots .dot{width:26px;height:26px;border-radius:50%;background:var(--panel2);border:1px solid var(--line);color:var(--faint);
     display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;user-select:none}
-  #dots .dot.cur{border-color:var(--brass);color:var(--brass)}
+  #dots .dot.load{border-style:dashed}
+  #dots .dot.cur{border-color:var(--brass);color:var(--brass);border-style:solid}
   #dots .dot.done{background:#3a4a38;color:var(--good);border-color:#3a4a38}
+  #dots .dotsep{align-self:center;font-size:11px;letter-spacing:.1em;color:var(--brass);border-left:1px solid var(--line);padding-left:8px;margin-left:2px;opacity:.8}
   #intro{position:fixed;inset:0;background:rgba(20,17,14,.93);display:flex;align-items:center;justify-content:center;z-index:11}
   #intro .card{background:var(--panel);border:1px solid var(--brass);border-radius:14px;padding:34px 38px;max-width:520px}
   #intro h1{font-size:28px;margin-bottom:16px;text-align:center;color:var(--brass)}
@@ -111,6 +113,7 @@
     <h1>規則書 · 鑽漏洞</h1>
     <p>你誤入一個由一本「活規則書」統治的村子。它不斷立法，把你綁在這裡。</p>
     <p>你走不了，是因為它的法。但法有破綻——讀懂每一條，想辦法鑽過去：成為它定義的「市民」、躲開它的耳朵、讓牲口代勞、撕掉它立法的依據……</p>
+    <p>前十關是<b>教學</b>，一關學一招；之後是<b>負荷關</b>——它把規則與物件層層疊起，滿牆的律法要你一步推翻。</p>
     <p class="small">每關一個小房間、幾條法。答案不會給你，自己想。方向鍵／WASD 移動 · Z 復原 · R 重來。</p>
     <button class="primary" id="b-begin">走進村子 →</button>
     <div class="small" style="text-align:center;margin-top:14px"><a href="/" style="color:var(--faint)">← 沙盒探索版</a></div>

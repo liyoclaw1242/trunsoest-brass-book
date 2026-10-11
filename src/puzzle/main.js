@@ -44,8 +44,12 @@ function earshot() {
   return set;
 }
 
+const TUT_COUNT = LEVELS.filter(l => l.chapter !== 'load').length;
 function renderDots() {
-  $('dots').innerHTML = LEVELS.map((l, i) => `<div class="dot ${i === idx ? 'cur' : ''} ${solved[i] ? 'done' : ''}" data-i="${i}" title="${l.name}">${solved[i] ? '✓' : i + 1}</div>`).join('');
+  $('dots').innerHTML = LEVELS.map((l, i) => {
+    const sep = (i === TUT_COUNT && TUT_COUNT > 0 && TUT_COUNT < LEVELS.length) ? '<div class="dotsep" title="以下為負荷關">負荷</div>' : '';
+    return sep + `<div class="dot ${l.chapter === 'load' ? 'load' : ''} ${i === idx ? 'cur' : ''} ${solved[i] ? 'done' : ''}" data-i="${i}" title="${l.name}">${solved[i] ? '✓' : i + 1}</div>`;
+  }).join('');
 }
 
 let cellEls = new Map(), tokenEls = new Map();
@@ -100,7 +104,9 @@ function updateBoard() {
 function render() {
   const s = puz.status();
   renderDots();
-  $('levelsel').textContent = `第 ${idx + 1} / ${LEVELS.length} 關　·　步數 ${puz.history.length}`;
+  const isLoad = puz.level.chapter === 'load';
+  const chLabel = isLoad ? `負荷關 ${idx - TUT_COUNT + 1} / ${LEVELS.length - TUT_COUNT}` : `教學 ${idx + 1} / ${TUT_COUNT}`;
+  $('levelsel').textContent = `${chLabel}　·　步數 ${puz.history.length}`;
   $('lvname').textContent = puz.level.name;
   $('teach').textContent = puz.level.teach || '';
   updateBoard();
