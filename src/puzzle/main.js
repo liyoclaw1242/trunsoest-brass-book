@@ -29,7 +29,8 @@ function sfx(kind) {
 }
 function doMove(dir) {
   const r = puz.move(dir); render();
-  if (r.win) sfx('win'); else if (!r.moved) sfx('deny');
+  if (r.win) sfx('win');
+  else if (!r.moved) { sfx('deny'); const g = tokenEls.get('player')?.querySelector('.g'); if (g) { g.classList.remove('shake'); void g.offsetWidth; g.classList.add('shake'); } }
   else sfx(/領|換上|吃了|馱|脫下|開了|繞|讀/.test(r.msg || '') ? 'good' : 'move');
 }
 
@@ -75,7 +76,8 @@ function updateBoard() {
   const ear = earshot();
   for (const [k, c] of cellEls) {
     const [x, y] = k.split(',').map(Number), isWall = puz.wall(x, y), o = puz.at(x, y);
-    c.className = 'cell' + ((x + y) % 2 ? ' alt' : '') + (isWall ? ' wall' : '') + (!isWall && ear.has(k) ? ' earshot' : '') + (o && o.type === 'exit' ? ' exit' + (s.leaveAllowed ? ' open' : '') : '');
+    const canGlow = s.leaveAllowed && puz.laws.some(l => l.verb === 'leave');
+    c.className = 'cell' + ((x + y) % 2 ? ' alt' : '') + (isWall ? ' wall' : '') + (!isWall && ear.has(k) ? ' earshot' : '') + (o && o.type === 'exit' ? ' exit' + (canGlow ? ' open' : '') : '');
   }
   for (const o of puz.objs) {
     const e = tokenEls.get(o.id); if (!e) continue;
