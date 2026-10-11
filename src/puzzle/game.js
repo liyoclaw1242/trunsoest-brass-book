@@ -122,10 +122,10 @@ export class Puzzle {
   /** 物件對應的「主詞」身分（供「物不得推」「山羊不得吃」這類管物件的法用）。 */
   objWho(o) { return o.type === 'goat' ? ['goat', 'item'] : ['item']; }
   playerWho() { return [this.isCitizen() ? 'citizen' : 'outsider', 'any']; }
-  /** 推動某物是否被法條禁止（可針對推的人，也可針對被推的物，如「物不得推」）。 */
+  /** 推動某物是否被「推」(push) 類法條禁止（可針對推的人，也可針對被推的物，如「物不得推」）。搬書／牽羊之類仍走 moveForbidden。 */
   pushForbidden(o) {
     const whos = new Set([...this.playerWho(), ...this.objWho(o)]);
-    return this.laws.some(l => l.mode === 'forbid' && (l.verb === 'push' || l.verb === 'move') && this.active(l) && (!l.who || l.who === 'any' || whos.has(l.who)));
+    return this.laws.some(l => l.mode === 'forbid' && l.verb === 'push' && this.active(l) && (l.target ? l.target === o.type : true) && (!l.who || l.who === 'any' || whos.has(l.who)));
   }
   /** 山羊吃東西是否被法條禁止（如「山羊不得吃」）。 */
   eatForbidden() {
