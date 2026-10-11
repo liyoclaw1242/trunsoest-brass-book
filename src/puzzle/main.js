@@ -88,8 +88,8 @@ function updateBoard() {
     e.style.display = hidden ? 'none' : '';
     if (hidden) continue;
     setPos(e, o.x, o.y);
-    e.querySelector('.g').textContent = o.type === 'tile' ? o.word : GLYPH[o.type];
-    if (o.type === 'tile') continue;
+    if (o.type === 'tile') { e.className = 'token tile ' + o.kind + (o.fixed ? ' fixed' : ''); e.querySelector('.g').textContent = o.word; continue; }
+    e.querySelector('.g').textContent = GLYPH[o.type];
     let b = e.querySelector('.badge');
     if (o.carries === 'book') { if (!b) { b = document.createElement('span'); b.className = 'badge'; e.appendChild(b); } b.textContent = '📖'; }
     else if (b) b.remove();

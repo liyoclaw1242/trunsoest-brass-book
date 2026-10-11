@@ -7,7 +7,9 @@ function solve(level) {
   const start = p.snapshot();
   const seen = new Set([start]);
   let frontier = [[start, '']]; let depth = 0;
+  const CAP = 500000;
   while (frontier.length && depth < 60) {
+    if (seen.size > CAP) return { ok: false, explored: seen.size, capped: true };
     const next = [];
     for (const [s, path] of frontier) {
       for (const [k, d] of Object.entries(DIRS)) {
