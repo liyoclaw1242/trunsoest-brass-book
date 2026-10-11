@@ -11,6 +11,28 @@ let solved = new Array(LEVELS.length).fill(false);
 try { const d = JSON.parse(localStorage.getItem(KEY) || '{}'); if (Array.isArray(d.solved)) d.solved.forEach((v, i) => { if (i < solved.length) solved[i] = !!v; }); } catch {}
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ solved })); } catch {} };
 
+// —— 音效（Web Audio，無外部檔）——
+let actx, muted = false;
+try { muted = localStorage.getItem('rb_puzzle_mute') === '1'; } catch {}
+function beep(freq, dur, type = 'sine', vol = 0.12, when = 0) {
+  try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); const t = actx.currentTime + when;
+    const o = actx.createOscillator(), g = actx.createGain(); o.type = type; o.frequency.value = freq;
+    o.connect(g); g.connect(actx.destination); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0008, t + dur);
+    o.start(t); o.stop(t + dur); } catch {}
+}
+function sfx(kind) {
+  if (muted) return;
+  if (kind === 'move') beep(200, 0.05, 'square', 0.04);
+  else if (kind === 'good') beep(540, 0.1, 'triangle', 0.12);
+  else if (kind === 'deny') beep(110, 0.13, 'sawtooth', 0.08);
+  else if (kind === 'win') [523, 659, 784, 1047].forEach((f, i) => beep(f, 0.2, 'triangle', 0.13, i * 0.09));
+}
+function doMove(dir) {
+  const r = puz.move(dir); render();
+  if (r.win) sfx('win'); else if (!r.moved) sfx('deny');
+  else sfx(/領|換上|吃了|馱|脫下|開了|繞|讀/.test(r.msg || '') ? 'good' : 'move');
+}
+
 function earshot() {
   const set = new Set();
   for (const o of puz.objs) {
@@ -110,14 +132,16 @@ const DIRS = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRig
 addEventListener('keydown', e => {
   if ($('intro').style.display !== 'none') return;
   if ($('win').style.display === 'flex') { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); nextLevel(); } return; }
-  if (DIRS[e.key]) { e.preventDefault(); puz.move(DIRS[e.key]); render(); }
+  if (DIRS[e.key]) { e.preventDefault(); doMove(DIRS[e.key]); }
   else if (/^[zZuU]$/.test(e.key)) { puz.undo(); render(); }
   else if (/^[rR]$/.test(e.key)) { puz.reset(); render(); }
 });
 
 $('dots').onclick = e => { const d = e.target.closest('.dot'); if (d) load(+d.dataset.i); };
 const DMAP = { U: [0, -1], D: [0, 1], L: [-1, 0], R: [1, 0] };
-$('dpad').onclick = e => { const b = e.target.closest('button'); if (b && !puz.won) { puz.move(DMAP[b.dataset.d]); render(); } };
+$('dpad').onclick = e => { const b = e.target.closest('button'); if (b && !puz.won) doMove(DMAP[b.dataset.d]); };
+$('b-mute').onclick = () => { muted = !muted; try { localStorage.setItem('rb_puzzle_mute', muted ? '1' : '0'); } catch {} $('b-mute').textContent = muted ? '🔇' : '🔊'; if (!muted) sfx('good'); };
+$('b-mute').textContent = muted ? '🔇' : '🔊';
 $('b-undo').onclick = () => { puz.undo(); render(); };
 $('b-reset').onclick = () => { puz.reset(); render(); };
 $('b-prev').onclick = () => load(idx - 1);
