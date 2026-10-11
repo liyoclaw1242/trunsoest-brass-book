@@ -22,6 +22,11 @@
     background:var(--floor);position:relative;user-select:none}
   .cell.alt{background:var(--floor2)}
   .cell.wall{background:var(--wall);box-shadow:inset 0 0 0 1px #3a322b}
+  .cell.water{background:repeating-linear-gradient(135deg,#3b7fa6 0 8px,#4a90bd 8px 16px)}
+  .cell.wood{background:repeating-linear-gradient(90deg,#b5894f 0 13px,#a97d44 13px 14px);box-shadow:inset 0 0 0 1px #9a6f3c}
+  .cell.cave{background:#1b1713;box-shadow:inset 0 0 8px #000}
+  .cell.fire{background:radial-gradient(circle,#e06a2a,#b23d1a);animation:flick .5s ease-in-out infinite alternate}
+  @keyframes flick{from{filter:brightness(.9)}to{filter:brightness(1.2)}}
   .cell.earshot::after{content:"";position:absolute;inset:0;background:var(--earshot);border-radius:6px}
   .cell.exit{background:#d9c9a3}
   #gridwrap{position:relative;display:inline-block}
@@ -73,6 +78,7 @@
   #dots .dot{width:26px;height:26px;border-radius:50%;background:var(--panel2);border:1px solid var(--line);color:var(--faint);
     display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;user-select:none}
   #dots .dot.load{border-style:dashed}
+  #dots .dot.env{border-style:dotted;border-color:#6f8f6a}
   #dots .dot.cur{border-color:var(--brass);color:var(--brass);border-style:solid}
   #dots .dot.done{background:#3a4a38;color:var(--good);border-color:#3a4a38}
   #dots .dotsep{align-self:center;font-size:11px;letter-spacing:.1em;color:var(--brass);border-left:1px solid var(--line);padding-left:8px;margin-left:2px;opacity:.8}
@@ -118,7 +124,7 @@
     <h1>規則書 · 鑽漏洞</h1>
     <p>你誤入一個由一本「活規則書」統治的村子。它不斷立法，把你綁在這裡。</p>
     <p>你走不了，是因為它的法。但法有破綻——讀懂每一條，想辦法鑽過去：成為它定義的「市民」、躲開它的耳朵、讓牲口代勞、撕掉它立法的依據……</p>
-    <p>前十關是<b>教學</b>，一關學一招；之後是<b>負荷關</b>——它把規則與物件層層疊起，滿牆的律法要你一步推翻。</p>
+    <p>前十關是<b>教學</b>，一關學一招；接著是<b>負荷關</b>——規則與物件層層疊起，一步推翻滿牆律法；最後是<b>野外</b>——河、木屋、火、洞穴、樹與斧，新地形各有玩法。</p>
     <p class="small">每關一個小房間、幾條法。答案不會給你，自己想。方向鍵／WASD 移動 · Z 復原 · R 重來。</p>
     <button class="primary" id="b-begin">走進村子 →</button>
     <div class="small" style="text-align:center;margin-top:14px"><a href="/" style="color:var(--faint)">← 沙盒探索版</a></div>

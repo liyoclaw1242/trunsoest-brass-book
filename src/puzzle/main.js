@@ -3,7 +3,7 @@ import { Puzzle } from './game.js';
 import { LEVELS } from './levels.js';
 
 const $ = id => document.getElementById(id);
-const GLYPH = { exit: '🚪', name: '📛', clothes: '👕', notice: '🪧', speaker: '📣', goat: '🐐', book: '📖', wilddeep: '🌲', villager: '👷', shed: '🧺', door: '🚧' };
+const GLYPH = { exit: '🚪', name: '📛', clothes: '👕', notice: '🪧', speaker: '📣', goat: '🐐', book: '📖', wilddeep: '🌲', villager: '👷', shed: '🧺', door: '🚧', tree: '🌳', axe: '🪓' };
 const KEY = 'rb_puzzle_v2';
 
 let idx = 0, puz = new Puzzle(LEVELS[0]);
@@ -46,11 +46,14 @@ function earshot() {
   return set;
 }
 
-const TUT_COUNT = LEVELS.filter(l => l.chapter !== 'load').length;
+const CH_LABEL = { tut: '教學', load: '負荷', env: '野外' };
 function renderDots() {
+  let prev = null;
   $('dots').innerHTML = LEVELS.map((l, i) => {
-    const sep = (i === TUT_COUNT && TUT_COUNT > 0 && TUT_COUNT < LEVELS.length) ? '<div class="dotsep" title="以下為負荷關">負荷</div>' : '';
-    return sep + `<div class="dot ${l.chapter === 'load' ? 'load' : ''} ${i === idx ? 'cur' : ''} ${solved[i] ? 'done' : ''}" data-i="${i}" title="${l.name}">${solved[i] ? '✓' : i + 1}</div>`;
+    const ch = l.chapter || 'tut';
+    const sep = (prev !== null && ch !== prev) ? `<div class="dotsep">${CH_LABEL[ch] || ch}</div>` : '';
+    prev = ch;
+    return sep + `<div class="dot ${ch} ${i === idx ? 'cur' : ''} ${solved[i] ? 'done' : ''}" data-i="${i}" title="${l.name}">${solved[i] ? '✓' : i + 1}</div>`;
   }).join('');
 }
 
@@ -86,7 +89,9 @@ function updateBoard() {
   for (const [k, c] of cellEls) {
     const [x, y] = k.split(',').map(Number), isWall = puz.wall(x, y), o = puz.at(x, y);
     const canGlow = s.leaveAllowed && puz.laws.some(l => l.verb === 'leave');
-    c.className = 'cell' + ((x + y) % 2 ? ' alt' : '') + (isWall ? ' wall' : '') + (!isWall && ear.has(k) ? ' earshot' : '') + (o && o.type === 'exit' ? ' exit' + (canGlow ? ' open' : '') : '');
+    const water = puz.water.has(k), wood = puz.wood.has(k), cave = puz.cave.has(k), fire = puz.fire.has(k);
+    c.className = 'cell' + ((x + y) % 2 ? ' alt' : '') + (isWall ? ' wall' : '') + (water ? ' water' : '') + (wood ? ' wood' : '') + (cave ? ' cave' : '') + (fire ? ' fire' : '') + (!isWall && ear.has(k) ? ' earshot' : '') + (o && o.type === 'exit' ? ' exit' + (canGlow ? ' open' : '') : '');
+    c.textContent = fire ? '🔥' : cave ? '🕳️' : '';
   }
   for (const o of puz.objs) {
     const e = tokenEls.get(o.id); if (!e) continue;
@@ -101,13 +106,17 @@ function updateBoard() {
     else if (b) b.remove();
   }
   const p = tokenEls.get('player'); p.querySelector('.g').textContent = s.citizen ? '🧑‍🌾' : '🧍'; setPos(p, s.pos[0], s.pos[1]);
+  let pb = p.querySelector('.badge');
+  if (s.has.includes('axe')) { if (!pb) { pb = document.createElement('span'); pb.className = 'badge'; p.appendChild(pb); } pb.textContent = '🪓'; }
+  else if (pb) pb.remove();
 }
 
 function render() {
   const s = puz.status();
   renderDots();
-  const isLoad = puz.level.chapter === 'load';
-  const chLabel = isLoad ? `負荷關 ${idx - TUT_COUNT + 1} / ${LEVELS.length - TUT_COUNT}` : `教學 ${idx + 1} / ${TUT_COUNT}`;
+  const ch = puz.level.chapter || 'tut';
+  const chLevels = LEVELS.filter(l => (l.chapter || 'tut') === ch);
+  const chLabel = `${CH_LABEL[ch] || ch} ${chLevels.indexOf(puz.level) + 1} / ${chLevels.length}`;
   $('levelsel').textContent = `${chLabel}　·　步數 ${puz.history.length}`;
   $('lvname').textContent = puz.level.name;
   $('teach').textContent = puz.level.teach || '';

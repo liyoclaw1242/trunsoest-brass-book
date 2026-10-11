@@ -1,13 +1,13 @@
 // game.js —— 回合制「鑽規則漏洞」解謎引擎（Baba 式）。純邏輯、可被 node 直接驅動以驗證可解。
 // 格子移動、推動（山羊／廣播器／書）、拾取（名牌／衣物）、讀公告、山羊吃公告／馱書、狀態（市民／已聽）、離開判定、undo／reset。
 
-const WALKABLE = new Set(['exit', 'name', 'clothes', 'notice', 'wilddeep', 'shed']);
+const WALKABLE = new Set(['exit', 'name', 'clothes', 'notice', 'wilddeep', 'shed', 'axe']);
 const PUSHABLE = new Set(['goat', 'speaker', 'book', 'villager', 'tile']);
 
 // Baba 式字塊：法條由可推動的字塊排成一句「主詞 情態 動詞」而生效；玩家推字塊就能改規則。
-const SUBJ = { '外鄉人': 'outsider', '市民': 'citizen', '任何人': 'any', '山羊': 'goat', '物': 'item' };
+const SUBJ = { '外鄉人': 'outsider', '市民': 'citizen', '任何人': 'any', '山羊': 'goat', '物': 'item', '樹木': 'tree' };
 const MODAL = { '不得': 'forbid', '得': 'permit' };
-const VERB = { '離開': 'leave', '進入': 'enter', '搬書': 'move', '推': 'push', '吃': 'eat' };
+const VERB = { '離開': 'leave', '進入': 'enter', '搬書': 'move', '推': 'push', '吃': 'eat', '砍伐': 'chop', '持有': 'hold' };
 const TILE_KIND = w => (w in SUBJ ? 'subject' : w in MODAL ? 'modal' : w in VERB ? 'verb' : 'word');
 
 export class Puzzle {
@@ -15,13 +15,20 @@ export class Puzzle {
     this.level = level;
     this.w = level.map[0].length; this.h = level.map.length;
     this.walls = new Set(); this.objs = []; let n = 0;
+    // 地形：河（過不去）、木地板（會燒）、洞穴（把推進來的東西吞掉）、火（會沿木地板蔓延）
+    this.water = new Set(); this.cave = new Set(); this.wood = new Set(); this.fire = new Set();
     for (let y = 0; y < this.h; y++) for (let x = 0; x < this.w; x++) {
-      const ch = level.map[y][x];
-      if (ch === '#') { this.walls.add(x + ',' + y); continue; }
+      const ch = level.map[y][x], key = x + ',' + y;
+      if (ch === '#') { this.walls.add(key); continue; }
       if (ch === '@') { this.startPos = [x, y]; continue; }
-      const t = { E: 'exit', N: 'name', C: 'clothes', K: 'notice', S: 'speaker', G: 'goat', B: 'book', V: 'villager', x: 'wilddeep', H: 'shed', D: 'door' }[ch];
+      if (ch === '~') { this.water.add(key); continue; }   // 河
+      if (ch === '=') { this.wood.add(key); continue; }     // 木地板（房子）
+      if (ch === 'O') { this.cave.add(key); continue; }     // 洞穴
+      if (ch === '^') { this.fire.add(key); continue; }     // 火堆
+      const t = { E: 'exit', N: 'name', C: 'clothes', K: 'notice', S: 'speaker', G: 'goat', B: 'book', V: 'villager', x: 'wilddeep', H: 'shed', D: 'door', T: 'tree', X: 'axe' }[ch];
       if (t) this.objs.push({ id: 'o' + (n++), type: t, x, y, ox: x, oy: y, gone: false, carries: null, state: t === 'door' ? 'closed' : null, ostate: t === 'door' ? 'closed' : null });
     }
+    this.wood0 = new Set(this.wood); this.fire0 = new Set(this.fire);   // 供 reset 還原動態地形
     // 可推動的字塊（Baba 式：玩家自己排規則）
     for (const t of (level.tiles || [])) this.objs.push({ id: 'o' + (n++), type: 'tile', word: t.word, kind: TILE_KIND(t.word), fixed: !!t.fixed, x: t.x, y: t.y, ox: t.x, oy: t.y, gone: false, carries: null, state: null, ostate: null });
     // 活書：大型關裡書不停立法——預先造好「還沒寫下」的字塊（隱藏），每隔幾步揭露一組
@@ -49,6 +56,7 @@ export class Puzzle {
     this.heard = new Set();
     this.turn = 0; this.bookIdx = 0; this.voided = false; this.didReset = false; this.lost = false; this.penRule = 0; this.penWord = 0; this.penAnchor = null; this.penDir = null;
     for (const o of this.objs) { o.x = o.ox; o.y = o.oy; o.gone = o.ogone; o.carries = null; o.state = o.ostate; if (o.reactive) { o.word = ''; o.kind = 'word'; } }
+    this.wood = new Set(this.wood0); this.fire = new Set(this.fire0);
     this.history = [];
     this.won = false; this.msg = '';
     this.refreshHeard();
@@ -131,16 +139,52 @@ export class Puzzle {
   eatForbidden() {
     return this.laws.some(l => l.mode === 'forbid' && l.verb === 'eat' && this.active(l) && (!l.who || l.who === 'any' || l.who === 'goat' || l.who === 'item'));
   }
+  /** 砍伐樹木是否被法條禁止（如「樹木不得砍伐」）。 */
+  chopForbidden() {
+    return this.laws.some(l => l.mode === 'forbid' && l.verb === 'chop' && this.active(l) && (l.target ? l.target === 'tree' : true));
+  }
+  /** 身上持有裝備是否被法條禁止（如「任何人不得持有裝備」「身上不得有裝備」）。 */
+  equipForbidden() {
+    return this.laws.some(l => l.mode === 'forbid' && l.verb === 'hold' && this.active(l) && (l.target ? (l.target === 'equipment' || l.target === 'axe') : true));
+  }
+  /** 「身上不得有裝備」生效時，書強行卸下你的斧頭（放回你腳下，可再撿）。 */
+  dropEquip() {
+    if (this.has.has('axe') && this.equipForbidden()) {
+      this.has.delete('axe');
+      const ax = this.objs.find(o => o.type === 'axe');
+      if (ax) { ax.gone = false; ax.x = this.pos[0]; ax.y = this.pos[1]; }
+      this.msg = '「身上不得有裝備」——書強行卸下了你的斧頭。';
+    }
+  }
+  /** 火沿木地板蔓延：每回合把相鄰的木地板燒成火，燒到的字塊／物件一併燒毀。 */
+  spreadFire() {
+    if (!this.fire.size) return;
+    const add = [];
+    for (const key of this.fire) {
+      const [fx, fy] = key.split(',').map(Number);
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const nk = (fx + dx) + ',' + (fy + dy);
+        if (this.wood.has(nk) && !this.fire.has(nk)) add.push(nk);
+      }
+    }
+    for (const nk of add) {
+      this.wood.delete(nk); this.fire.add(nk);
+      const [x, y] = nk.split(',').map(Number);
+      for (const o of this.objs) if (!o.gone && o.x === x && o.y === y && o.type !== 'exit') o.gone = true;
+    }
+  }
 
   // ---------- 行動 ----------
   snapshot() {
     return JSON.stringify({ pos: this.pos, has: [...this.has], heard: [...this.heard], turn: this.turn, bookIdx: this.bookIdx, penRule: this.penRule, penWord: this.penWord, penAnchor: this.penAnchor, penDir: this.penDir, voided: this.voided ? 1 : 0, didReset: this.didReset ? 1 : 0, lost: this.lost ? 1 : 0,
+      wood: [...this.wood].sort(), fire: [...this.fire].sort(),
       objs: this.objs.map(o => [o.x, o.y, o.gone ? 1 : 0, o.carries || '', o.state || '', o.word || '']) });
   }
   restore(s) {
     const d = JSON.parse(s);
     this.pos = d.pos; this.has = new Set(d.has); this.heard = new Set(d.heard); this.turn = d.turn || 0; this.bookIdx = d.bookIdx || 0;
     this.penRule = d.penRule || 0; this.penWord = d.penWord || 0; this.penAnchor = d.penAnchor || null; this.penDir = d.penDir || null; this.voided = !!d.voided; this.didReset = !!d.didReset; this.lost = !!d.lost;
+    this.wood = new Set(d.wood || []); this.fire = new Set(d.fire || []);
     d.objs.forEach((v, i) => { const o = this.objs[i]; o.x = v[0]; o.y = v[1]; o.gone = !!v[2]; o.carries = v[3] || null; o.state = v[4] || null; if (o.type === 'tile') { o.word = v[5] || o.word; o.kind = TILE_KIND(o.word); } });
     this.won = false; this.msg = '';
     this.refreshHeard(); this.refreshRules();
@@ -153,9 +197,12 @@ export class Puzzle {
     const before = this.snapshot();
     const r = this._apply(dir);
     if (r.moved) {
-      this.history.push(before); this.turn++; this.bookWrite(); this.reactiveWrite(); this.openGates(); this.refreshHeard(); this.refreshRules();
+      this.history.push(before); this.turn++; this.bookWrite(); this.reactiveWrite(); this.spreadFire(); this.openGates(); this.refreshHeard(); this.refreshRules(); this.dropEquip();
       if (!this.voided && this.hasContradiction()) this.triggerReset();
       if (this.checkWin()) { this.won = true; r.win = true; }
+      else if (this.fire.has(this.pos[0] + ',' + this.pos[1])) {
+        this.lost = true; r.lost = true; r.msg = '火追上來把你吞了——你沒能及時離開這片木地板。';
+      }
       else if (this.level.deadline != null && this.turn >= this.level.deadline) {
         // 將軍：書搶在你之前把規則填滿、寫下必殺令——你困死在這裡。
         this.lost = true; r.lost = true;
@@ -167,10 +214,23 @@ export class Puzzle {
   }
 
   _apply([dx, dy]) {
-    const [px, py] = this.pos, tx = px + dx, ty = py + dy;
+    const [px, py] = this.pos, tx = px + dx, ty = py + dy, tkey = tx + ',' + ty;
     if (this.wall(tx, ty)) return { moved: false, msg: '牆擋著路。' };
+    if (this.water.has(tkey)) return { moved: false, msg: '是河，過不去。' };
+    if (this.cave.has(tkey)) return { moved: false, msg: '是洞穴，掉下去可不行。' };
+    if (this.fire.has(tkey)) return { moved: false, msg: '火擋著，過不去。' };
     const o = this.at(tx, ty);
     if (!o) { this.pos = [tx, ty]; return { moved: true }; }
+
+    if (o.type === 'tree') {
+      if (!this.has.has('axe')) return { moved: false, msg: '一棵樹擋著路——徒手砍不動，得有把斧頭。' };
+      if (this.chopForbidden()) return { moved: false, msg: '「樹木不得砍伐」——你舉著斧頭，卻下不了手。先改掉那條法。' };
+      o.gone = true; this.pos = [tx, ty]; return { moved: true, msg: '你一斧把樹放倒了。' };
+    }
+    if (o.type === 'axe') {
+      if (this.equipForbidden()) return { moved: false, msg: '「身上不得有裝備」——你撿不起這把斧頭。' };
+      this.has.add('axe'); o.gone = true; this.pos = [tx, ty]; return { moved: true, msg: '你撿起一把斧頭，裝備上了。' };
+    }
 
     if (o.type === 'exit') {
       if (this.leaveAllowed()) { this.pos = [tx, ty]; return { moved: true, msg: '你走出去了。' }; }
@@ -188,8 +248,11 @@ export class Puzzle {
       if (o.type === 'tile' && o.fixed) return { moved: false, msg: '這個字塊像是刻死的，推不動。' };
       if (this.moveForbidden(o)) return { moved: false, msg: o.type === 'book' ? '外鄉人不得搬動黃銅書。' : o.type === 'goat' ? '外鄉人不得牽引牲口。' : '法條禁止你搬動它。' };
       if (o.type !== 'tile' && this.pushForbidden(o)) return { moved: false, msg: '法條禁止推動' + (o.type === 'goat' ? '牲口' : '物品') + '。（先改掉那條法）' };
-      const bx = tx + dx, by = ty + dy;
+      const bx = tx + dx, by = ty + dy, bkey = bx + ',' + by;
       if (this.wall(bx, by)) return { moved: false, msg: '推不動，後面是牆。' };
+      if (this.water.has(bkey)) return { moved: false, msg: '推不動，後面是河。' };
+      if (this.cave.has(bkey)) { o.gone = true; this.pos = [tx, ty]; return { moved: true, msg: o.type === 'tile' ? '字塊被推下洞穴，永遠消失了。' : '它被推下了洞穴。' }; }
+      if (this.fire.has(bkey)) { o.gone = true; this.pos = [tx, ty]; return { moved: true, msg: o.type === 'tile' ? '字塊被推進火裡，燒成了灰。' : '它被推進火裡燒了。' }; }
       const beyond = this.at(bx, by);
       // 山羊被推到公告上 → 吃掉公告
       if (o.type === 'goat' && beyond && beyond.type === 'notice') { if (this.eatForbidden()) return { moved: false, msg: '法條禁止山羊吃紙。（先改掉那條法）' }; beyond.gone = true; o.x = bx; o.y = by; this.pos = [tx, ty]; return { moved: true, msg: '山羊把公告吃了——那條法沒人讀得到了。' }; }
@@ -275,7 +338,8 @@ export class Puzzle {
   status() {
     return { pos: [...this.pos], w: this.w, h: this.h, won: this.won, lost: this.lost, msg: this.msg,
       citizen: this.isCitizen(), has: [...this.has], heard: [...this.heard], leaveAllowed: this.leaveAllowed(),
-      walls: [...this.walls], objs: this.objs.filter(o => !o.gone).map(o => ({ type: o.type, x: o.x, y: o.y, carries: o.carries })),
+      walls: [...this.walls], water: [...this.water], wood: [...this.wood], cave: [...this.cave], fire: [...this.fire],
+      objs: this.objs.filter(o => !o.gone).map(o => ({ type: o.type, x: o.x, y: o.y, carries: o.carries })),
       goal: this.goal,
       deadline: this.level.deadline ?? null, turnsLeft: this.level.deadline != null ? Math.max(0, this.level.deadline - this.turn) : null,
       book: this.livingBook ? { remaining: this.livingBook.writes.length - this.bookIdx, nextIn: this.bookIdx < this.livingBook.writes.length ? (this.livingBook.everyN - (this.turn % this.livingBook.everyN)) : null } : null };
