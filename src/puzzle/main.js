@@ -3,7 +3,7 @@ import { Puzzle } from './game.js';
 import { LEVELS } from './levels.js';
 
 const $ = id => document.getElementById(id);
-const GLYPH = { exit: '🚪', name: '📛', clothes: '👕', notice: '🪧', speaker: '📣', goat: '🐐', book: '📖', wilddeep: '🌲', villager: '👷', shed: '🧺', door: '🚧', tree: '🌳', axe: '🪓' };
+const GLYPH = { exit: '🚪', name: '📛', clothes: '👕', notice: '🪧', speaker: '📣', goat: '🐐', book: '📖', wilddeep: '🌲', villager: '👷', shed: '🧺', door: '🚧', tree: '🌳', axe: '🪓', chaser: '🐺' };
 const KEY = 'rb_puzzle_v2';
 
 let idx = 0, puz = new Puzzle(LEVELS[0]);
@@ -46,7 +46,7 @@ function earshot() {
   return set;
 }
 
-const CH_LABEL = { tut: '教學', load: '負荷', env: '野外' };
+const CH_LABEL = { tut: '教學', load: '負荷', env: '野外', peril: '險境' };
 function renderDots() {
   let prev = null;
   $('dots').innerHTML = LEVELS.map((l, i) => {
@@ -107,7 +107,8 @@ function updateBoard() {
   }
   const p = tokenEls.get('player'); p.querySelector('.g').textContent = s.citizen ? '🧑‍🌾' : '🧍'; setPos(p, s.pos[0], s.pos[1]);
   let pb = p.querySelector('.badge');
-  if (s.has.includes('axe')) { if (!pb) { pb = document.createElement('span'); pb.className = 'badge'; p.appendChild(pb); } pb.textContent = '🪓'; }
+  const badge = s.double ? '⚡' : s.has.includes('axe') ? '🪓' : '';
+  if (badge) { if (!pb) { pb = document.createElement('span'); pb.className = 'badge'; p.appendChild(pb); } pb.textContent = badge; }
   else if (pb) pb.remove();
 }
 
@@ -131,7 +132,9 @@ function render() {
     : puz.goal === 'reset' ? '目標：逼書自相矛盾，寫出「以上規則無效」' : '';
   const bookTxt = s.book ? `<div style="margin-top:8px;color:var(--brass)">📖 這本書還活著：還要寫 ${s.book.remaining} 條${s.book.nextIn != null ? `，再走 ${s.book.nextIn} 步寫下一條` : ''}。</div>` : '';
   const dlTxt = s.deadline != null ? `<div style="margin-top:8px;color:${s.turnsLeft <= 5 ? 'var(--bad)' : 'var(--brass)'}">⏳ 將軍倒數：還有 <b>${s.turnsLeft}</b> 步，書就把規則填滿、寫出必殺令。別來回空走。</div>` : '';
-  $('status').innerHTML = `你現在是 <span class="pill ${s.citizen ? 'cit' : 'out'}">${s.citizen ? '市　民' : '外鄉人'}</span>　` + goalTxt + bookTxt + dlTxt;
+  const chTxt = s.chaserSpeed != null ? `<div style="margin-top:8px;color:${s.chaserSpeed > 1 ? 'var(--bad)' : 'var(--good)'}">🐺 追逐者這回合走 <b>${s.chaserSpeed}</b> 格${s.chaserSpeed > 1 ? '——太快，想辦法用規則把牠降成一格' : '（已被規則降速）'}。</div>` : '';
+  const dblTxt = s.double ? `<div style="margin-top:8px;color:var(--good)">⚡ 你現在一步能走兩格。</div>` : '';
+  $('status').innerHTML = `你現在是 <span class="pill ${s.citizen ? 'cit' : 'out'}">${s.citizen ? '市　民' : '外鄉人'}</span>　` + goalTxt + bookTxt + dlTxt + chTxt + dblTxt;
   $('heard').textContent = s.heard.length ? '已被這些法綁住：' + s.heard.map(id => puz.law(id)?.text || id).join('；') : '';
   const m = $('msg'); m.textContent = s.msg || ''; m.className = /不得|推不動|牆|過不去|禁止/.test(s.msg) ? 'bad' : /出去|吃了|馱|領|換上|繞|脫下/.test(s.msg) ? 'good' : '';
   if (s.won) win();

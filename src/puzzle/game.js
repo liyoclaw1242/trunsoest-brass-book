@@ -5,9 +5,9 @@ const WALKABLE = new Set(['exit', 'name', 'clothes', 'notice', 'wilddeep', 'shed
 const PUSHABLE = new Set(['goat', 'speaker', 'book', 'villager', 'tile']);
 
 // Baba 式字塊：法條由可推動的字塊排成一句「主詞 情態 動詞」而生效；玩家推字塊就能改規則。
-const SUBJ = { '外鄉人': 'outsider', '市民': 'citizen', '任何人': 'any', '山羊': 'goat', '物': 'item', '樹木': 'tree' };
+const SUBJ = { '外鄉人': 'outsider', '市民': 'citizen', '任何人': 'any', '山羊': 'goat', '物': 'item', '樹木': 'tree', '生物': 'creature' };
 const MODAL = { '不得': 'forbid', '得': 'permit' };
-const VERB = { '離開': 'leave', '進入': 'enter', '搬書': 'move', '推': 'push', '吃': 'eat', '砍伐': 'chop', '持有': 'hold' };
+const VERB = { '離開': 'leave', '進入': 'enter', '搬書': 'move', '推': 'push', '吃': 'eat', '砍伐': 'chop', '持有': 'hold', '兩格': 'double' };
 const TILE_KIND = w => (w in SUBJ ? 'subject' : w in MODAL ? 'modal' : w in VERB ? 'verb' : 'word');
 
 export class Puzzle {
@@ -25,7 +25,7 @@ export class Puzzle {
       if (ch === '=') { this.wood.add(key); continue; }     // 木地板（房子）
       if (ch === 'O') { this.cave.add(key); continue; }     // 洞穴
       if (ch === '^') { this.fire.add(key); continue; }     // 火堆
-      const t = { E: 'exit', N: 'name', C: 'clothes', K: 'notice', S: 'speaker', G: 'goat', B: 'book', V: 'villager', x: 'wilddeep', H: 'shed', D: 'door', T: 'tree', X: 'axe' }[ch];
+      const t = { E: 'exit', N: 'name', C: 'clothes', K: 'notice', S: 'speaker', G: 'goat', B: 'book', V: 'villager', x: 'wilddeep', H: 'shed', D: 'door', T: 'tree', X: 'axe', Z: 'chaser' }[ch];
       if (t) this.objs.push({ id: 'o' + (n++), type: t, x, y, ox: x, oy: y, gone: false, carries: null, state: t === 'door' ? 'closed' : null, ostate: t === 'door' ? 'closed' : null });
     }
     this.wood0 = new Set(this.wood); this.fire0 = new Set(this.fire);   // 供 reset 還原動態地形
@@ -156,6 +156,45 @@ export class Puzzle {
       this.msg = '「身上不得有裝備」——書強行卸下了你的斧頭。';
     }
   }
+  /** 「兩格」是可被規則賦予／剝奪的屬性：對某主詞 permit=得走兩格、forbid=不得走兩格。 */
+  doubleRule(whoList, mode) {
+    return this.laws.some(l => l.verb === 'double' && l.mode === mode && this.active(l) && (!l.who || l.who === 'any' || whoList.includes(l.who)));
+  }
+  /** 玩家這一步能走幾格：基礎 1；有「（你的身分）得兩格」且未被「不得兩格」壓制 → 2。 */
+  playerDouble() { const who = this.playerWho(); return this.doubleRule(who, 'permit') && !this.doubleRule(who, 'forbid'); }
+  /** 追逐者這一步走幾格：基礎 2（兇）；被「生物不得兩格」之類壓制 → 1。 */
+  chaserSteps() { return this.doubleRule(['creature', 'any'], 'forbid') ? 1 : 2; }
+  /** 追逐者不能進入的格（牆、河、洞穴、火、以及任何非自己的物件／字塊；玩家所在格不算擋，踩上＝抓到）。 */
+  chaserBlocked(x, y) {
+    const k = x + ',' + y;
+    if (this.wall(x, y) || this.water.has(k) || this.cave.has(k) || this.fire.has(k)) return true;
+    return this.objs.some(o => !o.gone && o.type !== 'chaser' && o.x === x && o.y === y);
+  }
+  /** 追逐者朝玩家走一格（貪婪：先走距離大的軸，平手先橫）。回傳新座標，走不動則原地。 */
+  chaserStepTo(c) {
+    const pdx = this.pos[0] - c.x, pdy = this.pos[1] - c.y;
+    const sx = Math.sign(pdx), sy = Math.sign(pdy);
+    const tries = Math.abs(pdx) >= Math.abs(pdy) ? [[sx, 0], [0, sy]] : [[0, sy], [sx, 0]];
+    for (const [dx, dy] of tries) {
+      if (dx === 0 && dy === 0) continue;
+      const nx = c.x + dx, ny = c.y + dy;
+      if (nx === this.pos[0] && ny === this.pos[1]) return [nx, ny];   // 撲到玩家身上
+      if (!this.chaserBlocked(nx, ny)) return [nx, ny];
+    }
+    return [c.x, c.y];
+  }
+  /** 追逐者移動（每回合走 chaserSteps() 格）；撲到玩家＝你被抓住，判負。 */
+  moveChaser() {
+    const c = this.objs.find(o => o.type === 'chaser' && !o.gone);
+    if (!c) return;
+    const steps = this.chaserSteps();
+    for (let s = 0; s < steps; s++) {
+      const [nx, ny] = this.chaserStepTo(c);
+      if (nx === c.x && ny === c.y) break;
+      if (nx === this.pos[0] && ny === this.pos[1]) { c.x = nx; c.y = ny; this.lost = true; this.msg = '追逐者撲上來抓住了你！'; return; }
+      c.x = nx; c.y = ny;
+    }
+  }
   /** 火沿木地板蔓延：每回合把相鄰的木地板燒成火，燒到的字塊／物件一併燒毀。 */
   spreadFire() {
     if (!this.fire.size) return;
@@ -195,11 +234,18 @@ export class Puzzle {
   move(dir) {
     if (this.won || this.lost) return { moved: false };
     const before = this.snapshot();
+    const dbl = this.playerDouble();
     const r = this._apply(dir);
     if (r.moved) {
-      this.history.push(before); this.turn++; this.bookWrite(); this.reactiveWrite(); this.spreadFire(); this.openGates(); this.refreshHeard(); this.refreshRules(); this.dropEquip();
+      if (dbl) { const r2 = this._apply(dir); if (r2.moved && r2.msg) r.msg = r2.msg; }   // 「得兩格」：同一步再走一格
+      this.history.push(before); this.turn++;
+      this.bookWrite(); this.reactiveWrite(); this.spreadFire();
+      this.refreshHeard(); this.refreshRules();         // 先讓玩家這步造成的規則變動生效（追逐者才會即時被「不得兩格」減速）
+      this.moveChaser();
+      this.openGates(); this.dropEquip();
       if (!this.voided && this.hasContradiction()) this.triggerReset();
       if (this.checkWin()) { this.won = true; r.win = true; }
+      else if (this.lost) { r.lost = true; r.msg = this.msg; }   // 被追逐者抓到
       else if (this.fire.has(this.pos[0] + ',' + this.pos[1])) {
         this.lost = true; r.lost = true; r.msg = '火追上來把你吞了——你沒能及時離開這片木地板。';
       }
@@ -342,6 +388,7 @@ export class Puzzle {
       objs: this.objs.filter(o => !o.gone).map(o => ({ type: o.type, x: o.x, y: o.y, carries: o.carries })),
       goal: this.goal,
       deadline: this.level.deadline ?? null, turnsLeft: this.level.deadline != null ? Math.max(0, this.level.deadline - this.turn) : null,
+      double: this.playerDouble(), chaserSpeed: this.objs.some(o => o.type === 'chaser' && !o.gone) ? this.chaserSteps() : null,
       book: this.livingBook ? { remaining: this.livingBook.writes.length - this.bookIdx, nextIn: this.bookIdx < this.livingBook.writes.length ? (this.livingBook.everyN - (this.turn % this.livingBook.everyN)) : null } : null };
   }
 }
