@@ -165,7 +165,16 @@ export class Puzzle {
       if (this.objs.some(v => v.type === 'villager' && !v.gone && Math.abs(v.x - d.x) + Math.abs(v.y - d.y) === 1)) { d.state = 'open'; this.msg = '市民替你把門開了。'; }
     }
   }
+  /** 兩條法同主詞同動詞、一禁一准 → 書自相矛盾，只好寫「以上規則無效」。 */
+  hasContradiction() {
+    const r = this.laws.filter(l => l.verb && l.mode);
+    for (let i = 0; i < r.length; i++) for (let j = i + 1; j < r.length; j++)
+      if (r[i].verb === r[j].verb && r[i].who === r[j].who && r[i].mode !== r[j].mode) return true;
+    return false;
+  }
+
   checkWin() {
+    if (this.goal === 'reset') return this.hasContradiction();
     if (this.goal === 'leave') return this.pos[0] === this.at0('exit')?.x && this.pos[1] === this.at0('exit')?.y && this.leaveAllowed();
     if (this.goal === 'bookOut') {
       const goat = this.objs.find(o => o.type === 'goat');

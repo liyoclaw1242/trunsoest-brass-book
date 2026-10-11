@@ -109,8 +109,10 @@ function render() {
     const tag = l.src === 'speaker' ? '（廣播器喊的：聽到才綁你）' : l.src === 'notice' ? '（寫在公告上：讀了才綁你）' : l.onNotice ? '（載於公告牌：牌子沒了便失效）' : '';
     return `<div class="${c}">${l.text}<span style="color:var(--faint)">${tag}</span></div>`;
   }).join('');
-  $('status').innerHTML = `你現在是 <span class="pill ${s.citizen ? 'cit' : 'out'}">${s.citizen ? '市　民' : '外鄉人'}</span>　`
-    + (puz.goal === 'leave' ? (s.leaveAllowed ? '<span style="color:var(--good)">此刻可離開</span>' : '<span style="color:var(--bad)">此刻不得離開</span>') : '目標：把書弄進荒野 🌲');
+  const goalTxt = puz.goal === 'leave' ? (s.leaveAllowed ? '<span style="color:var(--good)">此刻可離開</span>' : '<span style="color:var(--bad)">此刻不得離開</span>')
+    : puz.goal === 'bookOut' ? '目標：把書弄進荒野 🌲'
+    : puz.goal === 'reset' ? '目標：逼書自相矛盾，寫出「以上規則無效」' : '';
+  $('status').innerHTML = `你現在是 <span class="pill ${s.citizen ? 'cit' : 'out'}">${s.citizen ? '市　民' : '外鄉人'}</span>　` + goalTxt;
   $('heard').textContent = s.heard.length ? '已被這些法綁住：' + s.heard.map(id => puz.law(id)?.text || id).join('；') : '';
   const m = $('msg'); m.textContent = s.msg || ''; m.className = /不得|推不動|牆|過不去|禁止/.test(s.msg) ? 'bad' : /出去|吃了|馱|領|換上|繞|脫下/.test(s.msg) ? 'good' : '';
   if (s.won) win();
@@ -120,7 +122,7 @@ function win() {
   if (!solved[idx]) { solved[idx] = true; save(); renderDots(); }
   const last = idx + 1 >= LEVELS.length;
   const allDone = solved.every(Boolean);
-  $('win-h').textContent = last && allDone ? '全部過關' : '出去了';
+  $('win-h').textContent = last && allDone ? '全部過關' : puz.goal === 'reset' ? '以上規則無效' : puz.goal === 'bookOut' ? '放逐了' : '出去了';
   $('win-text').textContent = puz.level.hintWin || '你出去了。';
   $('b-wnext').textContent = last ? (allDone ? '🎉 再玩一次（第一關）' : '回到未解的關') : '下一關 →';
   $('win').style.display = 'flex';
