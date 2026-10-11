@@ -3,7 +3,7 @@ import { Puzzle } from './game.js';
 import { LEVELS } from './levels.js';
 
 const $ = id => document.getElementById(id);
-const GLYPH = { exit: '🚪', name: '📛', clothes: '👕', notice: '🪧', speaker: '📣', goat: '🐐', book: '📖', wilddeep: '🌲', villager: '👷', shed: '🧺', door: '🚧', tree: '🌳', axe: '🪓', chaser: '🐺' };
+const GLYPH = { exit: '🚪', name: '📛', clothes: '👕', notice: '🪧', speaker: '📣', goat: '🐐', book: '📖', wilddeep: '🌲', villager: '👷', shed: '🧺', door: '🚧', tree: '🌳', axe: '🪓', chaser: '🐺', wall: '🧱', key: '🗝️', rock: '🪨' };
 const KEY = 'rb_puzzle_v2';
 
 let idx = 0, puz = new Puzzle(LEVELS[0]);
@@ -46,7 +46,7 @@ function earshot() {
   return set;
 }
 
-const CH_LABEL = { tut: '教學', load: '負荷', env: '野外', peril: '險境' };
+const CH_LABEL = { tut: '教學', village: '村莊', load: '負荷', env: '野外', peril: '險境' };
 function renderDots() {
   let prev = null;
   $('dots').innerHTML = LEVELS.map((l, i) => {
@@ -89,8 +89,8 @@ function updateBoard() {
   for (const [k, c] of cellEls) {
     const [x, y] = k.split(',').map(Number), isWall = puz.wall(x, y), o = puz.at(x, y);
     const canGlow = s.leaveAllowed && puz.laws.some(l => l.verb === 'leave');
-    const water = puz.water.has(k), wood = puz.wood.has(k), cave = puz.cave.has(k), fire = puz.fire.has(k);
-    c.className = 'cell' + ((x + y) % 2 ? ' alt' : '') + (isWall ? ' wall' : '') + (water ? ' water' : '') + (wood ? ' wood' : '') + (cave ? ' cave' : '') + (fire ? ' fire' : '') + (!isWall && ear.has(k) ? ' earshot' : '') + (o && o.type === 'exit' ? ' exit' + (canGlow ? ' open' : '') : '');
+    const water = puz.water.has(k), wood = puz.wood.has(k), cave = puz.cave.has(k), fire = puz.fire.has(k), sanc = puz.sanctum.has(k);
+    c.className = 'cell' + ((x + y) % 2 ? ' alt' : '') + (isWall ? ' wall' : '') + (water ? ' water' : '') + (wood ? ' wood' : '') + (cave ? ' cave' : '') + (fire ? ' fire' : '') + (sanc ? ' sanctum' : '') + (!isWall && ear.has(k) ? ' earshot' : '') + (o && o.type === 'exit' ? ' exit' + (canGlow ? ' open' : '') : '');
     c.textContent = fire ? '🔥' : cave ? '🕳️' : '';
   }
   for (const o of puz.objs) {

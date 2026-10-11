@@ -28,6 +28,7 @@ function solve(level) {
 }
 let allok = true;
 for (const lv of LEVELS) {
+  if (lv.chapter === 'village') { console.log(`SKIP  ${lv.name} — 開放大地圖，改用 tools/village-verify.js 腳本雙線驗證`); continue; }
   const r = solve(lv);
   if (r.ok) console.log(`PASS  ${lv.name} — 最短解 ${r.len} 步（探索 ${r.explored} 狀態）：${r.path}`);
   else { console.log(`FAIL  ${lv.name} — 找不到解（探索 ${r.explored} 狀態）`); allok = false; }
