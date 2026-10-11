@@ -2,7 +2,13 @@
 // 格子移動、推動（山羊／廣播器／書）、拾取（名牌／衣物）、讀公告、山羊吃公告／馱書、狀態（市民／已聽）、離開判定、undo／reset。
 
 const WALKABLE = new Set(['exit', 'name', 'clothes', 'notice', 'wilddeep', 'shed']);
-const PUSHABLE = new Set(['goat', 'speaker', 'book', 'villager']);
+const PUSHABLE = new Set(['goat', 'speaker', 'book', 'villager', 'tile']);
+
+// Baba 式字塊：法條由可推動的字塊排成一句「主詞 情態 動詞」而生效；玩家推字塊就能改規則。
+const SUBJ = { '外鄉人': 'outsider', '市民': 'citizen', '任何人': 'any', '山羊': 'goat' };
+const MODAL = { '不得': 'forbid', '得': 'permit' };
+const VERB = { '離開': 'leave', '進入': 'enter', '搬書': 'move' };
+const TILE_KIND = w => (w in SUBJ ? 'subject' : w in MODAL ? 'modal' : w in VERB ? 'verb' : 'word');
 
 export class Puzzle {
   constructor(level) {
@@ -16,9 +22,11 @@ export class Puzzle {
       const t = { E: 'exit', N: 'name', C: 'clothes', K: 'notice', S: 'speaker', G: 'goat', B: 'book', V: 'villager', x: 'wilddeep', H: 'shed', D: 'door' }[ch];
       if (t) this.objs.push({ id: 'o' + (n++), type: t, x, y, ox: x, oy: y, gone: false, carries: null, state: t === 'door' ? 'closed' : null, ostate: t === 'door' ? 'closed' : null });
     }
-    this.laws = level.laws.map((l, i) => ({ ...l, id: 'L' + i }));
-    // 把廣播器連到它所播的法與半徑
-    const spLaw = this.laws.find(l => l.src === 'speaker');
+    // 可推動的字塊（Baba 式：玩家自己排規則）
+    for (const t of (level.tiles || [])) this.objs.push({ id: 'o' + (n++), type: 'tile', word: t.word, kind: TILE_KIND(t.word), x: t.x, y: t.y, ox: t.x, oy: t.y, gone: false, carries: null, state: null, ostate: null });
+    // 固定法條（給教學關）；大型關的法多由字塊即時解析而來
+    this.staticLaws = (level.laws || []).map((l, i) => ({ ...l, id: 'L' + i }));
+    const spLaw = this.staticLaws.find(l => l.src === 'speaker');
     for (const o of this.objs) if (o.type === 'speaker') { o.law = spLaw ? spLaw.id : null; o.radius = level.speakerRadius ?? 1; }
     this.goal = level.goal;
     this.reset();
@@ -32,6 +40,25 @@ export class Puzzle {
     this.history = [];
     this.won = false; this.msg = '';
     this.refreshHeard();
+    this.refreshRules();
+  }
+
+  /** 從字塊即時解析出的法，接上固定法，組成當前有效法條集。 */
+  refreshRules() { this.laws = this.staticLaws.concat(this.parseTiles()); }
+
+  /** 掃描字塊：相鄰成「主詞→情態→動詞」（橫或直）即成一條法。玩家推動字塊就改了規則。 */
+  parseTiles() {
+    const out = []; let n = 0;
+    const tileAt = (x, y) => this.objs.find(o => o.type === 'tile' && !o.gone && o.x === x && o.y === y);
+    const mk = (a, b, c) => (a && a.word in SUBJ && b && b.word in MODAL && c && c.word in VERB)
+      ? { who: SUBJ[a.word], mode: MODAL[b.word], verb: VERB[c.word], id: 'T' + (n++), fromTiles: true,
+          text: `${a.word}${b.word}${c.word}` } : null;
+    for (const t of this.objs) {
+      if (t.type !== 'tile' || t.gone || !(t.word in SUBJ)) continue;
+      let r = mk(t, tileAt(t.x + 1, t.y), tileAt(t.x + 2, t.y)); if (r) out.push(r);
+      r = mk(t, tileAt(t.x, t.y + 1), tileAt(t.x, t.y + 2)); if (r) out.push(r);
+    }
+    return out;
   }
 
   // ---------- 查詢 ----------
@@ -82,6 +109,7 @@ export class Puzzle {
     this.pos = d.pos; this.has = new Set(d.has); this.heard = new Set(d.heard);
     d.objs.forEach((v, i) => { const o = this.objs[i]; o.x = v[0]; o.y = v[1]; o.gone = !!v[2]; o.carries = v[3] || null; o.state = v[4] || null; });
     this.won = false; this.msg = '';
+    this.refreshHeard(); this.refreshRules();
   }
   undo() { if (this.history.length) { this.restore(this.history.pop()); return true; } return false; }
 
@@ -90,7 +118,7 @@ export class Puzzle {
     if (this.won) return { moved: false };
     const before = this.snapshot();
     const r = this._apply(dir);
-    if (r.moved) { this.history.push(before); this.openGates(); this.refreshHeard(); if (this.checkWin()) { this.won = true; r.win = true; } }
+    if (r.moved) { this.history.push(before); this.openGates(); this.refreshHeard(); this.refreshRules(); if (this.checkWin()) { this.won = true; r.win = true; } }
     this.msg = r.msg || '';
     return r;
   }

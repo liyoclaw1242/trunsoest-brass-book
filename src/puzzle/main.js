@@ -61,7 +61,10 @@ function buildBoard() {
   for (const c of g.children) cellEls.set(c.dataset.k, c);
   const tk = $('tokens'); tk.innerHTML = ''; tokenEls = new Map();
   const mk = (id, glyph) => { const e = document.createElement('div'); e.className = 'token'; e.innerHTML = `<span class="g">${glyph}</span>`; tk.appendChild(e); tokenEls.set(id, e); return e; };
-  for (const o of puz.objs) if (GLYPH[o.type]) mk(o.id, GLYPH[o.type]);
+  for (const o of puz.objs) {
+    if (o.type === 'tile') { const e = mk(o.id, o.word); e.classList.add('tile', o.kind); }
+    else if (GLYPH[o.type]) mk(o.id, GLYPH[o.type]);
+  }
   mk('player', '🧍');
   tk.classList.add('notrans');
   updateBoard();
@@ -85,7 +88,8 @@ function updateBoard() {
     e.style.display = hidden ? 'none' : '';
     if (hidden) continue;
     setPos(e, o.x, o.y);
-    e.querySelector('.g').textContent = GLYPH[o.type];
+    e.querySelector('.g').textContent = o.type === 'tile' ? o.word : GLYPH[o.type];
+    if (o.type === 'tile') continue;
     let b = e.querySelector('.badge');
     if (o.carries === 'book') { if (!b) { b = document.createElement('span'); b.className = 'badge'; e.appendChild(b); } b.textContent = '📖'; }
     else if (b) b.remove();
