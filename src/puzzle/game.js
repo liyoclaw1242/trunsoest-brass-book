@@ -41,7 +41,7 @@ export class Puzzle {
     this.pos = [...this.startPos];
     this.has = new Set(this.level.has || []);
     this.heard = new Set();
-    this.turn = 0; this.bookIdx = 0;
+    this.turn = 0; this.bookIdx = 0; this.voided = false; this.didReset = false;
     for (const o of this.objs) { o.x = o.ox; o.y = o.oy; o.gone = o.ogone; o.carries = null; o.state = o.ostate; }
     this.history = [];
     this.won = false; this.msg = '';
@@ -49,8 +49,17 @@ export class Puzzle {
     this.refreshRules();
   }
 
-  /** 從字塊即時解析出的法，接上固定法，組成當前有效法條集。 */
-  refreshRules() { this.laws = this.staticLaws.concat(this.parseTiles()); }
+  /** 從字塊即時解析出的法，接上固定法，組成當前有效法條集。書寫過「以上規則無效」後全空。 */
+  refreshRules() { this.laws = this.voided ? [] : this.staticLaws.concat(this.parseTiles()); }
+
+  /** 規則互相矛盾 → 書寫下「以上規則無效」：全場規則文字消失、法條全作廢。 */
+  triggerReset() {
+    this.voided = true; this.didReset = true;
+    for (const o of this.objs) if (o.type === 'tile') o.gone = true;         // 全場規則文字消失
+    if (this.livingBook) this.bookIdx = this.livingBook.writes.length;        // 書被自己打垮，不再續寫
+    this.refreshRules();
+    this.msg = '書自相矛盾，只好寫下「以上規則無效」——全場規則作廢！';
+  }
 
   /** 掃描字塊：相鄰成「主詞→情態→動詞」（橫或直）即成一條法。玩家推動字塊就改了規則。 */
   parseTiles() {
@@ -107,12 +116,13 @@ export class Puzzle {
 
   // ---------- 行動 ----------
   snapshot() {
-    return JSON.stringify({ pos: this.pos, has: [...this.has], heard: [...this.heard], turn: this.turn, bookIdx: this.bookIdx,
+    return JSON.stringify({ pos: this.pos, has: [...this.has], heard: [...this.heard], turn: this.turn, bookIdx: this.bookIdx, voided: this.voided ? 1 : 0, didReset: this.didReset ? 1 : 0,
       objs: this.objs.map(o => [o.x, o.y, o.gone ? 1 : 0, o.carries || '', o.state || '']) });
   }
   restore(s) {
     const d = JSON.parse(s);
     this.pos = d.pos; this.has = new Set(d.has); this.heard = new Set(d.heard); this.turn = d.turn || 0; this.bookIdx = d.bookIdx || 0;
+    this.voided = !!d.voided; this.didReset = !!d.didReset;
     d.objs.forEach((v, i) => { const o = this.objs[i]; o.x = v[0]; o.y = v[1]; o.gone = !!v[2]; o.carries = v[3] || null; o.state = v[4] || null; });
     this.won = false; this.msg = '';
     this.refreshHeard(); this.refreshRules();
@@ -124,7 +134,11 @@ export class Puzzle {
     if (this.won) return { moved: false };
     const before = this.snapshot();
     const r = this._apply(dir);
-    if (r.moved) { this.history.push(before); this.turn++; this.bookWrite(); this.openGates(); this.refreshHeard(); this.refreshRules(); if (this.checkWin()) { this.won = true; r.win = true; } }
+    if (r.moved) {
+      this.history.push(before); this.turn++; this.bookWrite(); this.openGates(); this.refreshHeard(); this.refreshRules();
+      if (!this.voided && this.hasContradiction()) this.triggerReset();
+      if (this.checkWin()) { this.won = true; r.win = true; }
+    }
     this.msg = r.msg || '';
     return r;
   }
@@ -189,7 +203,7 @@ export class Puzzle {
   }
 
   checkWin() {
-    if (this.goal === 'reset') return this.hasContradiction();
+    if (this.goal === 'reset') return this.didReset;
     if (this.goal === 'leave') return this.pos[0] === this.at0('exit')?.x && this.pos[1] === this.at0('exit')?.y && this.leaveAllowed();
     if (this.goal === 'bookOut') {
       const goat = this.objs.find(o => o.type === 'goat');
