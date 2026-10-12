@@ -63,6 +63,8 @@
   #msg{margin-top:12px;min-height:22px;color:var(--ink);font-size:14px}
   #msg.bad{color:var(--bad)} #msg.good{color:var(--good)}
   #keys{color:var(--faint);font-size:12px;margin-top:14px}
+  #softlock{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#5a2f28;color:#ffd9cf;border:1px solid var(--bad);
+    border-radius:10px;padding:11px 18px;font-size:14px;z-index:9;box-shadow:0 6px 20px rgba(0,0,0,.4);display:none;max-width:90vw;text-align:center}
   #win{position:fixed;inset:0;background:rgba(20,17,14,.82);display:none;align-items:center;justify-content:center;z-index:10}
   #win .card{background:var(--panel);border:1px solid var(--brass);border-radius:14px;padding:30px 34px;max-width:460px;text-align:center}
   #win h1{font-size:26px;margin-bottom:12px}
@@ -123,6 +125,7 @@
     <div id="msg"></div>
     <div id="keys">方向鍵／WASD 移動 · Z 復原 · R 重來</div>
   </div>
+  <div id="softlock">⚠ 這一步之後，似乎再也贏不了了——按 <b>Z</b> 復原一步，或 <b>R</b> 重來整關。</div>
   <div id="win"><div class="card"><h1 id="win-h">出去了</h1><p id="win-text"></p><button class="primary" id="b-wnext">下一關 →</button></div></div>
   <div id="lose"><div class="card lose"><h1 id="lose-h">被將死</h1><p id="lose-text"></p><div style="display:flex;gap:10px;justify-content:center;margin-top:22px"><button id="b-undo2">↶ 退一步 (Z)</button><button class="primary" id="b-retry">↺ 整關重來 (R)</button></div></div></div>
   <div id="intro"><div class="card">

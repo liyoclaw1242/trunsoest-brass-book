@@ -1,6 +1,7 @@
 // main.js —— 解謎原型的畫面與輸入（DOM 格子、法條面板、復原／重來、關卡選擇、進度存檔、過關）。
 import { Puzzle } from './game.js';
 import { LEVELS } from './levels.js';
+import { solveMacro } from '../../tools/solver.js';
 
 const $ = id => document.getElementById(id);
 const GLYPH = { exit: '🚪', name: '📛', clothes: '👕', notice: '🪧', speaker: '📣', goat: '🐐', book: '📖', wilddeep: '🌲', villager: '👷', shed: '🧺', door: '🚧', tree: '🌳', axe: '🪓', chaser: '🐺', wall: '🧱', key: '🗝️', rock: '🪨' };
@@ -28,8 +29,26 @@ function sfx(kind) {
   else if (kind === 'win') [523, 659, 784, 1047].forEach((f, i) => beep(f, 0.2, 'triangle', 0.13, i * 0.09));
   else if (kind === 'lose') [330, 247, 175, 131].forEach((f, i) => beep(f, 0.28, 'sawtooth', 0.12, i * 0.1));
 }
+// —— soft-lock 執行期提示（乙案：允許 soft-lock，但要「看得出來、好退回」）——
+// 只在「不可逆動作」後檢查是否還贏得了（可逆移動不會把人玩死），且延後執行、不卡住操作。
+const resSig = () => { let gone = 0; for (const o of puz.objs) if (o.gone) gone++; return { gone, has: puz.has.size, water: puz.water.size, voided: puz.voided }; };
+const isDestructive = (a, b) => (b.gone > a.gone && b.has <= a.has) || b.water < a.water || (b.voided && !a.voided);
+let slToken = 0, softlocked = false;
+const showSoftlock = () => { $('softlock').style.display = 'block'; };
+const clearSoftlock = () => { slToken++; softlocked = false; $('softlock').style.display = 'none'; };
+function checkSoftlock() {
+  const t = ++slToken, snap = puz.snapshot(), lvl = puz.level;
+  setTimeout(() => {
+    if (t !== slToken) return;
+    let res; try { res = solveMacro(lvl, { fromSnap: snap, cap: 40000 }); } catch { return; }
+    if (t !== slToken) return;
+    if (res && !res.ok && !res.capped) { softlocked = true; showSoftlock(); }   // 確定無解才提示；探索被 cap 截斷就不亂報
+  }, 30);
+}
 function doMove(dir) {
+  const before = resSig();
   const r = puz.move(dir); render();
+  if (r.moved && !r.win && !r.lost && !softlocked && isDestructive(before, resSig())) checkSoftlock();
   if (r.win) sfx('win');
   else if (r.lost) sfx('lose');
   else if (!r.moved) { sfx('deny'); const g = tokenEls.get('player')?.querySelector('.g'); if (g) { g.classList.remove('shake'); void g.offsetWidth; g.classList.add('shake'); } }
@@ -158,7 +177,7 @@ function win() {
 }
 const hideWin = () => $('win').style.display = 'none';
 
-function load(i) { idx = (i + LEVELS.length) % LEVELS.length; puz = new Puzzle(LEVELS[idx]); hideWin(); hideLose(); buildBoard(); render(); }
+function load(i) { idx = (i + LEVELS.length) % LEVELS.length; puz = new Puzzle(LEVELS[idx]); hideWin(); hideLose(); clearSoftlock(); buildBoard(); render(); }
 function nextLevel() {
   if (idx + 1 < LEVELS.length) return load(idx + 1);
   const unsolved = solved.findIndex(v => !v);
@@ -170,13 +189,13 @@ addEventListener('keydown', e => {
   if ($('intro').style.display !== 'none') return;
   if ($('win').style.display === 'flex') { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); nextLevel(); } return; }
   if ($('lose').style.display === 'flex') {
-    if (/^[zZuU]$/.test(e.key)) { puz.undo(); hideLose(); render(); }
-    else if (/^[rR]$/.test(e.key) || e.key === 'Enter' || e.key === ' ') { e.preventDefault(); puz.reset(); hideLose(); render(); }
+    if (/^[zZuU]$/.test(e.key)) { puz.undo(); clearSoftlock(); hideLose(); render(); }
+    else if (/^[rR]$/.test(e.key) || e.key === 'Enter' || e.key === ' ') { e.preventDefault(); puz.reset(); clearSoftlock(); hideLose(); render(); }
     return;
   }
   if (DIRS[e.key]) { e.preventDefault(); doMove(DIRS[e.key]); }
-  else if (/^[zZuU]$/.test(e.key)) { puz.undo(); render(); }
-  else if (/^[rR]$/.test(e.key)) { puz.reset(); render(); }
+  else if (/^[zZuU]$/.test(e.key)) { puz.undo(); clearSoftlock(); render(); }
+  else if (/^[rR]$/.test(e.key)) { puz.reset(); clearSoftlock(); render(); }
 });
 
 $('dots').onclick = e => { const d = e.target.closest('.dot'); if (d) load(+d.dataset.i); };
@@ -184,13 +203,13 @@ const DMAP = { U: [0, -1], D: [0, 1], L: [-1, 0], R: [1, 0] };
 $('dpad').onclick = e => { const b = e.target.closest('button'); if (b && !puz.won && !puz.lost) doMove(DMAP[b.dataset.d]); };
 $('b-mute').onclick = () => { muted = !muted; try { localStorage.setItem('rb_puzzle_mute', muted ? '1' : '0'); } catch {} $('b-mute').textContent = muted ? '🔇' : '🔊'; if (!muted) sfx('good'); };
 $('b-mute').textContent = muted ? '🔇' : '🔊';
-$('b-undo').onclick = () => { puz.undo(); render(); };
-$('b-reset').onclick = () => { puz.reset(); render(); };
+$('b-undo').onclick = () => { puz.undo(); clearSoftlock(); render(); };
+$('b-reset').onclick = () => { puz.reset(); clearSoftlock(); render(); };
 $('b-prev').onclick = () => load(idx - 1);
 $('b-next').onclick = () => load(idx + 1);
 $('b-wnext').onclick = nextLevel;
-$('b-retry').onclick = () => { puz.reset(); hideLose(); render(); };
-$('b-undo2').onclick = () => { puz.undo(); hideLose(); render(); };
+$('b-retry').onclick = () => { puz.reset(); clearSoftlock(); hideLose(); render(); };
+$('b-undo2').onclick = () => { puz.undo(); clearSoftlock(); hideLose(); render(); };
 $('b-begin').onclick = () => { $('intro').style.display = 'none'; const resume = solved.findIndex(v => !v); load(resume < 0 ? 0 : resume); };
 
 buildBoard(); render();
