@@ -166,3 +166,32 @@ export function analyzeSoftlock(level) {
   });
   return { ok: true, hasDestroyer, traps };
 }
+
+// —— 挑戰度指標 —— 量「決策密度」而非面積。
+// 沿著最短解走，每一步看有幾個「有意義」的不同後續（會改變生效法集／耗資源／得物／獲勝）；
+// 純線性關卡鏈每步只有 1 個 → 0 個抉擇點。另算「互動法對」（彼此共用名詞/動詞、會組合或衝突的法）。
+function lawsHash(p) { return p.laws.map(l => l.text || (l.who + '/' + l.mode + '/' + l.verb + '/' + (l.toNoun || l.target || ''))).sort().join('§'); }
+function meaningSig(p) { let g = 0; for (const o of p.objs) if (o.gone) g++; return lawsHash(p) + '#' + g + '#' + p.water.size + '#' + (p.voided ? 1 : 0) + '#' + p.has.size; }
+export function challengeMetrics(level) {
+  const base = solveMacro(level);
+  if (!base.ok) return { ok: false };
+  const p = new Puzzle(level);
+  let snap = p.snapshot(), D = 0, maxOpts = 0, totalOpts = 0;
+  for (const act of base.actions) {
+    p.restore(snap); p.won = false; p.lost = false;
+    const cur = meaningSig(p);
+    const { acts, prev } = macroActions(p);
+    const sigs = new Set();
+    for (const a of acts) {
+      p.restore(snap); p.won = false; p.lost = false;
+      const r = applyMacro(p, a, prev); if (!r.moved) continue;
+      const s = p.won ? 'WIN' : meaningSig(p);
+      if (s !== cur) sigs.add(s);
+    }
+    const opts = sigs.size; totalOpts += opts; if (opts > maxOpts) maxOpts = opts; if (opts >= 2) D++;
+    // 依最短解前進一步
+    p.restore(snap); p.won = false; p.lost = false;
+    const { prev: pv } = macroActions(p); applyMacro(p, act, pv); snap = p.snapshot();
+  }
+  return { ok: true, L: base.actions.length, decisions: D, maxOpts, avgOpts: +(totalOpts / Math.max(1, base.actions.length)).toFixed(2) };
+}
