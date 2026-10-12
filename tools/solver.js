@@ -51,6 +51,7 @@ function macroActions(p) {
 }
 // 執行一個巨觀動作：先走到 (ax,ay)，再朝 d 踏一步（互動）。prev 須為「目前狀態」的泛洪結果。
 function applyMacro(p, [ax, ay, d], prev) {
+  p.history.length = 0;   // 求解不需 undo 歷史；清掉以免 move() 每步塞快照、跨百萬次重放累積成記憶體洩漏
   for (const step of pathTo(prev, ax, ay)) if (!p.move(DIRS[step]).moved) return { moved: false };
   return p.move(DIRS[d]);
 }
@@ -66,7 +67,7 @@ function timed(level) {
 }
 const TKEYS = ['turn', 'bookIdx', 'penRule', 'penWord', 'penAnchor', 'penDir'];
 export function solveMacro(level, opts = {}) {
-  const cap = opts.cap ?? 200000;
+  const cap = opts.cap ?? 60000;   // 省記憶體：無解的關會探索整個可達空間（多動件會爆），上限壓低；可解關通常很快就找到解
   const p = new Puzzle(level);
   if (opts.fromSnap) { p.restore(opts.fromSnap); p.won = false; p.lost = false; }
   const isTimed = timed(level);

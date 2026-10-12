@@ -65,7 +65,7 @@ function earshot() {
   return set;
 }
 
-const CH_LABEL = { tut: '教學', village: '村莊', mine: '礦坑', hard: '進階', load: '負荷', env: '野外', peril: '險境', define: '定義' };
+const CH_LABEL = { tut: '教學', hard: '進階', big: '大地圖', load: '負荷', env: '野外', peril: '險境', define: '定義' };
 function renderDots() {
   let prev = null;
   $('dots').innerHTML = LEVELS.map((l, i) => {

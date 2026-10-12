@@ -35,8 +35,9 @@ function analyze(lv) {
     for (let i = 0; i < lv.laws.length; i++) {
       const law = lv.laws[i]; if (law.note) continue;
       const clone = JSON.parse(JSON.stringify(lv)); clone.laws.splice(i, 1);
-      const r = solveMacro(clone);
-      const tag = !r.ok ? '必要（移除即無解）'
+      const r = solveMacro(clone, { cap: 40000 });
+      const tag = r.capped ? '必要（移除後求解超出上限、找不到解——極可能必要）'
+        : !r.ok ? '必要（移除即無解）'
         : r.steps < base.steps ? `有用（移除後 ${r.steps} 步、變簡單——它確實擋了你）`
         : `⚠ 步數不變（可能冗餘／安全網／等價繞法，建議人工確認）`;
       if (!r.ok || r.steps < base.steps) loadBearing.push(law);
