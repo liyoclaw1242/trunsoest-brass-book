@@ -36,9 +36,9 @@ function pathTo(prev, tx, ty) {
   while (prev[c]) { out.push(prev[c].d); c = prev[c].k; }
   return out.reverse();
 }
-// 列出目前可做的巨觀動作：對可及區域的每個邊界（走到 A、朝 d 踏向目標格），由引擎決定效果。
+// 列出目前可做的巨觀動作：對可及區域的每個邊界（走到 A、朝 d 踏向目標格）。回傳 {acts, prev}（prev 供還原路徑，省一次泛洪）。
 function macroActions(p) {
-  const { set } = flood(p);
+  const { set, prev } = flood(p);
   const acts = [];
   for (const k of set) {
     const [x, y] = k.split(',').map(Number);
@@ -47,12 +47,10 @@ function macroActions(p) {
       if (!set.has(nk) && !p.wall(x + dx, y + dy)) acts.push([x, y, d]);   // 邊界：目標格不可直接走過
     }
   }
-  return acts;
+  return { acts, prev };
 }
-// 執行一個巨觀動作：先走到 (ax,ay)，再朝 d 踏一步（互動）。回傳最後一步的 move 結果。
-function applyMacro(p, [ax, ay, d]) {
-  const { prev, set } = flood(p);
-  if (!set.has(ax + ',' + ay)) return { moved: false };
+// 執行一個巨觀動作：先走到 (ax,ay)，再朝 d 踏一步（互動）。prev 須為「目前狀態」的泛洪結果。
+function applyMacro(p, [ax, ay, d], prev) {
   for (const step of pathTo(prev, ax, ay)) if (!p.move(DIRS[step]).moved) return { moved: false };
   return p.move(DIRS[d]);
 }
@@ -61,42 +59,54 @@ function applyMacro(p, [ax, ay, d]) {
  * 巨觀求解。opts:{cap=200000, graph=false}
  * 回傳 { ok, steps, actions, states, capped, graph? }；graph={start, adj:Map(state->[{to,act}]), wins:Set, reach:Set}
  */
+// 有時間壓力的關卡（步數上限／活書／即時對手／火／追逐者），turn 才算進狀態；否則剝掉 turn 讓「浪費回合」的局面收斂（避免無限狀態）。
+function timed(level) {
+  return level.deadline != null || level.livingBook || level.reactiveBook
+    || level.map.some(r => r.includes('^') || r.includes('Z'));
+}
 export function solveMacro(level, opts = {}) {
   const cap = opts.cap ?? 200000;
   const p = new Puzzle(level);
-  const start = p.snapshot();
-  const prevState = new Map([[start, null]]);     // state -> {from, act}
+  const isTimed = timed(level);
+  const TKEYS = ['turn', 'bookIdx', 'penRule', 'penWord', 'penAnchor', 'penDir'];
+  const keyOf = s => { if (isTimed) return s; const d = JSON.parse(s); for (const k of TKEYS) delete d[k]; return JSON.stringify(d); };
+  const start = p.snapshot(), startK = keyOf(start);
+  const full = new Map([[startK, start]]);        // key -> 可還原的完整快照
+  const prevState = new Map([[startK, null]]);     // key -> {from:key, act}
   const adj = opts.graph ? new Map() : null;
   const wins = new Set();
-  let frontier = [start], depth = 0, explored = 1;
-  const reconstruct = s => { const out = []; let c = s; while (prevState.get(c)) { out.push(prevState.get(c).act); c = prevState.get(c).from; } return out.reverse(); };
-  while (frontier.length && depth < 200) {
+  let frontier = [startK], depth = 0, explored = 1;
+  const reconstruct = k => { const out = []; let c = k; while (prevState.get(c)) { out.push(prevState.get(c).act); c = prevState.get(c).from; } return out.reverse(); };
+  while (frontier.length && depth < 400) {
     const next = [];
-    for (const s of frontier) {
-      p.restore(s); p.won = false; p.lost = false;
-      const acts = macroActions(p);
-      if (adj && !adj.has(s)) adj.set(s, []);
+    for (const sk of frontier) {
+      p.restore(full.get(sk)); p.won = false; p.lost = false;
+      const { acts, prev } = macroActions(p);
+      if (adj && !adj.has(sk)) adj.set(sk, []);
       for (const a of acts) {
-        p.restore(s); p.won = false; p.lost = false;
-        const r = applyMacro(p, a);
+        p.restore(full.get(sk)); p.won = false; p.lost = false;
+        const r = applyMacro(p, a, prev);
         if (!r.moved) continue;
-        const ns = p.snapshot();
+        const ns = p.snapshot(), nk = keyOf(ns);
         if (p.won) {
-          wins.add(ns);
-          if (adj) { adj.get(s).push({ to: ns, act: a }); if (!adj.has(ns)) adj.set(ns, []); }
-          if (!opts.graph) return { ok: true, steps: reconstruct(s).length + 1, actions: [...reconstruct(s), a], states: explored, capped: false };
-          if (!prevState.has(ns)) { prevState.set(ns, { from: s, act: a }); }
+          wins.add(nk);
+          if (adj) { adj.get(sk).push({ to: nk, act: a }); if (!adj.has(nk)) adj.set(nk, []); }
+          if (!prevState.has(nk)) { prevState.set(nk, { from: sk, act: a }); full.set(nk, ns); }
+          if (!opts.graph) return { ok: true, steps: reconstruct(nk).length, actions: reconstruct(nk), states: explored, capped: false };
           continue;
         }
         if (p.lost) continue;
-        if (adj) { adj.get(s).push({ to: ns, act: a }); }
-        if (!prevState.has(ns)) { prevState.set(ns, { from: s, act: a }); explored++; next.push(ns); if (explored > cap) return { ok: wins.size > 0, steps: null, states: explored, capped: true, graph: adj ? { start, adj, wins, reach: new Set(prevState.keys()) } : undefined }; }
+        if (adj) adj.get(sk).push({ to: nk, act: a });
+        if (!prevState.has(nk)) {
+          prevState.set(nk, { from: sk, act: a }); full.set(nk, ns); explored++; next.push(nk);
+          if (explored > cap) return { ok: wins.size > 0, steps: null, states: explored, capped: true, graph: adj ? { start: startK, adj, wins, reach: new Set(prevState.keys()) } : undefined };
+        }
       }
     }
     frontier = next; depth++;
   }
   const ok = wins.size > 0;
   let best = null;
-  if (ok) { for (const w of wins) { const len = reconstruct(w).length; if (best == null || len < best.len) best = { len, w }; } }
-  return { ok, steps: ok ? best.len : null, actions: ok ? reconstruct(best.w) : null, states: explored, capped: false, graph: adj ? { start, adj, wins, reach: new Set(prevState.keys()) } : undefined };
+  if (ok) for (const w of wins) { const len = reconstruct(w).length; if (best == null || len < best.len) best = { len, w }; }
+  return { ok, steps: ok ? best.len : null, actions: ok ? reconstruct(best.w) : null, states: explored, capped: false, graph: adj ? { start: startK, adj, wins, reach: new Set(prevState.keys()) } : undefined };
 }
