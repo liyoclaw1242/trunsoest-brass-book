@@ -44,18 +44,20 @@ function analyze(lv) {
       lines.push(`  · 法「${law.text || JSON.stringify(law)}」：${tag}`);
     }
   }
-  // 挑戰度：決策密度（每步有幾個有意義的不同後續，1≈線性）＋互動法對
+  // 挑戰度：沿多個軸量，別只看「密度」。密度（規則分支）看不見「空間／推箱路線」與「有多容易把自己玩死」，
+  // 這正是「分析器放行、玩起來卻簡單」的盲點。故一併報：
+  //   解長（巨觀步）、探索狀態（求解搜尋空間≈「要想多久才找得到路」）、密度與互動法對（規則分支）、soft-lock 陷阱數（乙案下＝必須有遠見）。
   if (base.ok) {
     const cm = challengeMetrics(lv);
+    const sl = analyzeSoftlock(lv);
+    const traps = (sl.traps && sl.traps.length) || 0;
     let pairs = 0;
     for (let i = 0; i < loadBearing.length; i++) for (let j = i + 1; j < loadBearing.length; j++) if (lawsInteract(loadBearing[i], loadBearing[j])) pairs++;
-    const shallow = cm.avgOpts < 1.6 && pairs === 0;
-    lines.push(`  · 挑戰度：解長 ${cm.L}、抉擇點 ${cm.decisions}、密度 ${cm.avgOpts}（1≈線性）、最深 ${cm.maxOpts}、互動法對 ${pairs}${shallow ? '　⚠ 偏淺（接近線性關卡鏈，缺互動）' : ''}`);
-  }
-  if (base.ok) {
-    const sl = analyzeSoftlock(lv);
-    if (sl.traps && sl.traps.length)
-      lines.push(`  · ⚠ soft-lock：可把 ${sl.traps.join('、')} 推進洞穴/火/河而卡死（經可達性精算確認）——建議擋住或給備品`);
+    // 偏淺：各軸皆低才算——規則不互動、密度近線性、解又短、搜尋空間小、且沒有能把自己玩死的陷阱。
+    const shallow = cm.avgOpts < 1.6 && pairs === 0 && cm.L <= 6 && base.states < 1200 && traps === 0;
+    lines.push(`  · 挑戰度：解長 ${cm.L} 步、探索 ${base.states} 狀態、密度 ${cm.avgOpts}（1≈線性）、最深 ${cm.maxOpts}、互動法對 ${pairs}、soft-lock 陷阱 ${traps}${shallow ? '　⚠ 偏淺（規則不互動、解短、搜尋空間小、無自困風險）' : ''}`);
+    if (traps)
+      lines.push(`  · ⚠ soft-lock：可把 ${sl.traps.join('、')} 推進洞穴/火/河而卡死（經可達性精算確認）——乙案下為刻意張力，須在執行面可見且易撤銷`);
     else lines.push('  · soft-lock：無（' + (sl.hasDestroyer ? '雖有摧毀地形，但沒有可被推去卡死的必要資源' : '場上無摧毀地形') + '）');
   }
   if (warns.length) lines.push('  · ⚠ lint：' + warns.join('；'));
