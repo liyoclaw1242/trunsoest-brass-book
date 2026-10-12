@@ -64,11 +64,12 @@ function timed(level) {
   return level.deadline != null || level.livingBook || level.reactiveBook
     || level.map.some(r => r.includes('^') || r.includes('Z'));
 }
+const TKEYS = ['turn', 'bookIdx', 'penRule', 'penWord', 'penAnchor', 'penDir'];
 export function solveMacro(level, opts = {}) {
   const cap = opts.cap ?? 200000;
   const p = new Puzzle(level);
+  if (opts.fromSnap) { p.restore(opts.fromSnap); p.won = false; p.lost = false; }
   const isTimed = timed(level);
-  const TKEYS = ['turn', 'bookIdx', 'penRule', 'penWord', 'penAnchor', 'penDir'];
   const keyOf = s => { if (isTimed) return s; const d = JSON.parse(s); for (const k of TKEYS) delete d[k]; return JSON.stringify(d); };
   const start = p.snapshot(), startK = keyOf(start);
   const full = new Map([[startK, start]]);        // key -> 可還原的完整快照
@@ -109,4 +110,59 @@ export function solveMacro(level, opts = {}) {
   let best = null;
   if (ok) for (const w of wins) { const len = reconstruct(w).length; if (best == null || len < best.len) best = { len, w }; }
   return { ok, steps: ok ? best.len : null, actions: ok ? reconstruct(best.w) : null, states: explored, capped: false, graph: adj ? { start: startK, adj, wins, reach: new Set(prevState.keys()) } : undefined };
+}
+
+// —— soft-lock 偵測（關鍵資源分析）——
+// 想法：soft-lock＝不可逆地毀掉了必要資源。對每個「可被摧毀的」字塊/物件，假設它從一開始就沒了，重解一次；
+// 若因此無解＝它是「關鍵資源」。地圖上若又有摧毀地形（洞穴🕳️/火🔥/河🌊，把東西推進去就永久消失），
+// 這個關鍵資源就有被推進去而無法挽回的風險＝潛在 soft-lock。便宜（#可推件 次求解）、省記憶體、能分辨「備品 vs 必需」。
+// 註：這是「該資源不可或缺」的充分判定；「玩家是否真能把它推進摧毀地形」是另一層（可逆推動可達性），
+//     列為風險提示讓設計者確認／擋住，寧可多報不可漏報。
+const PUSH_TYPES = new Set(['goat', 'speaker', 'book', 'villager', 'rock']);
+// 其他物件（第 except 件除外）的位置/存滅指紋——用來把搜尋限制成「只有這一件（與玩家）在動」。
+function objFP(p, except) { let s = ''; for (let i = 0; i < p.objs.length; i++) { if (i === except) continue; const o = p.objs[i]; s += o.x + ',' + o.y + ',' + (o.gone ? 1 : 0) + ',' + (o.word || '') + ';'; } return s; }
+// 可達性精算：玩家「只動第 idx 件」（其餘不碰），能否把它推進某摧毀地形、且之後真的無解？能＝真 soft-lock。
+function strandable(level, idx) {
+  const p = new Puzzle(level);
+  const isTimed = timed(level);
+  const keyOf = s => { if (isTimed) return s; const d = JSON.parse(s); for (const k of TKEYS) delete d[k]; return JSON.stringify(d); };
+  const baseFP = objFP(p, idx), start = p.snapshot();
+  const seen = new Set([keyOf(start)]); let frontier = [start], depth = 0;
+  while (frontier.length && depth < 80) {
+    const next = [];
+    for (const s of frontier) {
+      p.restore(s); p.won = false; p.lost = false;
+      const { acts, prev } = macroActions(p);
+      for (const a of acts) {
+        p.restore(s); p.won = false; p.lost = false;
+        const r = applyMacro(p, a, prev);
+        if (!r.moved || p.won) continue;
+        if (objFP(p, idx) !== baseFP) continue;              // 只許該件（與玩家）動，其餘保持原狀
+        const ns = p.snapshot(), nk = keyOf(ns);
+        if (seen.has(nk)) continue; seen.add(nk);
+        if (p.objs[idx].gone) { if (!solveMacro(level, { fromSnap: ns }).ok) return true; continue; }  // 被摧毀後真的無解
+        next.push(ns);
+      }
+    }
+    frontier = next; depth++;
+  }
+  return false;
+}
+export function analyzeSoftlock(level) {
+  const base = solveMacro(level);
+  if (!base.ok) return { ok: false, note: '關卡本身就無解' };
+  const hasDestroyer = level.map.some(r => /[O^~]/.test(r));   // 洞穴/火/河
+  if (!hasDestroyer) return { ok: true, hasDestroyer: false, traps: [] };
+  const p0 = new Puzzle(level);
+  const start = p0.snapshot();
+  const traps = [];
+  p0.objs.forEach((o, i) => {
+    if (o.gone) return;
+    const pushable = o.type === 'tile' ? !o.fixed : PUSH_TYPES.has(o.type);
+    if (!pushable) return;
+    const d = JSON.parse(start); d.objs[i][2] = 1;            // 先便宜篩：這件若不存在是否就無解（必要資源）
+    if (solveMacro(level, { fromSnap: JSON.stringify(d) }).ok) return;
+    if (strandable(level, i)) traps.push(o.type === 'tile' ? `字塊「${o.word}」@(${o.x},${o.y})` : `${o.type}@(${o.x},${o.y})`);  // 再精算：真能被推去摧毀而卡死
+  });
+  return { ok: true, hasDestroyer, traps };
 }

@@ -2,7 +2,7 @@
 //   可解？最短巨觀步數、探索狀態數；規則必要性（逐條移除靜態法重解）；靜態 lint。
 //   用 tools/solver.js 的巨觀求解器，小關與大地圖都跑得動（village 約 1 秒）。
 // 規則必要性判讀：移除後「無解」＝必要；「更快」＝確實擋了你、有用；「步數不變」＝可能冗餘/安全網/等價繞法，建議人工確認。
-import { solveMacro } from './solver.js';
+import { solveMacro, analyzeSoftlock } from './solver.js';
 import { LEVELS } from '../src/puzzle/levels.js';
 
 const SUBJ = new Set(['外鄉人', '市民', '任何人', '山羊', '物', '樹木', '生物', '圍牆']);
@@ -32,6 +32,12 @@ function analyze(lv) {
         : `⚠ 步數不變（可能冗餘／安全網／等價繞法，建議人工確認）`;
       lines.push(`  · 法「${law.text || JSON.stringify(law)}」：${tag}`);
     }
+  }
+  if (base.ok) {
+    const sl = analyzeSoftlock(lv);
+    if (sl.traps && sl.traps.length)
+      lines.push(`  · ⚠ soft-lock：可把 ${sl.traps.join('、')} 推進洞穴/火/河而卡死（經可達性精算確認）——建議擋住或給備品`);
+    else lines.push('  · soft-lock：無（' + (sl.hasDestroyer ? '雖有摧毀地形，但沒有可被推去卡死的必要資源' : '場上無摧毀地形') + '）');
   }
   if (warns.length) lines.push('  · ⚠ lint：' + warns.join('；'));
   return { ok: base.ok, text: lines.join('\n') };
